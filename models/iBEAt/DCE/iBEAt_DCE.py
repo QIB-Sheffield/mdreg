@@ -171,6 +171,6 @@ def parallel_DCE_Fitting(images_to_be_fitted, signal_model_parameters):# images 
     
     pool.close() 
     
-    return fitted, [Fp.reshape((shape[0],shape[1])), Tp.reshape((shape[0],shape[1])), PS.reshape((shape[0],shape[1])), Te.reshape((shape[0],shape[1]))]
+    return fitted
     
     
