@@ -4,3 +4,7 @@
  Models included: T1, T2, T2*, DTI, IVIM (mono-exponential only), DCE-MRI.
  To be extended for: MT, PC-MRI, ASL.
  
+ Additional Requirements:
+ Install SimpleElastix -(Installation guide: https://simpleelastix.readthedocs.io/GettingStarted.html)
+ 
+ 
