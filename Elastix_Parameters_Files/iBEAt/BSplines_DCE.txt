@@ -72,7 +72,10 @@
 // such that the final grid spacing is obtained in the last 
 // resolution level.
 // The grid spacing here is specified in voxel units.
-(FinalGridSpacingInVoxels 8)
+//(FinalGridSpacingInPhysicalUnits 10.0 10.0) 
+(FinalGridSpacingInPhysicalUnits 50.0 50.0) 
+// fotis original in voxels
+//(FinalGridSpacingInVoxels 8)
 
 // *********************
 // * Optimizer settings
