@@ -1,2 +1,4 @@
 # MDR_Library
- New repository for MDR
+ Open-source, platform independent library for model-driven registration in quantitative renal MRI
+ Currently developed for the iBEAt study
+ 
