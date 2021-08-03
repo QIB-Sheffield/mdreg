@@ -10,8 +10,7 @@ from scipy.optimize import curve_fit
 
 def read_echo_times(fname,lstFilesDCM):
     """
-    This function reads the inversion times for T2* sequences and echo times
-    It takes as argument as fname, lstFilesDCM
+    This function takes as argument as fname, lstFilesDCM
     and returns the sorted list of echo times and DICOMs from corresponding echo times
     """
     echo_times = []
