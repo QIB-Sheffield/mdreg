@@ -1,7 +1,7 @@
 #!/ur/bin/python
 # -*- coding: utf-8 -*-
 """
-@author: Kanishka Sharma; iBEAt study; T2* mapping
+@author: Kanishka Sharma; iBEAt study; T2 mapping
 """
 
 import numpy as np
@@ -57,7 +57,7 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
 
 def fitting(images_to_be_fitted, signal_model_parameters):
     '''
-    images_to_be_fitted: single pixel at different echo times
+    images_to_be_fitted: single pixel at different T2-prep times
     '''
     
     fitted_parameters = []
