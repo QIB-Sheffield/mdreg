@@ -1,5 +1,5 @@
 """
-@KanishkaS: 2021 for the MDR library - IVIM monoexponential fit
+@KanishkaS: 2021 for the MDR library - DWI monoexponential fit
 """
 
 import numpy as np
