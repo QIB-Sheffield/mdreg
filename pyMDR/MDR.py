@@ -150,7 +150,7 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
         print(maximum_deformation_per_pixel)
 
         improvement.append(maximum_deformation_per_pixel)
-        # TODO: correct bug: only stores 1st and last max. deformation
+  
         diagnostics_dict = {'maximum_deformation_per_pixel': improvement}
         
         # update the deformation field
