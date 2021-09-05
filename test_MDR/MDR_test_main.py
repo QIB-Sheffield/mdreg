@@ -1,7 +1,8 @@
 """
 MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-
+Main script to test Model driven registration Library
+Test case MR sequences from the iBEAt study are provided 
 """
 import sys
 import glob
@@ -144,6 +145,7 @@ if __name__ == '__main__':
 
                         MDR_test_T2.iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters)
 
+                    # MDR for T2star-mapping sequence
                     elif sequence == 'T2star':
                        
                         ## output directory for final registration results 
@@ -151,6 +153,7 @@ if __name__ == '__main__':
                        
                         MDR_test_T2star.iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
   
+                    ## MDR for DTI sequence
                     elif sequence == 'DTI':
 
                         ## output directory for final registration results 
@@ -158,6 +161,7 @@ if __name__ == '__main__':
 
                         MDR_test_DTI.iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
 
+                    ## MDR for IVIM/DWI sequence
                     elif sequence == 'IVIM':
 
                         ## output directory for final registration results 
@@ -165,6 +169,7 @@ if __name__ == '__main__':
 
                         MDR_test_DWI.iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
 
+                    ## MDR for DCE sequence
                     elif sequence == 'DCE':
 
                         ## output directory for final registration results 
