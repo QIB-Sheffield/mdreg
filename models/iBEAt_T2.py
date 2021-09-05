@@ -1,22 +1,23 @@
 #!/ur/bin/python
 # -*- coding: utf-8 -*-
 """
-@author: Kanishka Sharma; iBEAt study; T2 mapping
+@author: Kanishka Sharma
+iBEAt study; T2 mapping sequence using T2 prep times
+Siemens 3T PRISMA - Leeds
 """
 
 import numpy as np
 from scipy.optimize import curve_fit
 
 
-## TODO: Generalise for other scanners
+## TODO: Generalise to add echo times for other scanners in the iBEAt study
 def read_prep_times():
     """
-    This function manually reads the T2 prep times for T2 sequence and echo times
-    and returns the correspondent list of echo times
+    This function manually reads the T2 prep times for the iBEAt study T2-prep sequence
+    and returns  T2 prep times as a list 
     """
     T2_prep_times = []
-    files = []
-    ##TODO: TBC how to add prep times - not available in anonymised Siemens dicoms
+    ## hard coded as these are not available in the anonymised Siemens dicom tags
     T2_prep_times = [0,30,40,50,60,70,80,90,100,110,120]
     
     return T2_prep_times

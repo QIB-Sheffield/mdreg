@@ -89,14 +89,17 @@ def simpleElastix_ffd_coregistration(target, source, elastix_model_parameters, s
 
     return coregistered, deformation_field
 
-
-
+## TODO: change the function call with modified variable names
+#def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
 def model_driven_registration(original_images, slice_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
     """
-      This is the main function to call MDR 
-      it takes as input the unregistered images as array, slice parameters (origin, spacing, etc., signal model parameters, elastix model parameters as input)
-      and returns ffd based co-registered image, fitted image, deformation field, fitted parameters and diagnostics 
-    """
+    This is the main function to call Model Driven Registration 
+    images: the unregistered images as nd-array
+    image_parameters: [image origin, image spacing]
+    signal_model_parameters: [MODEL, model specific parameters]
+    elastix_model_parameters:
+    and returns ffd based co-registered image, fitted image, deformation field, fitted parameters and diagnostics 
+  """
     shape = np.shape(original_images)
     
     coregistered =  np.zeros([shape[0]*shape[1], shape[2]])
@@ -149,7 +152,8 @@ def model_driven_registration(original_images, slice_parameters, signal_model_pa
         print(maximum_deformation_per_pixel)
 
         improvement.append(maximum_deformation_per_pixel)
-        diagnostics_dict = {'maximum_deformation_per_pixel': improvement} # original
+        # TODO: correct bug: only stores 1st and last max. deformation
+        diagnostics_dict = {'maximum_deformation_per_pixel': improvement}
         
         # update the deformation field
         deformation_field = new_deformation_field
@@ -168,7 +172,9 @@ def model_driven_registration(original_images, slice_parameters, signal_model_pa
     coregistered = np.reshape(coregistered,(shape[0],shape[1],shape[2]))
     deformation_field = np.reshape(deformation_field,(shape[0],shape[1],2,shape[2]))
 
-    
-    return coregistered, fit, deformation_field, Par, diagnostics 
-    # return coregistered images, fits, deformation fields, fitted parameters, diagnostics
+    MDR_output = []
+
+    MDR_output = [coregistered, fit, deformation_field, Par, diagnostics] 
+
+    return MDR_output
    
