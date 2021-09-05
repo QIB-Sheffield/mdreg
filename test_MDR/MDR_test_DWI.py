@@ -12,7 +12,7 @@ from models  import iBEAt_DWI_monoexponential
 
 np.set_printoptions(threshold=sys.maxsize)
 
-def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, fname, lstFilesDCM):
+def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM):
 
     ## ## read sequence acquisition parameter for signal modelling
     b_values, bVec_original, image_orientation_patient, slice_sorted_b_values  = iBEAt_DWI_monoexponential.read_dicom_tags_IVIM(fname, lstFilesDCM)
@@ -36,7 +36,7 @@ def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_tim
 
     MDR_output = []
                     
-    MDR_output = model_driven_registration(original_images, slice_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
+    MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
     
     # MDR output variables 
     motion_corrected_images = MDR_output[0]

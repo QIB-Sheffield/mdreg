@@ -86,7 +86,7 @@ if __name__ == '__main__':
             
                     files = []
 
-                    slice_parameters = []
+                    image_parameters = []
 
                     for fname in lstFilesDCM:
                         print("loading: {}".format(fname))
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
                     slice_sorted_acq_time = sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)
                      
-                    slice_parameters = [origin, spacing]
+                    image_parameters = [origin, spacing]
 
                     img_shape = np.shape(ArrayDicomiBEAt)
 
@@ -142,35 +142,35 @@ if __name__ == '__main__':
                         ## output directory for final registration results 
                         output_dir =  OUTPUT_REG_PATH + '/T2/'
 
-                        MDR_test_T2.iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters)
+                        MDR_test_T2.iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters)
 
                     elif sequence == 'T2star':
                        
                         ## output directory for final registration results 
                         output_dir =  OUTPUT_REG_PATH + '/T2star/'
                        
-                        MDR_test_T2star.iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, fname, lstFilesDCM)
+                        MDR_test_T2star.iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
   
                     elif sequence == 'DTI':
 
                         ## output directory for final registration results 
                         output_dir =  OUTPUT_REG_PATH + '/DTI/'
 
-                        MDR_test_DTI.iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, fname, lstFilesDCM)
+                        MDR_test_DTI.iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
 
                     elif sequence == 'IVIM':
 
                         ## output directory for final registration results 
                         output_dir =  OUTPUT_REG_PATH + '/DWI/'
 
-                        MDR_test_DWI.iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, fname, lstFilesDCM)
+                        MDR_test_DWI.iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, fname, lstFilesDCM)
 
                     elif sequence == 'DCE':
 
                         ## output directory for final registration results 
                         output_dir =  OUTPUT_REG_PATH + '/DCE/'
 
-                        MDR_test_DCE.iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, fname, lstFilesDCM)
+                        MDR_test_DCE.iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, AIFs_PATH, patient_folder)
 
 
                     else:

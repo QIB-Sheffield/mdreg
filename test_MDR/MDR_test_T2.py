@@ -12,7 +12,7 @@ from models  import iBEAt_T2
 
 np.set_printoptions(threshold=sys.maxsize)
 
-def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters):
+def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters):
                   
     ## read sequence acquisition parameter for signal modelling
     T2_prep_times = iBEAt_T2.read_prep_times()
@@ -35,7 +35,7 @@ def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time
 
     MDR_output = []
                     
-    MDR_output = model_driven_registration(original_images, slice_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
+    MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
     
     # MDR output variables 
     motion_corrected_images = MDR_output[0]

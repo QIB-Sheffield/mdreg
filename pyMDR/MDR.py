@@ -12,7 +12,6 @@ import time
 import pandas as pd
 
 
-## 
 def calculate_diagnostics(deformation_field, new_deformation_field):
     """
     This function calculates diagnostics from the registration process
@@ -47,7 +46,7 @@ def signal_model_fit(time_curve, signal_model_parameters):
 
 
 # deformable registration for MDR
-def simpleElastix_ffd_coregistration(target, source, elastix_model_parameters, slice_parameters):
+def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
     """
         This function takes source image and target image as input 
         and returns ffd based co-registered image and deformation field 
@@ -57,14 +56,14 @@ def simpleElastix_ffd_coregistration(target, source, elastix_model_parameters, s
 
     ## TODO for 3D; OK for 2D images
     source = sitk.GetImageFromArray(source)
-    source.SetOrigin(slice_parameters[0])
-    source.SetSpacing(slice_parameters[1])
+    source.SetOrigin(image_parameters[0])
+    source.SetSpacing(image_parameters[1])
     source.__SetPixelAsUInt16__
     source = np.reshape(source, [shape_source[0], shape_source[1]]) 
     
     target = sitk.GetImageFromArray(target)
-    target.SetOrigin(slice_parameters[0])
-    target.SetSpacing(slice_parameters[1])
+    target.SetOrigin(image_parameters[0])
+    target.SetSpacing(image_parameters[1])
     target.__SetPixelAsUInt16__
     target = np.reshape(target, [shape_target[0], shape_target[1]])
     
@@ -89,21 +88,20 @@ def simpleElastix_ffd_coregistration(target, source, elastix_model_parameters, s
 
     return coregistered, deformation_field
 
-## TODO: change the function call with modified variable names
-#def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
-def model_driven_registration(original_images, slice_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
+
+def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
     """
     This is the main function to call Model Driven Registration 
     images: the unregistered images as nd-array
     image_parameters: [image origin, image spacing]
     signal_model_parameters: [MODEL, model specific parameters]
-    elastix_model_parameters:
+    elastix_model_parameters: elastix file registration parameters
     and returns ffd based co-registered image, fitted image, deformation field, fitted parameters and diagnostics 
   """
-    shape = np.shape(original_images)
+    shape = np.shape(images)
     
     coregistered =  np.zeros([shape[0]*shape[1], shape[2]])
-    coregistered =  np.reshape(original_images,(shape[0]*shape[1],shape[2]))
+    coregistered =  np.reshape(images,(shape[0]*shape[1],shape[2]))
    
     deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]]) # todo for 3D
     new_deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]]) # todo for 3d
@@ -126,7 +124,7 @@ def model_driven_registration(original_images, slice_parameters, signal_model_pa
     
     for t in range(shape[2]): #dynamics
 
-      coregistered[:,t], deformation_field[:,:,t] = simpleElastix_ffd_coregistration(original_images[:,:,t], fit[:,:,t], elastix_model_parameters, slice_parameters)
+      coregistered[:,t], deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
       
     converged = False
 
@@ -143,7 +141,7 @@ def model_driven_registration(original_images, slice_parameters, signal_model_pa
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
         
         for t in range(shape[2]):#dynamics
-          coregistered[:,t], new_deformation_field[:,:,t] = simpleElastix_ffd_coregistration(original_images[:,:,t], fit[:,:,t], elastix_model_parameters, slice_parameters)
+          coregistered[:,t], new_deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
 
            
         ## calculate diagnostics: maximum_deformation_per_pixel  

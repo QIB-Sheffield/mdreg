@@ -12,7 +12,7 @@ from models  import iBEAt_DCE
 
 np.set_printoptions(threshold=sys.maxsize)
 
-def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, slice_parameters, AIFs_PATH, patient_folder):
+def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_time, original_images, image_parameters, AIFs_PATH, patient_folder):
 
     ## read sequence acquisition parameter for signal modelling
     aif, times = iBEAt_DCE.load_txt(AIFs_PATH + '/' + str(patient_folder) + '/' + 'AIF__2C Filtration__Curve.txt')
@@ -37,7 +37,7 @@ def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, slice_sorted_acq_tim
 
     MDR_output = []
                     
-    MDR_output = model_driven_registration(original_images, slice_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
+    MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision  = 1)
     
     # MDR output variables 
     motion_corrected_images = MDR_output[0]
