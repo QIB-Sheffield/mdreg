@@ -12,83 +12,6 @@ import time
 import pandas as pd
 
 
-def calculate_diagnostics(deformation_field, new_deformation_field):
-    """
-    This function calculates diagnostics from the registration process
-    it takes as input the original deformation field and the new deformation field
-    and returns maximum deformation per pixel
-    """
-
-    df_difference = deformation_field - new_deformation_field
-
-    df_difference_x_squared = np.square(df_difference[:,0,:].squeeze())
-    df_difference_y_squared = np.square(df_difference[:,1,:].squeeze())
-
-    dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
-
-    maximum_deformation_per_pixel = np.nanmax(dist)
-
-    return maximum_deformation_per_pixel
-
-
-
-# signal model function for MDR
-def signal_model_fit(time_curve, signal_model_parameters): 
-    """
-        This function takes signal time curve and signal model paramters as input 
-        and returns the fitted signal and model parameters
-    """
-
-    fit, fitted_parameters = getattr(signal_model_parameters[0][0], signal_model_parameters[0][1])(time_curve, signal_model_parameters) 
-  
-    return fit, fitted_parameters
-
-
-
-# deformable registration for MDR
-def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
-    """
-        This function takes source image and target image as input 
-        and returns ffd based co-registered image and deformation field 
-    """
-    shape_source = np.shape(source)
-    shape_target = np.shape(target)
-
-    ## TODO for 3D; OK for 2D images
-    source = sitk.GetImageFromArray(source)
-    source.SetOrigin(image_parameters[0])
-    source.SetSpacing(image_parameters[1])
-    source.__SetPixelAsUInt16__
-    source = np.reshape(source, [shape_source[0], shape_source[1]]) 
-    
-    target = sitk.GetImageFromArray(target)
-    target.SetOrigin(image_parameters[0])
-    target.SetSpacing(image_parameters[1])
-    target.__SetPixelAsUInt16__
-    target = np.reshape(target, [shape_target[0], shape_target[1]])
-    
-    ## read the source and target images
-    elastixImageFilter = sitk.ElastixImageFilter()
-    elastixImageFilter.SetFixedImage(sitk.GetImageFromArray(source))
-    elastixImageFilter.SetMovingImage(sitk.GetImageFromArray(target))
-
-    ## call the parameter map file specifying the registration parameters
-    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
-    elastixImageFilter.PrintParameterMap()
-
-    ## RUN ELASTIX using SimpleITK filters
-    elastixImageFilter.Execute()
-    coregistered = elastixImageFilter.GetResultImage()
-
-    transformixImageFilter = sitk.TransformixImageFilter()
-    transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
-    transformixImageFilter.ComputeDeformationFieldOn()
-    transformixImageFilter.Execute()
-    deformation_field = transformixImageFilter.GetDeformationField()
-
-    return coregistered, deformation_field
-
-
 def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
     """
     This is the main function to call Model Driven Registration 
@@ -175,4 +98,84 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
     MDR_output = [coregistered, fit, deformation_field, Par, diagnostics] 
 
     return MDR_output
+
+
+def calculate_diagnostics(deformation_field, new_deformation_field):
+    """
+    This function calculates diagnostics from the registration process
+    it takes as input the original deformation field and the new deformation field
+    and returns maximum deformation per pixel
+    """
+
+    df_difference = deformation_field - new_deformation_field
+
+    df_difference_x_squared = np.square(df_difference[:,0,:].squeeze())
+    df_difference_y_squared = np.square(df_difference[:,1,:].squeeze())
+
+    dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
+
+    maximum_deformation_per_pixel = np.nanmax(dist)
+
+    return maximum_deformation_per_pixel
+
+
+
+# signal model function for MDR
+def signal_model_fit(time_curve, signal_model_parameters): 
+    """
+        This function takes signal time curve and signal model paramters as input 
+        and returns the fitted signal and model parameters
+    """
+
+    fit, fitted_parameters = getattr(signal_model_parameters[0][0], signal_model_parameters[0][1])(time_curve, signal_model_parameters) 
+  
+    return fit, fitted_parameters
+
+
+
+# deformable registration for MDR
+def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
+    """
+        This function takes source image and target image as input 
+        and returns ffd based co-registered image and deformation field 
+    """
+    shape_source = np.shape(source)
+    shape_target = np.shape(target)
+
+    ## TODO for 3D; OK for 2D images
+    source = sitk.GetImageFromArray(source)
+    source.SetOrigin(image_parameters[0])
+    source.SetSpacing(image_parameters[1])
+    source.__SetPixelAsUInt16__
+    source = np.reshape(source, [shape_source[0], shape_source[1]]) 
+    
+    target = sitk.GetImageFromArray(target)
+    target.SetOrigin(image_parameters[0])
+    target.SetSpacing(image_parameters[1])
+    target.__SetPixelAsUInt16__
+    target = np.reshape(target, [shape_target[0], shape_target[1]])
+    
+    ## read the source and target images
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(sitk.GetImageFromArray(source))
+    elastixImageFilter.SetMovingImage(sitk.GetImageFromArray(target))
+
+    ## call the parameter map file specifying the registration parameters
+    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
+    elastixImageFilter.PrintParameterMap()
+
+    ## RUN ELASTIX using SimpleITK filters
+    elastixImageFilter.Execute()
+    coregistered = elastixImageFilter.GetResultImage()
+
+    transformixImageFilter = sitk.TransformixImageFilter()
+    transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
+    transformixImageFilter.ComputeDeformationFieldOn()
+    transformixImageFilter.Execute()
+    deformation_field = transformixImageFilter.GetDeformationField()
+
+    return coregistered, deformation_field
+
+
+
    
