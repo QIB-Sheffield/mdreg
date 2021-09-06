@@ -135,6 +135,8 @@ if __name__ == '__main__':
 
                     img_shape = np.shape(ArrayDicomiBEAt)
 
+## WHY ARE THESE SET TO ZERO?
+
                     original_images = np.zeros(img_shape)
   
                     ## MDR for T2-mapping sequence
