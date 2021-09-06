@@ -4,6 +4,7 @@ MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 
 """
 import sys
+import time
 import numpy as np
 import SimpleITK as sitk
 from PIL import Image
@@ -30,6 +31,7 @@ def iBEAt_test_DTI(Elastix_Parameter_filepath, output_dir, slice_sorted_acq_time
     -----------
     What does this function do??
     """
+    start_computation_time = time.time()
 
     # Format input variables
     images = sort_images(images, slice_sorted_acq_time)
@@ -38,7 +40,7 @@ def iBEAt_test_DTI(Elastix_Parameter_filepath, output_dir, slice_sorted_acq_time
     
     #Perform MDR
     MDR_output = model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
-    
+
     #Export results
     export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_DTI_')
     export_images(MDR_output[1], output_dir +'/fit/fit_image_')
@@ -48,6 +50,11 @@ def iBEAt_test_DTI(Elastix_Parameter_filepath, output_dir, slice_sorted_acq_time
     export_maps(MDR_output[3][3::4], output_dir + '/fitted_parameters/ADC', np.shape(images))
     MDR_output[4].to_csv(output_dir + 'DTI_largest_deformations.csv')
 
+    # Report computation times
+    end_computation_time = time.time()
+    print("total computation time for MDR (minutes taken:)...")
+    print(0.0166667*(end_computation_time - start_computation_time)) # in minutes
+    print("completed MDR registration!")
     print("Finished processing Model Driven Registration case for iBEAt study DTI sequence!")
 
 
@@ -60,6 +67,7 @@ def signal_model_parameters(fname, lstFilesDCM):
     signal_model_parameters.append(image_orientation_patient)
     return signal_model_parameters
 
+
 ## read elastix parameters
 def elastix_model_parameters(Elastix_Parameter_file_PATH):
     elastixImageFilter = sitk.ElastixImageFilter()
@@ -68,6 +76,7 @@ def elastix_model_parameters(Elastix_Parameter_file_PATH):
     elastixImageFilter.SetParameterMap(elastix_model_parameters)
     return elastix_model_parameters
 
+
 ## sort original images according to acquisiton times and run MDR
 def sort_images(original_images, slice_sorted_acq_time):   
     for i, s in enumerate(slice_sorted_acq_time):
@@ -75,12 +84,14 @@ def sort_images(original_images, slice_sorted_acq_time):
         original_images[:, :, i] = img2d  
     return original_images 
 
+
 ## Save MDR results to folder
 def export_images(MDR_output, folder):
     shape = np.shape(MDR_output)
     for i in range(shape[2]):
         im = Image.fromarray(MDR_output[:,:,i])
         im.save(folder + str(i) + ".tiff")
+
 
 ## Fitted Parameters to output folder
 def export_maps(MDR_output, folder, shape):

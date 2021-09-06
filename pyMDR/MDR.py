@@ -8,99 +8,78 @@ MDR Library
 
 import numpy as np
 import SimpleITK as sitk
-import time
 import pandas as pd
 
+def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm (TO DOCSTRING)
+    """ Performs model driven registration
 
-def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm
-    """
-    This is the main function to call Model Driven Registration 
-    images: the unregistered images as nd-array
-    image_parameters: [image origin, image spacing]
+    Parameters
+    ---------- 
+    images: the unregistered images as nd-array (KANISHKA SPECIFY dimensions and date type)
+    image_parameters: [image origin, image spacing] (KANISHKA SPECIFY; origin is a set of coordinates??? what si image spacing? What format is this?)
     signal_model_parameters: [MODEL, model specific parameters]
     elastix_model_parameters: elastix file registration parameters
-    and returns ffd based co-registered image, fitted image, deformation field, fitted parameters and diagnostics 
-  """
+    precision: KANISHKA??
+
+    Return values
+    ------------
+    coregistered: ffd based co-registered image (TYPE, DIMENSIONS??)
+    fit: fitted image
+    deformation field: ???
+    par: fitted parameters
+    improvement: ????
+    """
     shape = np.shape(images)
-    
-    coregistered =  np.zeros([shape[0]*shape[1], shape[2]])
-    coregistered =  np.reshape(images,(shape[0]*shape[1],shape[2]))
-   
-    deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]]) # todo for 3D
-    new_deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]]) # todo for 3d
-    
-    # create a list for diagnostics
     improvement = []  
-    fit = np.zeros([shape[0]*shape[1], shape[2]])
     
-    ## store Parameters generated from fits
-    Par = np.array([])
-    
-    start_computation_time = time.time()
+    # Initialise the solution
+    coregistered =  np.reshape(images,(shape[0]*shape[1],shape[2]))
+    deformation_field = np.zeros((shape[0]*shape[1],2,shape[2]))
 
-    for x in range(shape[0]*shape[1]): #pixels
-      
-      fit[x,:], Par_x  = signal_model_fit(coregistered[x,:], signal_model_parameters)
-      Par = np.append(Par, Par_x)
-
-    fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
-    
-    for t in range(shape[2]): #dynamics
-
-      coregistered[:,t], deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
-      
     converged = False
-
-
     while not converged: 
 
-        fit = np.reshape(fit,(shape[0]*shape[1],shape[2]))
-        Par = np.array([]) 
+        # Update the solution
+        fit, par = fit_signal_model(shape, coregistered, signal_model_parameters)
+        coregistered, new_deformation_field = fit_coregistration(shape, fit, images, image_parameters, elastix_model_parameters)
 
-        for x in range(shape[0]*shape[1]):#pixels
-          fit[x,:], Par_x = signal_model_fit(coregistered[x,:], signal_model_parameters) 
-          Par = np.append(Par, Par_x)
-        
-        fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
-        
-        for t in range(shape[2]):#dynamics
-          coregistered[:,t], new_deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
-
-           
-        ## calculate diagnostics: maximum_deformation_per_pixel  
-        maximum_deformation_per_pixel = calculate_diagnostics(deformation_field, new_deformation_field)        
-        print("maximum_deformation_per_pixel")
-        print(maximum_deformation_per_pixel)
-
-        improvement.append(maximum_deformation_per_pixel)
-  
-        diagnostics_dict = {'maximum_deformation_per_pixel': improvement}
-        
-        # update the deformation field
+        ## check convergence    
+        improvement.append(maximum_deformation_per_pixel(deformation_field, new_deformation_field))
+        converged = improvement[-1] <= precision           
         deformation_field = new_deformation_field
 
-        if maximum_deformation_per_pixel <= precision: # elastix for physical units (in mm)
-            print("MDR converged! final improvement = " + str(maximum_deformation_per_pixel))
-            converged = True
-    
-    end_computation_time = time.time()
-    print("total computation time for MDR (minutes taken:)...")
-    print(0.0166667*(end_computation_time - start_computation_time)) # in minutes
-    print("completed MDR registration!")
-
-    diagnostics = pd.DataFrame(diagnostics_dict) 
-
     coregistered = np.reshape(coregistered,(shape[0],shape[1],shape[2]))
-    deformation_field = np.reshape(deformation_field,(shape[0],shape[1],2,shape[2]))
+    deformation_field = np.reshape(deformation_field,(shape[0],shape[1],2,shape[2])) 
+    improvement = pd.DataFrame({'maximum_deformation_per_pixel': improvement}) 
 
-    MDR_output = []
-
-    MDR_output = [coregistered, fit, deformation_field, Par, diagnostics] 
-
-    return MDR_output
+    return coregistered, fit, deformation_field, par, improvement
 
 
-def calculate_diagnostics(deformation_field, new_deformation_field):
+def fit_signal_model(shape, coregistered, signal_model_parameters):
+    """Fit signal model pixel by pixel"""
+
+    fit = np.zeros((shape[0]*shape[1],shape[2]))
+    par = np.array([]) 
+    for x in range(shape[0]*shape[1]):#pixels
+      fit[x,:], par_x = signal_model_fit(coregistered[x,:], signal_model_parameters) 
+      par = np.append(par, par_x)
+    fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
+    return fit, par
+
+
+def fit_coregistration(shape, fit, images, image_parameters, elastix_model_parameters):
+    """Coregister image by image"""
+
+    # Kanishka: Can Elastix MDR be initialised with the solution from the previous iteration?
+
+    coregistered = np.zeros((shape[0]*shape[1],shape[2]))
+    deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]])
+    for t in range(shape[2]): #dynamics
+      coregistered[:,t], deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
+    return coregistered, deformation_field
+
+
+def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     """
     This function calculates diagnostics from the registration process
     it takes as input the original deformation field and the new deformation field
@@ -108,16 +87,12 @@ def calculate_diagnostics(deformation_field, new_deformation_field):
     """
 
     df_difference = deformation_field - new_deformation_field
-
     df_difference_x_squared = np.square(df_difference[:,0,:].squeeze())
     df_difference_y_squared = np.square(df_difference[:,1,:].squeeze())
-
     dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
-
     maximum_deformation_per_pixel = np.nanmax(dist)
-
-    return maximum_deformation_per_pixel
-
+    
+    return maximum_deformation_per_pixel, converged
 
 
 # signal model function for MDR
@@ -126,11 +101,8 @@ def signal_model_fit(time_curve, signal_model_parameters):
         This function takes signal time curve and signal model paramters as input 
         and returns the fitted signal and model parameters
     """
-
     fit, fitted_parameters = getattr(signal_model_parameters[0][0], signal_model_parameters[0][1])(time_curve, signal_model_parameters) 
-  
     return fit, fitted_parameters
-
 
 
 # deformable registration for MDR
