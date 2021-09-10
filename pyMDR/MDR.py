@@ -10,24 +10,31 @@ import numpy as np
 import SimpleITK as sitk
 import pandas as pd
 
-def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): # precision is in mm (TO DOCSTRING)
+def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): 
     """ Performs model driven registration
 
     Parameters
     ---------- 
-    images: the unregistered images as nd-array (KANISHKA SPECIFY dimensions and date type)
-    image_parameters: [image origin, image spacing] (KANISHKA SPECIFY; origin is a set of coordinates??? what si image spacing? What format is this?)
+    images: unregistered 2D images (uint16) with shape: [x-dim,y-dim, number of slices]
+    image_parameters: SITK input: [image origin, image spacing]
+    sitk Origin: location in the world coordinate system of the voxel 
+    example origin: (-186.70486942826, 33.200800281755, 241.22697840639); 
+    sitk Spacing: distance between pixels along each of the dimensions
+    example spacing (mm): (1.0416666269302, 1.0416666269302, 1.0)
     signal_model_parameters: [MODEL, model specific parameters]
     elastix_model_parameters: elastix file registration parameters
-    precision: KANISHKA??
+    precision: in mm 
 
     Return values
     ------------
-    coregistered: ffd based co-registered image (TYPE, DIMENSIONS??)
-    fit: fitted image
-    deformation field: ???
+    coregistered: ffd based co-registered (uint16) 2D images with shape: [x-dim,y-dim, number of slices]
+    fit: signal model fit image
+    fit image dimension = 2D with shape: [x-dim,y-dim, num of slices]
+    fit image type: uint16
+    output deformation fields: deformation_field_x, deformation_field_y
+    deformation field dimension: [x-dim, y-dim, 2, num of slices]
     par: fitted parameters
-    improvement: ????
+    improvement: maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field
     """
     shape = np.shape(images)
     improvement = []  
@@ -70,8 +77,6 @@ def fit_signal_model(shape, coregistered, signal_model_parameters):
 def fit_coregistration(shape, fit, images, image_parameters, elastix_model_parameters):
     """Coregister image by image"""
 
-    # Kanishka: Can Elastix MDR be initialised with the solution from the previous iteration?
-
     coregistered = np.zeros((shape[0]*shape[1],shape[2]))
     deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]])
     for t in range(shape[2]): #dynamics
@@ -82,7 +87,7 @@ def fit_coregistration(shape, fit, images, image_parameters, elastix_model_param
 def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     """
     This function calculates diagnostics from the registration process
-    it takes as input the original deformation field and the new deformation field
+    It takes as input the original deformation field and the new deformation field
     and returns maximum deformation per pixel
     """
 
@@ -92,8 +97,7 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
     maximum_deformation_per_pixel = np.nanmax(dist)
     
-    return maximum_deformation_per_pixel, converged
-
+    return maximum_deformation_per_pixel 
 
 # signal model function for MDR
 def signal_model_fit(time_curve, signal_model_parameters): 
@@ -108,8 +112,8 @@ def signal_model_fit(time_curve, signal_model_parameters):
 # deformable registration for MDR
 def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
     """
-        This function takes source image and target image as input 
-        and returns ffd based co-registered image and deformation field 
+        This function takes unregistered source image and target image as input 
+        and returns ffd based co-registered image and corresponding deformation field 
     """
     shape_source = np.shape(source)
     shape_target = np.shape(target)
