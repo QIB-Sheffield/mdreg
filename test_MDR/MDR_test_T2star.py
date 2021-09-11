@@ -111,14 +111,13 @@ def sort_all_slice_files_acquisition_time(files):
 
 
                     
-def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
+def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
     """ Example application of MDR in renal T2* (iBEAt data)
     
     Parameters
     ----------
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
-    output_dir (string): directory where results are saved
-    slice_sorted_files: selected slices to process using MDR: sorted according to acquisition time 
+    output_dir (string): directory where results are saved 
     ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
     image_parameters SITK input: [image origin, image spacing]
     filenameDCM: dicom filenames to process
