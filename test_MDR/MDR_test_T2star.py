@@ -136,14 +136,14 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, sorted_slice_file
     image_shape = np.shape(ArrayDicomiBEAt)
     original_images = np.zeros(image_shape)
 
-    # initialise original_images with sorted acquisiton times to run MDR
-    for i, s in enumerate(sorted_slice_files):
+    # read signal model parameters and slice sorted per T2* echo time
+    signal_model_parameters, slice_sorted_echo_time = read_signal_model_parameters(filenameDCM, lstFilesDCM)
+
+    # initialise original_images with sorted images per T2* echo times to run MDR
+    for i, s in enumerate(slice_sorted_echo_time):
         img2d = s.pixel_array
         original_images[:, :, i] = img2d
     
-    
-   # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(filenameDCM, lstFilesDCM)
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
@@ -167,16 +167,17 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, sorted_slice_file
     print("Finished processing Model Driven Registration case for iBEAt study T2* sequence!")
 
  
- ## read sequence acquisition parameter for signal modelling
+ # read sequence acquisition parameter for signal modelling
+ # sort slices according to T2* echo times
 def read_signal_model_parameters(filenameDCM, lstFilesDCM):
     ## ## read sequence acquisition parameter for signal modelling
-    echo_times = iBEAt_T2star.read_echo_times(filenameDCM, lstFilesDCM)
+    echo_times, slice_sorted_echo_time = iBEAt_T2star.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
     # select model
     MODEL = [iBEAt_T2star,'fitting']
     # select signal model paramters
     signal_model_parameters = [MODEL, echo_times]
 
-    return signal_model_parameters
+    return signal_model_parameters, slice_sorted_echo_time
 
 
 ## read elastix parameters

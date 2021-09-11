@@ -8,7 +8,7 @@ import numpy as np
 import pydicom
 from scipy.optimize import curve_fit
 
-def read_echo_times(fname,lstFilesDCM):
+def read_and_sort_echo_times(fname,lstFilesDCM):
     """
     This function takes as argument as fname, lstFilesDCM
     and returns the sorted list of echo times and DICOMs from corresponding echo times
@@ -20,8 +20,6 @@ def read_echo_times(fname,lstFilesDCM):
         dataset = pydicom.dcmread(fname)   
         echo_times.append(dataset.EchoTime)
         files.append(pydicom.dcmread(fname)) 
-
-    print(echo_times)
 
     sort_index = np.argsort(echo_times)
   

@@ -5,9 +5,10 @@ MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 Main script to test Model Driven Registration Library (MDR-Library)
 """
 
-import MDR_test_T2
+
+import MDR_test_T2star
 
 
 if __name__ == '__main__':
   
-    MDR_test_T2.main()
+    MDR_test_T2star.main()
