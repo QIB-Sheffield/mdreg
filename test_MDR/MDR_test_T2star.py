@@ -1,7 +1,7 @@
 """
 MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for T2 star sequence using Model driven registration Library
+Test script for T2* sequence using Model driven registration Library
 """
 import sys
 import glob
@@ -21,7 +21,7 @@ np.set_printoptions(threshold=sys.maxsize)
 def main():
     # selected sequence to process
     sequence = 'T2star'
-    # number of expected slices to process (example: iBEAt study number of slice = 30)
+    # number of expected slices to process (example: iBEAt study number of slice = 5)
     slices = 5    
 
     # path definition  
@@ -80,10 +80,9 @@ def read_DICOM_files(lstFilesDCM):
     # read all dicoms and output dicom files
     for filenameDCM in lstFilesDCM: 
         files.append(pydicom.dcmread(filenameDCM))
-        ds = pydicom.dcmread(lstFilesDCM)
+        ds = pydicom.dcmread(filenameDCM)
         # write pixel data into numpy array
         ArrayDicomiBEAt[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
-
 
     return files, ArrayDicomiBEAt, filenameDCM
 

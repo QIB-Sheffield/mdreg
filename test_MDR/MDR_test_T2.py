@@ -1,7 +1,7 @@
 """
 MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for DTI sequence using Model driven registration Library
+Test script for T2 sequence using Model driven registration Library
 """
 import sys
 import glob
@@ -13,16 +13,16 @@ from pathlib import Path
 import time
 from PIL import Image
 from pyMDR.MDR import model_driven_registration  
-from models  import iBEAt_DTI
+from models  import iBEAt_T2
 
 np.set_printoptions(threshold=sys.maxsize)
 
 
 def main():
     # selected sequence to process
-    sequence = 'DTI'
-    # number of expected slices to process (example: iBEAt study number of slice = 30)
-    slices = 30    
+    sequence = 'T2'
+    # number of expected slices to process (example: iBEAt study number of slice = 5)
+    slices = 5    
 
     # path definition  
     # your 'os.getcwd()' path should point to your local directory containing the  MDR-Library 
@@ -32,7 +32,7 @@ def main():
     DATA_PATH = os.getcwd() + r'/test_MDR/test_data/DICOMs'
     OUTPUT_REG_PATH = os.getcwd() + r'/MDR_registration_output'
     Elastix_Parameter_file_PATH = os.getcwd() + r'/Elastix_Parameters_Files/iBEAt' 
-    output_dir =  OUTPUT_REG_PATH + '/DTI/'
+    output_dir =  OUTPUT_REG_PATH + '/T2/'
 
     # Organize files per each sequence:
     os.chdir(DATA_PATH)    
@@ -42,7 +42,7 @@ def main():
     for patient_folder in patients_folders:
         if patient_folder not in ['test_case_iBEAt_4128009']: # eg: test case selected to be processed - change to your own test case
             continue
-        # read path to the sequence to be processed for selected test patient case: eg: DTI
+        # read path to the sequence to be processed for selected test patient case: eg: T2
         sequence_images_path = patient_folder + '/' + str(sequence) + '/DICOM'
         os.chdir(DATA_PATH + '/' + sequence_images_path)
         # read all dicom files for selected sequence
@@ -52,8 +52,8 @@ def main():
         # slice to be processed from selected sequence
         for slice in range(1, slices+1):
             current_slice = sequence + '_slice_' + str(slice)
-            # single slice processing for DTI sequence (here selected slice number is 15)
-            if current_slice not in [sequence + '_slice_15']:
+            # single slice processing for T2* sequence (here selected slice number is 3)
+            if current_slice not in [sequence + '_slice_3']:
                 continue
             # read slice path to be processed
             slice_path = DATA_PATH + '/' + sequence_images_path + '/' + current_slice
@@ -67,8 +67,8 @@ def main():
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
             # sort slices correctly - based on acquisition time for model driven registration
             sorted_slice_files = sort_all_slice_files_acquisition_time(files)
-            # run DTI MDR test 
-            iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
+            # run T2 star MDR test function
+            iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
 # read input dicom files
 def read_DICOM_files(lstFilesDCM):
@@ -84,8 +84,8 @@ def read_DICOM_files(lstFilesDCM):
         # write pixel data into numpy array
         ArrayDicomiBEAt[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
 
-
     return files, ArrayDicomiBEAt, filenameDCM
+
 
 # get input image origin and spacing to set the numpy arrays for registration
 def get_sitk_image_details_from_DICOM(slice_path):
@@ -110,9 +110,10 @@ def sort_all_slice_files_acquisition_time(files):
 
     return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)  
 
-# test DTI using model driven registration
-def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    """ Example application of MDR in renal DTI (iBEAt data)
+
+                    
+def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
+    """ Example application of MDR in renal T2(iBEAt data)
     
     Parameters
     ----------
@@ -126,10 +127,11 @@ def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
 
     Description
     -----------
-    This function performs model driven registration for selected DTI sequence on a single selected slice 
+    This function performs model driven registration for selected T2-star sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
-    fitted parameters FA and ADC, and the final diagnostics.
+    fitted parameters S0 and T2 map, and the final diagnostics.
     """
+
     start_computation_time = time.time()
     # define numpy array with same input shape as original DICOMs
     image_shape = np.shape(ArrayDicomiBEAt)
@@ -139,9 +141,10 @@ def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
     for i, s in enumerate(sorted_slice_files):
         img2d = s.pixel_array
         original_images[:, :, i] = img2d
-
-    # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(filenameDCM, lstFilesDCM)
+    
+    
+   # read signal model parameters
+    signal_model_parameters = read_signal_model_parameters()
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
@@ -149,38 +152,39 @@ def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
 
     #Export results
-    export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_DTI_')
+    export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_T2_')
     export_images(MDR_output[1], output_dir +'/fit/fit_image_')
     export_images(MDR_output[2][:,:,0,:], output_dir +'/deformation_field/final_deformation_x_')
     export_images(MDR_output[2][:,:,1,:], output_dir +'/deformation_field/final_deformation_y_')
-    export_maps(MDR_output[3][2::4], output_dir + '/fitted_parameters/FA', np.shape(original_images))
-    export_maps(MDR_output[3][3::4], output_dir + '/fitted_parameters/ADC', np.shape(original_images))
-    MDR_output[4].to_csv(output_dir + 'DTI_largest_deformations.csv')
+    export_maps(MDR_output[3][::2], output_dir + '/fitted_parameters/S0', np.shape(original_images))
+    export_maps(MDR_output[3][1::2], output_dir + '/fitted_parameters/T2map', np.shape(original_images))
+    MDR_output[4].to_csv(output_dir + 'T2_largest_deformations.csv')
 
     # Report computation times
     end_computation_time = time.time()
     print("total computation time for MDR (minutes taken:)...")
     print(0.0166667*(end_computation_time - start_computation_time)) # in minutes
     print("completed MDR registration!")
-    print("Finished processing Model Driven Registration case for iBEAt study DTI sequence!")
+    print("Finished processing Model Driven Registration case for iBEAt study T2 sequence!")
 
+ 
+ ## read sequence acquisition parameter for signal modelling
+def read_signal_model_parameters(): 
+    T2_prep_times = iBEAt_T2.read_prep_times()
+    # select model
+    MODEL = [iBEAt_T2,'fitting'] 
+    # select signal model paramters
+    signal_model_parameters = [MODEL, T2_prep_times]
 
-
-## read sequence acquisition parameter for signal modelling
-def read_signal_model_parameters(filenameDCM, lstFilesDCM):
-    b_values, bVec_original, image_orientation_patient = iBEAt_DTI.read_dicom_tags_DTI(filenameDCM, lstFilesDCM)
-    MODEL = [iBEAt_DTI,'fitting']
-    signal_model_parameters = [MODEL, [b_values, bVec_original]]
-    signal_model_parameters.append(image_orientation_patient)
     return signal_model_parameters
 
 
 ## read elastix parameters
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
     elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + "/BSplines_DTI.txt")
+    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + "/BSplines_T2.txt")
     elastix_model_parameters['MaximumNumberOfIterations'] = ['256'] 
-    elastixImageFilter.SetParameterMap(elastix_model_parameters)
+    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
     return elastix_model_parameters
 
 
@@ -191,15 +195,9 @@ def export_images(MDR_output, folder):
         im = Image.fromarray(MDR_output[:,:,i])
         im.save(folder + str(i) + ".tiff")
 
-
 ## Fitted Parameters to output folder
 def export_maps(MDR_output, folder, shape):
     array = np.reshape(MDR_output, [shape[0],shape[1]]) 
     Img = Image.fromarray(array)
     Img.save(folder + ".tiff")
-    
 
-
-
-
-    
