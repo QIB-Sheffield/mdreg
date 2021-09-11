@@ -9,6 +9,10 @@ from scipy.signal import argrelextrema
 np.set_printoptions(threshold=sys.maxsize)
 
 def load_txt(full_path_txt):
+    """
+    input: full_path_txt is the path to the AIF text file
+    outputs: AIF and timepoints for DCE acquisition
+    """
     counter_file = open(full_path_txt, 'r+')
     content_lines = []
     for cnt, line in enumerate(counter_file):
@@ -34,8 +38,7 @@ def Integral_Trapezoidal_Rule_second(first_pass,time):
     return second_pass
 
 def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45): 
-  
-    
+      
     time =  timepoints
    
     ct0 = np.mean(ct[0:timepoint])
