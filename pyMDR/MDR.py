@@ -1,5 +1,5 @@
 """
-MODEL DRIVEN REGISTRATION for quantitative renal MRI
+MODEL DRIVEN REGISTRATION (MDR) for quantitative renal MRI
 MDR Library
 @Kanishka Sharma 
 @Steven Sourbron
