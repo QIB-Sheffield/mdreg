@@ -25,7 +25,4 @@ was initially developed using Elastix for co-registration and validated for rena
 Acknowledgement:
 The iBEAt study is part of the BEAt-DKD project. The BEAt-DKD project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 115974. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation programme and EFPIA with JDRF. For a full list of BEAt-DKD partners, see www.beat-dkd.eu
 
-For queries please email:
-
-kanishka.sharma@sheffield.ac.uk or s.sourbron@sheffield.ac.uk
- 
+For queries please email: kanishka.sharma@sheffield.ac.uk or s.sourbron@sheffield.ac.uk
