@@ -8,7 +8,7 @@
  
  Requirements:
  1. Install SimpleElastix -(Installation guide: https://simpleelastix.readthedocs.io/GettingStarted.html) 
- 2. Download test DICOM data (here) and unzip file in the 'test_data' folder.
+ 2. Download test DICOM data (here: shorturl.at/rwCUV) and unzip file in the 'test_data' folder.
 
 
 How to use:
