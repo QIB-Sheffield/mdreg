@@ -68,7 +68,7 @@ def main():
             # sort slices correctly - based on acquisition time for model driven registration
             sorted_slice_files = sort_all_slice_files_acquisition_time(files)
             # run T2 star MDR test function
-            iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
+            iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
 # read input dicom files
 def read_DICOM_files(lstFilesDCM):
