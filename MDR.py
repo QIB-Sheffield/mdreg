@@ -13,34 +13,26 @@ import pandas as pd
 def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): 
     """ main function that performs the model driven registration.
 
-    Parameters
-    ---------- 
-    images: np-array
-    unregistered 2D images (uint16) with shape [x-dim,y-dim, number of slices]
-    image_parameters: sitk tuple
-    distance between pixels (in mm) along each dimension
-    signal_model_parameters: list
-    a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
-    eg: [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
-    elastix_model_parameters: SimpleITK.ParameterMap
-    elastix file registration parameters
-    precision: int
-    precision (in mm) to define the convergence criterion for MDR
+    Args:
+    ----
+        images (numpy nd-array): unregistered 2D images (uint16) with shape [x-dim,y-dim, number of slices]
+        image_parameters (sitk tuple): distance between pixels (in mm) along each dimension
+        signal_model_parameters (list): a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
+        eg - [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
+        elastix_model_parameters (SimpleITK.ParameterMap): elastix file registration parameters
+        precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1.
 
-    Return values
-    ------------
-    coregistered: np-array
-    ffd based co-registered (uint16) 2D images as np-array with shape: [x-dim,y-dim, number of slices]
-    fit: np-array
-    signal model fit image (uint16) as np-array and shape [x-dim,y-dim, num of slices]
-    output deformation fields: 
-    deformation_field_x and deformation_field_y as np-array with shape [x-dim, y-dim, 2, num of slices]
-    par: list
-    signal model-fit parameters as a list
-    improvement: dataframe
-    maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field appended to a dataframe until convergence criterion is met.
+    Returns:
+    -------
+        coregistered (numpy nd-array): ffd based co-registered (uint16) 2D images as np-array with shape: [x-dim,y-dim, number of slices]
+        fit (numpy nd-array): signal model fit image (uint16) as np-array and shape [x-dim,y-dim, num of slices]
+        deformation_field (numpy nd-array): output deformation fields - deformation_field_x and deformation_field_y as np-array with shape [x-dim, y-dim, 2, num of slices]
+        par (list): signal model-fit parameters as a list
+        improvement (dataframe): maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field appended to a dataframe until convergence criterion is met.
     
     """
+
+
     shape = np.shape(images)
     improvement = []  
 
@@ -70,23 +62,17 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
 def fit_signal_model_image(shape, coregistered, signal_model_parameters):
     """Fit signal model images.
     
-    Parameters
-    ---------- 
-    shape: tuple
-    tuple with original image shape [x-dim,y-dim,z-dim]
-    coregistered: np-array
-    co-registerd 2D images as np-array with shape [x-dim * y-dim, number of slices]
-    signal_model_parameters: list
-    a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
-    eg: [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
+    Args:
+    ----
+    shape (tuple): tuple with original image shape [x-dim,y-dim,z-dim]
+    coregistered (numpy nd-array): co-registerd 2D images as np-array with shape [x-dim * y-dim, number of slices]
+    signal_model_parameters (list): a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
+    eg - [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
     
-    Return values
-    ------------
-    fit: np-array
-    signal model fit images (2D slices) as np-array with shape: [x-dim,y-dim, num of slices]
-    par: list
-    signal model-fit parameters as a list
-
+    Returns:
+    -------
+    fit (numpy nd-array): signal model fit images (2D slices) as np-array with shape: [x-dim,y-dim, num of slices]
+    par (list): signal model-fit parameters as a list.
     """
 
     fit = np.zeros((shape[0]*shape[1],shape[2]))
@@ -101,28 +87,18 @@ def fit_signal_model_image(shape, coregistered, signal_model_parameters):
 def fit_coregistration(shape, fit, images, image_parameters, elastix_model_parameters):
     """Co-register the 2D fit-image with the unregistered 2D input image.
 
-    Parameters
-    ---------- 
-    shape: tuple
-    tuple with original image shape [x-dim,y-dim,z-dim]
-    fit: np-array
-    signal model fit images (2D slices) with shape: [x-dim,y-dim, num of slices]
-    images: np-array
-    unregistered 2D images (uint16) as np-array with shape [x-dim,y-dim, number of slices]
-    image_parameters: sitk tuple
-    image parameters define the pixel spacing in the image
-    elastix_model_parameters: list
-    elastix parameter file parameters
+    Args:
+    ----
+    shape (tuple): tuple with original image shape [x-dim,y-dim,z-dim]
+    fit (numpy nd-array): signal model fit images (2D slices) with shape: [x-dim,y-dim, num of slices]
+    images (numpy nd-array): unregistered 2D images (uint16) as np-array with shape [x-dim,y-dim, number of slices]
+    image_parameters (sitk tuple): image parameters define the pixel spacing in the image
+    elastix_model_parameters (list): elastix parameter file parameters
 
-    Return values
-    ------------
-    coregistered: np-array
-    coregisterd 2D images with shape: [x-dim * y-dim, number of slices]
-    deformation_field: np-array
-    output deformation fields - deformation_field_x, deformation_field_y
-    deformation field dimension: array
-    [x-dim, y-dim, 2, num of slices]
-    
+    Returns:
+    -------
+    coregistered (numpy nd-array): coregisterd 2D images with shape [x-dim * y-dim, number of slices]
+    deformation_field (numpy nd-array): output deformation fields with shape [x-dim, y-dim, 2, num of slices]. Dimension '2' corresponds to deformation_field_x and deformation_field_y. 
     """
 
     coregistered = np.zeros((shape[0]*shape[1],shape[2]))
@@ -137,7 +113,8 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     This function calculates diagnostics from the registration process
     It takes as input the original deformation field and the new deformation field
     and returns the maximum deformation per pixel.
-    The maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field. 
+    The maximum deformation per pixel calculated as 
+    the euclidean distance of difference between old and new deformation field. 
     """
 
     df_difference = deformation_field - new_deformation_field

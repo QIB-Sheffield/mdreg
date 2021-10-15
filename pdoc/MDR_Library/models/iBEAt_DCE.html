@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>MDR_Library.models.iBEAt_DCE API documentation</title>
+<meta name="description" content="@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
+@author: Kanishka Sharma
+iBEAt study DCE 2 compartment filtration …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>MDR_Library.models.iBEAt_DCE</code></h1>
+</header>
+<section id="section-intro">
+<p>@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
+@author: Kanishka Sharma
+iBEAt study DCE 2 compartment filtration model fit
+2021</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
+@author: Kanishka Sharma
+iBEAt study DCE 2 compartment filtration model fit
+2021
+&#34;&#34;&#34;
+
+import numpy as np
+import sys  
+from numpy import trapz
+from scipy.signal import argrelextrema
+np.set_printoptions(threshold=sys.maxsize)
+
+def load_txt(full_path_txt):
+    &#34;&#34;&#34; reads the AIF text file to find the AIF values and associated time-points.
+
+        Parameters
+        ---------- 
+        full_path_txt: string
+        file path to the AIF text file.
+
+        Return values
+        ------------
+        aif: list
+        arterial input function at each timepoint
+        time: list
+        corresponding timepoints for each AIF 
+    &#34;&#34;&#34;
+    counter_file = open(full_path_txt, &#39;r+&#39;)
+    content_lines = []
+    for cnt, line in enumerate(counter_file):
+        content_lines.append(line)
+    x_values_index = content_lines.index(&#39;X-values\n&#39;)
+    assert (content_lines[x_values_index+1]==&#39;\n&#39;)
+    y_values_index = content_lines.index(&#39;Y-values\n&#39;)
+    assert (content_lines[y_values_index+1]==&#39;\n&#39;)
+    time = list(map(lambda x: float(x), content_lines[x_values_index+2 : y_values_index-1]))
+    aif = list(map(lambda x: float(x), content_lines[y_values_index+2 :]))
+    return aif, time
+
+def Integral_Trapezoidal_Rule_initial(x,time):
+    first_pass=[]
+    for tm in range(len(time)):
+        first_pass.append(trapz(x[0:tm+1],time[0:tm+1]))
+    return first_pass
+
+def Integral_Trapezoidal_Rule_second(first_pass,time):
+    second_pass=[]
+    for tm in range(len(time)):
+        second_pass.append(trapz(first_pass[0:tm+1],time[0:tm+1]))
+    return second_pass
+
+def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45): 
+    &#34;&#34;&#34; Linear least squares 2-Compartment filtration model fit.
+
+    Parameters
+    ---------- 
+    ct: concentration
+    timepoints: DCE dynamic timepoints
+    aif: arterial input function
+    timepoint: maximum-timepoint
+    Hct: hematocrit
+
+    Return values
+    ------------
+    fit: pixel level signal fit 
+    Fp, Tp, PS, Te: fit parameters
+    &#34;&#34;&#34;
+      
+    time =  timepoints
+   
+    ct0 = np.mean(ct[0:timepoint])
+    aif0 =  np.mean(aif[0:timepoint])
+    ct_new = ct-ct0
+
+    aif_new = (aif-aif0)/(1-Hct)
+
+    #initialization of matrix A
+    A=np.array([0,0,0,0]) 
+
+    first_pass_ct_new=Integral_Trapezoidal_Rule_initial(ct_new,time)
+    first_pass_aif_new=Integral_Trapezoidal_Rule_initial(aif_new,time)
+    second_pass_ct_new=Integral_Trapezoidal_Rule_second(first_pass_ct_new,time)
+    second_pass_aif_new=Integral_Trapezoidal_Rule_second(first_pass_aif_new,time)
+    for t in range(0,len(time)):
+        A1_1=second_pass_ct_new[t]
+        A1_2=first_pass_ct_new[t]
+        A1_3=second_pass_aif_new[t]
+        A1_4=first_pass_aif_new[t]
+        A_next=np.array([-A1_1,-A1_2,A1_3,A1_4])
+        A=np.vstack((A,A_next))    
+
+    # Drop first row of matrix [A] which is full of zeros and was used for initialization purposes
+    A=np.delete(A,(0),axis=0)
+
+    X = np.linalg.lstsq(A,ct_new,rcond=None)[0]
+
+    # Extract physical parameters
+    alpha = X[0]
+    beta = X[1]
+    gamma = X[2]
+    Fp = X[3]
+    
+    if alpha == 0 or Fp == 0 :
+        Tp = 0
+        PS = 0
+        Te = 0
+        fit = 0
+    else:    
+        T = gamma/(alpha*Fp)  
+        det = np.square(beta)-4*alpha
+        if det &lt; 0 :
+            Tp = beta/(2*alpha)
+            Te = beta/(2*alpha)
+        else:
+            Tp = (beta - np.sqrt(np.square(beta)-4*alpha))/(2*alpha)
+            Te = (beta + np.sqrt(np.square(beta)-4*alpha))/(2*alpha)
+        if Te == 0:
+            Fp = 0
+            Tp = 0
+            PS = 0
+            fit = 0
+        else:    
+            PS = Fp*(T-Tp)/Te                       
+            #params = [Fp, Tp, PS, Te]
+            fit =X[0]*A[:,0] + X[1]*A[:,1] + X[2]*A[:,2] + X[3]*A[:,3]
+            fit=ct0+fit
+    
+    return fit, Fp, Tp, PS, Te 
+
+# def DCE_find_timepoint(aif):
+#     &#34;&#34;&#34;
+#     input: AIF
+#     output: DCE maximum timepoint
+#     &#34;&#34;&#34;
+#     # find timepoint
+#     idx = np.argmax(aif)
+#     minima = argrelextrema(np.asarray(aif), np.less)[0]
+#     maxima = argrelextrema(np.asarray(aif), np.greater)[0]
+#     assert idx in maxima, &#34;The global maximum was not found in the maxima list&#34;
+#     wanted_minimum = np.nan
+#     for ix, val in enumerate(minima):
+#         if ix==len(minima)-1:
+#             continue
+#         elif val&lt;idx and minima[ix+1]&gt;idx:
+#             wanted_minimum = val
+#     assert wanted_minimum + 1 &lt; idx, &#34;Minimum + 1 position equals to Global Maximum&#34;
+#     return wanted_minimum + 1
+
+
+def main(images_to_be_fitted, signal_model_parameters):
+    &#34;&#34;&#34; main function that performs 2-compartment filtration DCE model fitting at single pixel level. 
+
+    Parameters
+    ---------- 
+    images_to_be_fitted: np-array
+    pixel-wise signal time curve for the time-series with shape: [x,:]
+    signal_model_parameters: list
+    [MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO
+
+    Return values
+    ------------
+    fit: np-array
+    signal model fit per pixel
+    fitted_parameters: list
+    [Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO
+    
+    &#34;&#34;&#34;
+    
+    AIF = signal_model_parameters[1][0]
+   
+    timepoints = signal_model_parameters[1][1]
+    
+    #max_timepoint = DCE_find_timepoint(AIF)
+
+    fit, Fp, Tp, Ps, Te = Linear_Least_Squares_2CFM(images_to_be_fitted, timepoints, AIF, timepoint = 39,Hct = 0.45)   
+    
+    fitted_parameters = [Fp, Tp, Ps, Te] 
+
+    return fit, fitted_parameters</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial"><code class="name flex">
+<span>def <span class="ident">Integral_Trapezoidal_Rule_initial</span></span>(<span>x, time)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Integral_Trapezoidal_Rule_initial(x,time):
+    first_pass=[]
+    for tm in range(len(time)):
+        first_pass.append(trapz(x[0:tm+1],time[0:tm+1]))
+    return first_pass</code></pre>
+</details>
+</dd>
+<dt id="MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second"><code class="name flex">
+<span>def <span class="ident">Integral_Trapezoidal_Rule_second</span></span>(<span>first_pass, time)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Integral_Trapezoidal_Rule_second(first_pass,time):
+    second_pass=[]
+    for tm in range(len(time)):
+        second_pass.append(trapz(first_pass[0:tm+1],time[0:tm+1]))
+    return second_pass</code></pre>
+</details>
+</dd>
+<dt id="MDR_Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM"><code class="name flex">
+<span>def <span class="ident">Linear_Least_Squares_2CFM</span></span>(<span>ct, timepoints, aif, timepoint=39, Hct=0.45)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Linear least squares 2-Compartment filtration model fit.</p>
+<h2 id="parameters">Parameters</h2>
+<p>ct: concentration
+timepoints: DCE dynamic timepoints
+aif: arterial input function
+timepoint: maximum-timepoint
+Hct: hematocrit</p>
+<h2 id="return-values">Return Values</h2>
+<p>fit: pixel level signal fit
+Fp, Tp, PS, Te: fit parameters</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45): 
+    &#34;&#34;&#34; Linear least squares 2-Compartment filtration model fit.
+
+    Parameters
+    ---------- 
+    ct: concentration
+    timepoints: DCE dynamic timepoints
+    aif: arterial input function
+    timepoint: maximum-timepoint
+    Hct: hematocrit
+
+    Return values
+    ------------
+    fit: pixel level signal fit 
+    Fp, Tp, PS, Te: fit parameters
+    &#34;&#34;&#34;
+      
+    time =  timepoints
+   
+    ct0 = np.mean(ct[0:timepoint])
+    aif0 =  np.mean(aif[0:timepoint])
+    ct_new = ct-ct0
+
+    aif_new = (aif-aif0)/(1-Hct)
+
+    #initialization of matrix A
+    A=np.array([0,0,0,0]) 
+
+    first_pass_ct_new=Integral_Trapezoidal_Rule_initial(ct_new,time)
+    first_pass_aif_new=Integral_Trapezoidal_Rule_initial(aif_new,time)
+    second_pass_ct_new=Integral_Trapezoidal_Rule_second(first_pass_ct_new,time)
+    second_pass_aif_new=Integral_Trapezoidal_Rule_second(first_pass_aif_new,time)
+    for t in range(0,len(time)):
+        A1_1=second_pass_ct_new[t]
+        A1_2=first_pass_ct_new[t]
+        A1_3=second_pass_aif_new[t]
+        A1_4=first_pass_aif_new[t]
+        A_next=np.array([-A1_1,-A1_2,A1_3,A1_4])
+        A=np.vstack((A,A_next))    
+
+    # Drop first row of matrix [A] which is full of zeros and was used for initialization purposes
+    A=np.delete(A,(0),axis=0)
+
+    X = np.linalg.lstsq(A,ct_new,rcond=None)[0]
+
+    # Extract physical parameters
+    alpha = X[0]
+    beta = X[1]
+    gamma = X[2]
+    Fp = X[3]
+    
+    if alpha == 0 or Fp == 0 :
+        Tp = 0
+        PS = 0
+        Te = 0
+        fit = 0
+    else:    
+        T = gamma/(alpha*Fp)  
+        det = np.square(beta)-4*alpha
+        if det &lt; 0 :
+            Tp = beta/(2*alpha)
+            Te = beta/(2*alpha)
+        else:
+            Tp = (beta - np.sqrt(np.square(beta)-4*alpha))/(2*alpha)
+            Te = (beta + np.sqrt(np.square(beta)-4*alpha))/(2*alpha)
+        if Te == 0:
+            Fp = 0
+            Tp = 0
+            PS = 0
+            fit = 0
+        else:    
+            PS = Fp*(T-Tp)/Te                       
+            #params = [Fp, Tp, PS, Te]
+            fit =X[0]*A[:,0] + X[1]*A[:,1] + X[2]*A[:,2] + X[3]*A[:,3]
+            fit=ct0+fit
+    
+    return fit, Fp, Tp, PS, Te </code></pre>
+</details>
+</dd>
+<dt id="MDR_Library.models.iBEAt_DCE.load_txt"><code class="name flex">
+<span>def <span class="ident">load_txt</span></span>(<span>full_path_txt)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>reads the AIF text file to find the AIF values and associated time-points.</p>
+<h2 id="parameters">Parameters</h2>
+<p>full_path_txt: string
+file path to the AIF text file.</p>
+<h2 id="return-values">Return Values</h2>
+<p>aif: list
+arterial input function at each timepoint
+time: list
+corresponding timepoints for each AIF</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_txt(full_path_txt):
+    &#34;&#34;&#34; reads the AIF text file to find the AIF values and associated time-points.
+
+        Parameters
+        ---------- 
+        full_path_txt: string
+        file path to the AIF text file.
+
+        Return values
+        ------------
+        aif: list
+        arterial input function at each timepoint
+        time: list
+        corresponding timepoints for each AIF 
+    &#34;&#34;&#34;
+    counter_file = open(full_path_txt, &#39;r+&#39;)
+    content_lines = []
+    for cnt, line in enumerate(counter_file):
+        content_lines.append(line)
+    x_values_index = content_lines.index(&#39;X-values\n&#39;)
+    assert (content_lines[x_values_index+1]==&#39;\n&#39;)
+    y_values_index = content_lines.index(&#39;Y-values\n&#39;)
+    assert (content_lines[y_values_index+1]==&#39;\n&#39;)
+    time = list(map(lambda x: float(x), content_lines[x_values_index+2 : y_values_index-1]))
+    aif = list(map(lambda x: float(x), content_lines[y_values_index+2 :]))
+    return aif, time</code></pre>
+</details>
+</dd>
+<dt id="MDR_Library.models.iBEAt_DCE.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>main function that performs 2-compartment filtration DCE model fitting at single pixel level. </p>
+<h2 id="parameters">Parameters</h2>
+<p>images_to_be_fitted: np-array
+pixel-wise signal time curve for the time-series with shape: [x,:]
+signal_model_parameters: list
+[MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO</p>
+<h2 id="return-values">Return Values</h2>
+<p>fit: np-array
+signal model fit per pixel
+fitted_parameters: list
+[Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
+    &#34;&#34;&#34; main function that performs 2-compartment filtration DCE model fitting at single pixel level. 
+
+    Parameters
+    ---------- 
+    images_to_be_fitted: np-array
+    pixel-wise signal time curve for the time-series with shape: [x,:]
+    signal_model_parameters: list
+    [MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO
+
+    Return values
+    ------------
+    fit: np-array
+    signal model fit per pixel
+    fitted_parameters: list
+    [Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO
+    
+    &#34;&#34;&#34;
+    
+    AIF = signal_model_parameters[1][0]
+   
+    timepoints = signal_model_parameters[1][1]
+    
+    #max_timepoint = DCE_find_timepoint(AIF)
+
+    fit, Fp, Tp, Ps, Te = Linear_Least_Squares_2CFM(images_to_be_fitted, timepoints, AIF, timepoint = 39,Hct = 0.45)   
+    
+    fitted_parameters = [Fp, Tp, Ps, Te] 
+
+    return fit, fitted_parameters</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="MDR_Library.models" href="index.html">MDR_Library.models</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial" href="#MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial">Integral_Trapezoidal_Rule_initial</a></code></li>
+<li><code><a title="MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second" href="#MDR_Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second">Integral_Trapezoidal_Rule_second</a></code></li>
+<li><code><a title="MDR_Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM" href="#MDR_Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM">Linear_Least_Squares_2CFM</a></code></li>
+<li><code><a title="MDR_Library.models.iBEAt_DCE.load_txt" href="#MDR_Library.models.iBEAt_DCE.load_txt">load_txt</a></code></li>
+<li><code><a title="MDR_Library.models.iBEAt_DCE.main" href="#MDR_Library.models.iBEAt_DCE.main">main</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
