@@ -1,5 +1,8 @@
+
 """
-@KanishkaS: 2021 for the MDR library - DWI monoexponential fit
+@author: Kanishka Sharma
+iBEAt study DWI monoexponential model fit for the MDR Library
+2021
 """
 
 import numpy as np
@@ -14,13 +17,21 @@ np.set_printoptions(threshold=sys.maxsize)
  
     
 def read_dicom_tags_IVIM(fname,lstFilesDCM):
+    """ This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags.
+
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
+
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    slice_sorted_b_values (list): list of slices sorted according to b-values
     """
-    This function takes as input the dicoms as "fname,lstFilesDCM"
-    and returns: 
-    the list of b-values "b_values"
-    the original b-vectors "b_Vec_original"
-    the patient orientation "image_orientation_patient"
-    """
+
     b_values = []
     b_values_sort = []
     b_Vec_original = []
@@ -39,9 +50,6 @@ def read_dicom_tags_IVIM(fname,lstFilesDCM):
 
     for i in range(21,30):
         b_Vec_original.append(g_dir_03)
-
-    print("b_Vec_original")
-    print(b_Vec_original)
 
     #TODO: calculate from gradient file instead of manual list
     b_values = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
@@ -71,25 +79,44 @@ def read_dicom_tags_IVIM(fname,lstFilesDCM):
     return b_values, b_Vec_original, image_orientation_patient, slice_sorted_b_values 
 
 
+#TODO: read v-values from gradient vec file instead.
 def exp_func(b, S0, ADC):
-    
-    b_v = []
-    b_v = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
-    S = []
+    """ mono-exponential decay function used to perform DWI-fitting.
 
+    Args:
+    ----
+    b (numpy.float64): object containing b values
+
+    Returns
+    -------
+    'S0' and 'ADC' (numpy.ndarray): fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel.
+    """
+    b_v = []
+    for i in b: # convert to list
+        b_v.append(i)
+   
     return S0*np.exp(-np.array(b_v)*ADC)
 
 
 def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
+    """ curve fit function which returns the fit, and fitted params: S0 and ADC.
 
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    signal_model_parameters (list): list of b_values
 
-    b_values = signal_model_parameters[1][0]
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameter 'S0' and 'ADC' (mm2/sec*10^-3) per pixel.
+    """
+
+    b_val = signal_model_parameters[0][0]
 
     lb = [0,0]
     ub = [np.inf,1]
-
-    b_val = functools.reduce(operator.iconcat, b_values, []) # flatten b-vals list to 1D
-    
+ 
     K = 10
     
     # computing strt, and end index 
@@ -135,18 +162,26 @@ def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
 
     fit = functools.reduce(operator.iconcat, fit, [])
 
-    Params = []
     Params = [S0, ADC]
 
     return fit, Params
 
 
-def fitting(images_to_be_fitted, signal_model_parameters):
- 
-    image_orientation_patient = signal_model_parameters[2]
+def main(images_to_be_fitted, signal_model_parameters):
+    """ main function for DWI model fitting at single pixel level. 
 
-    fit = []
-    fitted_parameters = []
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
+
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters 'S0' and 'ADC'.  
+    """
+    image_orientation_patient = signal_model_parameters[2] 
 
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], "Error in image_orientation_patient for IVIM"

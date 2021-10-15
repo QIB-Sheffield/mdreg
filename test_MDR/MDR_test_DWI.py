@@ -10,10 +10,11 @@ import numpy as np
 import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
+import importlib
 import time
 from PIL import Image
-from pyMDR.MDR import model_driven_registration  
-from models  import iBEAt_DWI_monoexponential
+from MDR import model_driven_registration  
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -92,9 +93,8 @@ def get_sitk_image_details_from_DICOM(slice_path):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing
+    return spacing
 
 # sort all input slices based on acquisition time
 def sort_all_slice_files_acquisition_time(files):
@@ -111,17 +111,17 @@ def sort_all_slice_files_acquisition_time(files):
 
 # test DWI using model driven registration
 def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    """ Example application of MDR in renal DWI (iBEAt data)
+    """ Example application of MDR in renal DWI (iBEAt data).
     
-    Parameters
-    ----------
-    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+    Args
+    ----
+    Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files: selected slices to process using MDR: sorted according to acquisition time 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
@@ -140,7 +140,8 @@ def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
         original_images[:, :, i] = img2d
 
     # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(filenameDCM, lstFilesDCM)
+    full_module_name = "models.iBEAt_DWI_monoexponential"
+    signal_model_parameters = read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM)
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
@@ -166,15 +167,15 @@ def iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
 
 
 ## read sequence acquisition parameter for signal modelling
-def read_signal_model_parameters(filenameDCM, lstFilesDCM):
-    b_values, bVec_original, image_orientation_patient, slice_sorted_b_values  = iBEAt_DWI_monoexponential.read_dicom_tags_IVIM(filenameDCM, lstFilesDCM)
-    # select model
-    MODEL = [iBEAt_DWI_monoexponential,'fitting']
-    # select signal model paramters
-    signal_model_parameters = [MODEL, [b_values, bVec_original]]
-    signal_model_parameters.append(image_orientation_patient)
-   #signal_model_parameters.append(slice_sorted_b_values) # NOT REQUIRED FOR DWI
+def read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM):
 
+    # generate a module named as a string
+    MODEL = importlib.import_module(full_module_name)
+    b_values, bVec_original, image_orientation_patient, slice_sorted_b_values  = MODEL.read_dicom_tags_IVIM(filenameDCM, lstFilesDCM)
+    # select signal model paramters
+    signal_model_parameters = [MODEL]
+    signal_model_parameters.append([b_values, bVec_original, image_orientation_patient])
+    
     return signal_model_parameters
 
 
