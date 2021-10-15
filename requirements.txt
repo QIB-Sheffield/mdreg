@@ -2,3 +2,4 @@ numpy
 scipy
 pydicom
 pandas
+Pillow
