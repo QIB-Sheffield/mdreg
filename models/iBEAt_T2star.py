@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 def read_and_sort_echo_times(fname,lstFilesDCM):
     """ This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).
 
-    Args:
+    Args
     ----
     fname (pathlib.PosixPath): dicom filenames to process
     lstFilesDCM (list): list of dicom files to process
@@ -53,7 +53,7 @@ def read_and_sort_echo_times(fname,lstFilesDCM):
 def exp_func(TE,S0,T2star):
     """ mono-exponential decay function used to perform T2star-fitting.
 
-    Args:
+    Args
     ----
     TE (int): Echo times (TE) for per time-series point for the T2* mapping sequence
 
@@ -70,7 +70,7 @@ def exp_func(TE,S0,T2star):
 def T2star_fitting(images_to_be_fitted, echo_times):
     """ curve fit function which returns the fit and fitted params S0 and T2*.
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE time) with shape [x,:]
     echo_times (list): list of TE times
@@ -104,7 +104,7 @@ def T2star_fitting(images_to_be_fitted, echo_times):
 def main(images_to_be_fitted, signal_model_parameters):
     """ main function for model fitting of T2* at single pixel level. 
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE) with shape [x,:]
     signal_model_parameters (list): TE times as a list

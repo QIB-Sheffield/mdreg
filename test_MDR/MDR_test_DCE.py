@@ -12,8 +12,9 @@ import pydicom
 from pathlib import Path 
 import time
 from PIL import Image
-from pyMDR.MDR import model_driven_registration  
-from models  import iBEAt_DCE
+from MDR import model_driven_registration  
+import importlib
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -94,9 +95,8 @@ def get_sitk_image_details_from_DICOM(slice_path):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing
+    return spacing
 
 # sort all input slices based on acquisition time
 def sort_all_slice_files_acquisition_time(files):
@@ -115,16 +115,15 @@ def sort_all_slice_files_acquisition_time(files):
 def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder):
     """ Example application of MDR in renal DCE (iBEAt data)
     
-    Parameters
-    ----------
+    Args
+    ----
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files: selected slices to process using MDR: sorted according to acquisition time 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
-    patient_folder: patient folder with AIFs text file
+    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
+    AIFs_PATH (string): string with full AIF path
+    patient_folder (string): patient folder with AIFs text file
 
     Description
     -----------
@@ -143,7 +142,8 @@ def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
         original_images[:, :, i] = img2d
 
     # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(AIFs_PATH, patient_folder)
+    full_module_name = "models.iBEAt_DCE"
+    signal_model_parameters = read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder)
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
@@ -171,14 +171,15 @@ def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
 
 
 ## read sequence acquisition parameter for signal modelling
-def read_signal_model_parameters(AIFs_PATH, patient_folder):
-    aif, times = iBEAt_DCE.load_txt(AIFs_PATH + '/' + str(patient_folder) + '/' + 'AIF__2C Filtration__Curve.txt')
+def read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder):
+   
+   # generate a module named as a string
+    MODEL = importlib.import_module(full_module_name)
+    aif, times = MODEL.load_txt(AIFs_PATH + '/' + str(patient_folder) + '/' + 'AIF__2C Filtration__Curve.txt')
     aif.append(aif[-1])
     times.append(times[-1])
-    # select model
-    MODEL = [iBEAt_DCE,'fitting']
     # select signal model paramters
-    signal_model_parameters = [MODEL, aif, times]
+    signal_model_parameters = [MODEL, [aif, times]]
     return signal_model_parameters
 
 

@@ -44,21 +44,17 @@ import pydicom
 from scipy.optimize import curve_fit
 
 def read_and_sort_echo_times(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function provides sorted list of echo times and DICOMs from corresponding T2* echo times (TE).
+    &#34;&#34;&#34; This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).
 
-    Parameters
-    ---------- 
-    fname: int
-    Dicom filename to process
-    lstFilesDCM: list
-    list of  dicom files to process
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    echo_times: list
-    sorted list of echo times 
-    slice_sorted_echo_time: list
-    sorted list of DICOMs from corresponding echo times (TE)
+    Returns
+    -------
+    echo_times (list): sorted list of echo times 
+    slice_sorted_echo_time (list): sorted list of DICOMs from sorted list of echo times (TE).
 
     &#34;&#34;&#34;
     echo_times = []
@@ -90,15 +86,13 @@ def read_and_sort_echo_times(fname,lstFilesDCM):
 def exp_func(TE,S0,T2star):
     &#34;&#34;&#34; mono-exponential decay function used to perform T2star-fitting.
 
-    Parameters
-    ---------- 
-    TE: list
-    echo times
+    Args
+    ----
+    TE (int): Echo times (TE) for per time-series point for the T2* mapping sequence
 
-    Return values
-    ------------
-    curve_fit: array
-    returns S0: fitted parameter &#39;S0&#39; and T2star: fitted parameter &#39;T2*&#39; (ms) per pixel
+    Returns
+    -------
+    S0, T2star(numpy.ndarray): signal model fitted parameters as np.ndarray.
 
     &#34;&#34;&#34;
   
@@ -107,23 +101,18 @@ def exp_func(TE,S0,T2star):
 
 
 def T2star_fitting(images_to_be_fitted, echo_times):
-    &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and T2*.
+    &#34;&#34;&#34; curve fit function which returns the fit and fitted params S0 and T2*.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total TEs * numer of slices]
-    echo_times: list
-    TE times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE time) with shape [x,:]
+    echo_times (list): list of TE times
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    S0: array
-    fitted parameter &#39;S0&#39; per pixel 
-    T2star: array
-    fitted parameter &#39;T2*&#39; (ms) per pxel
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    S0 (numpy.float64): fitted parameter &#39;S0&#39; per pixel 
+    T2star (numpy.float64): fitted parameter &#39;T2*&#39; (ms) per pixel.
 
     &#34;&#34;&#34;
     
@@ -146,21 +135,18 @@ def T2star_fitting(images_to_be_fitted, echo_times):
 
 
 def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function for model fitting at single pixel level. 
+    &#34;&#34;&#34; main function for model fitting of T2* at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: 2D np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        echo times (TE) per time-series
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE) with shape [x,:]
+    signal_model_parameters (list): TE times as a list
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        signal-model fitted parameters S0 and T2*
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;T2star&#39;.  
     &#34;&#34;&#34;
     
     echo_times = signal_model_parameters
@@ -187,41 +173,35 @@ def main(images_to_be_fitted, signal_model_parameters):
 <span>def <span class="ident">T2star_fitting</span></span>(<span>images_to_be_fitted, echo_times)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>curve fit function which returns the fit, and fitted params: S0 and T2*.</p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel value at each T2-prep time for all slices with shape: [1, total TEs * numer of slices]
-echo_times: list
-TE times</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-S0: array
-fitted parameter 'S0' per pixel
-T2star: array
-fitted parameter 'T2*' (ms) per pxel</p></div>
+<div class="desc"><p>curve fit function which returns the fit and fitted params S0 and T2*.</p>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE time) with shape [x,:]
+echo_times (list): list of TE times</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>S0 (numpy.float64): fitted parameter 'S0' per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>T2star (numpy.float64): fitted parameter 'T2*' (ms) per pixel.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def T2star_fitting(images_to_be_fitted, echo_times):
-    &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and T2*.
+    &#34;&#34;&#34; curve fit function which returns the fit and fitted params S0 and T2*.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total TEs * numer of slices]
-    echo_times: list
-    TE times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE time) with shape [x,:]
+    echo_times (list): list of TE times
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    S0: array
-    fitted parameter &#39;S0&#39; per pixel 
-    T2star: array
-    fitted parameter &#39;T2*&#39; (ms) per pxel
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    S0 (numpy.float64): fitted parameter &#39;S0&#39; per pixel 
+    T2star (numpy.float64): fitted parameter &#39;T2*&#39; (ms) per pixel.
 
     &#34;&#34;&#34;
     
@@ -247,12 +227,10 @@ fitted parameter 'T2*' (ms) per pxel</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>mono-exponential decay function used to perform T2star-fitting.</p>
-<h2 id="parameters">Parameters</h2>
-<p>TE: list
-echo times</p>
-<h2 id="return-values">Return Values</h2>
-<p>curve_fit: array
-returns S0: fitted parameter 'S0' and T2star: fitted parameter 'T2*' (ms) per pixel</p></div>
+<h2 id="args">Args</h2>
+<p>TE (int): Echo times (TE) for per time-series point for the T2* mapping sequence</p>
+<h2 id="returns">Returns</h2>
+<p>S0, T2star(numpy.ndarray): signal model fitted parameters as np.ndarray.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -260,15 +238,13 @@ returns S0: fitted parameter 'S0' and T2star: fitted parameter 'T2*' (ms) per pi
 <pre><code class="python">def exp_func(TE,S0,T2star):
     &#34;&#34;&#34; mono-exponential decay function used to perform T2star-fitting.
 
-    Parameters
-    ---------- 
-    TE: list
-    echo times
+    Args
+    ----
+    TE (int): Echo times (TE) for per time-series point for the T2* mapping sequence
 
-    Return values
-    ------------
-    curve_fit: array
-    returns S0: fitted parameter &#39;S0&#39; and T2star: fitted parameter &#39;T2*&#39; (ms) per pixel
+    Returns
+    -------
+    S0, T2star(numpy.ndarray): signal model fitted parameters as np.ndarray.
 
     &#34;&#34;&#34;
   
@@ -279,37 +255,33 @@ returns S0: fitted parameter 'S0' and T2star: fitted parameter 'T2*' (ms) per pi
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>main function for model fitting at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: 2D np-array
-pixel-wise signal time curve for the time-series with shape: [x,:]
-signal_model_parameters: list
-echo times (TE) per time-series</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-fitted_parameters: list
-signal-model fitted parameters S0 and T2*</p></div>
+<div class="desc"><p>main function for model fitting of T2* at single pixel level. </p>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE) with shape [x,:]
+signal_model_parameters (list): TE times as a list</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>fitted_parameters (list): list with signal model fitted parameters 'S0' and 'T2star'.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function for model fitting at single pixel level. 
+    &#34;&#34;&#34; main function for model fitting of T2* at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: 2D np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        echo times (TE) per time-series
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE) with shape [x,:]
+    signal_model_parameters (list): TE times as a list
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        signal-model fitted parameters S0 and T2*
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;T2star&#39;.  
     &#34;&#34;&#34;
     
     echo_times = signal_model_parameters
@@ -329,38 +301,32 @@ signal-model fitted parameters S0 and T2*</p></div>
 <span>def <span class="ident">read_and_sort_echo_times</span></span>(<span>fname, lstFilesDCM)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This function provides sorted list of echo times and DICOMs from corresponding T2* echo times (TE).</p>
-<h2 id="parameters">Parameters</h2>
-<p>fname: int
-Dicom filename to process
-lstFilesDCM: list
-list of
-dicom files to process</p>
-<h2 id="return-values">Return Values</h2>
-<p>echo_times: list
-sorted list of echo times
-slice_sorted_echo_time: list
-sorted list of DICOMs from corresponding echo times (TE)</p></div>
+<div class="desc"><p>This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).</p>
+<h2 id="args">Args</h2>
+<p>fname (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>echo_times (list): sorted list</code> of <code>echo times </code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>slice_sorted_echo_time (list): sorted list of DICOMs from sorted list of echo times (TE).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_and_sort_echo_times(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function provides sorted list of echo times and DICOMs from corresponding T2* echo times (TE).
+    &#34;&#34;&#34; This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).
 
-    Parameters
-    ---------- 
-    fname: int
-    Dicom filename to process
-    lstFilesDCM: list
-    list of  dicom files to process
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    echo_times: list
-    sorted list of echo times 
-    slice_sorted_echo_time: list
-    sorted list of DICOMs from corresponding echo times (TE)
+    Returns
+    -------
+    echo_times (list): sorted list of echo times 
+    slice_sorted_echo_time (list): sorted list of DICOMs from sorted list of echo times (TE).
 
     &#34;&#34;&#34;
     echo_times = []

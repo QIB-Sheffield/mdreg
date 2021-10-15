@@ -83,7 +83,7 @@ def read_dicom_tags_IVIM(fname,lstFilesDCM):
 def exp_func(b, S0, ADC):
     """ mono-exponential decay function used to perform DWI-fitting.
 
-    Args:
+    Args
     ----
     b (numpy.float64): object containing b values
 
@@ -101,7 +101,7 @@ def exp_func(b, S0, ADC):
 def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
     """ curve fit function which returns the fit, and fitted params: S0 and ADC.
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
     signal_model_parameters (list): list of b_values
@@ -170,7 +170,7 @@ def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
 def main(images_to_be_fitted, signal_model_parameters):
     """ main function for DWI model fitting at single pixel level. 
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at b-value) with shape [x,:]
     signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient

@@ -48,21 +48,17 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def read_inversion_times_and_sort(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function reads the inversion times for T1 sequences and sorts the files according to these inversion times.
+    &#34;&#34;&#34; This function reads the inversion times for the T1 sequence and sorts the files according to these inversion times.
     
-    Parameters
-    ---------- 
-    fname: list
-    dicom filenames to process
-    lstFilesDCM: list
-    list of  dicom files to process
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    inversion_times: list
-    sorted list of inversion times 
-    slice_sorted_inv_time: list
-    sorted list of DICOMs from corresponding inversion times (TI)
+    Returns
+    -------
+    inversion_times (list): sorted list of inversion times 
+    slice_sorted_inv_time (list): sorted list of DICOMs from corresponding inversion times (TI).
     &#34;&#34;&#34;
 
     inversion_times = []
@@ -92,14 +88,13 @@ def read_inversion_times_and_sort(fname,lstFilesDCM):
 def exp_func(x, a, b, T1):
     &#34;&#34;&#34; exponential function used to perform T1-fitting.
 
-    Parameters
-    ---------- 
-    x: list
-    inversion times (TI) 
+    Args
+    ----
+    x (list): list of inversion times (TI) 
     
-    Return values
-    ------------
-    curve_fit returns fitted parameter &#39;a&#39;, &#39;b&#39; and &#39;apparent T1&#39;(ms) per pixel
+    Returns
+    -------
+    a, b, S0, T1 (numpy.ndarray): signal model fitted parameters as np.ndarray.
     &#34;&#34;&#34;
 
     return a - b * np.exp(-x/T1) #S = a-b*exp(-TI/T1)
@@ -109,19 +104,15 @@ def exp_func(x, a, b, T1):
 def T1_fitting(images_to_be_fitted, inversion_times):
     &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and apparent T1.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total TIs * numer of slices]
-    inversion_times: list
-    T1 inversion times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+    inversion_times (list): T1 inversion times
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    results: list
-    fitted parameters inluding &#39;T1_estimated&#39; which is the estimated T1 (ms) and &#39;T1_apparent&#39; which is the apparent T1 (ms), B, A
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    results (list): fitted parameters inluding &#39;T1_estimated&#39; - estimated T1 (ms) and &#39;T1_apparent&#39; - T1 (ms), and B, and A.
     &#34;&#34;&#34;
 
     lb = [0, 0, 0]
@@ -173,20 +164,16 @@ def T1_fitting(images_to_be_fitted, inversion_times):
 def main(images_to_be_fitted, signal_model_parameters): 
     &#34;&#34;&#34; main function for model fitting at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal model parameters for T1: list
-        signal_model_parameters: list
-        T1 inversion times as a list 
+        Args
+        ----
+        images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+        signal model parameters (list): T1 inversion times as a list 
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        list of estimated parameters from model fit including T1_estimated: estimated T1 (ms), T1_apparent: apparent T1 (ms), B, A
+        Returns
+        -------
+        fit (list): signal model fit per pixel
+        fitted_parameters (list): list of estimated parameters from model fit including T1_estimated - estimated T1 (ms), 
+        T1_apparent - apparent T1 (ms), and B, and A.
     &#34;&#34;&#34;
 
     fitted_parameters = []
@@ -217,16 +204,15 @@ def main(images_to_be_fitted, signal_model_parameters):
 </code></dt>
 <dd>
 <div class="desc"><p>curve fit function which returns the fit, and fitted params: S0 and apparent T1.</p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel value at each T2-prep time for all slices with shape: [1, total TIs * numer of slices]
-inversion_times: list
-T1 inversion times</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-results: list
-fitted parameters inluding 'T1_estimated' which is the estimated T1 (ms) and 'T1_apparent' which is the apparent T1 (ms), B, A</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+inversion_times (list): T1 inversion times</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>results (list): fitted parameters inluding 'T1_estimated' - estimated T1 (ms) and 'T1_apparent' - T1 (ms), and B, and A.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -234,19 +220,15 @@ fitted parameters inluding 'T1_estimated' which is the estimated T1 (ms) and 'T1
 <pre><code class="python">def T1_fitting(images_to_be_fitted, inversion_times):
     &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and apparent T1.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total TIs * numer of slices]
-    inversion_times: list
-    T1 inversion times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+    inversion_times (list): T1 inversion times
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    results: list
-    fitted parameters inluding &#39;T1_estimated&#39; which is the estimated T1 (ms) and &#39;T1_apparent&#39; which is the apparent T1 (ms), B, A
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    results (list): fitted parameters inluding &#39;T1_estimated&#39; - estimated T1 (ms) and &#39;T1_apparent&#39; - T1 (ms), and B, and A.
     &#34;&#34;&#34;
 
     lb = [0, 0, 0]
@@ -299,11 +281,10 @@ fitted parameters inluding 'T1_estimated' which is the estimated T1 (ms) and 'T1
 </code></dt>
 <dd>
 <div class="desc"><p>exponential function used to perform T1-fitting.</p>
-<h2 id="parameters">Parameters</h2>
-<p>x: list
-inversion times (TI) </p>
-<h2 id="return-values">Return Values</h2>
-<p>curve_fit returns fitted parameter 'a', 'b' and 'apparent T1'(ms) per pixel</p></div>
+<h2 id="args">Args</h2>
+<p>x (list): list of inversion times (TI) </p>
+<h2 id="returns">Returns</h2>
+<p>a, b, S0, T1 (numpy.ndarray): signal model fitted parameters as np.ndarray.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -311,14 +292,13 @@ inversion times (TI) </p>
 <pre><code class="python">def exp_func(x, a, b, T1):
     &#34;&#34;&#34; exponential function used to perform T1-fitting.
 
-    Parameters
-    ---------- 
-    x: list
-    inversion times (TI) 
+    Args
+    ----
+    x (list): list of inversion times (TI) 
     
-    Return values
-    ------------
-    curve_fit returns fitted parameter &#39;a&#39;, &#39;b&#39; and &#39;apparent T1&#39;(ms) per pixel
+    Returns
+    -------
+    a, b, S0, T1 (numpy.ndarray): signal model fitted parameters as np.ndarray.
     &#34;&#34;&#34;
 
     return a - b * np.exp(-x/T1) #S = a-b*exp(-TI/T1)</code></pre>
@@ -329,17 +309,17 @@ inversion times (TI) </p>
 </code></dt>
 <dd>
 <div class="desc"><p>main function for model fitting at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel-wise signal time curve for the time-series with shape: [x,:]
-signal model parameters for T1: list
-signal_model_parameters: list
-T1 inversion times as a list </p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-fitted_parameters: list
-list of estimated parameters from model fit including T1_estimated: estimated T1 (ms), T1_apparent: apparent T1 (ms), B, A</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+signal model parameters (list): T1 inversion times as a list </p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>fitted_parameters (list): list</code> of <code>estimated parameters from model fit including T1_estimated - estimated T1 (ms),</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>T1_apparent - apparent T1 (ms), and B, and A.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -347,20 +327,16 @@ list of estimated parameters from model fit including T1_estimated: estimated T1
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters): 
     &#34;&#34;&#34; main function for model fitting at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal model parameters for T1: list
-        signal_model_parameters: list
-        T1 inversion times as a list 
+        Args
+        ----
+        images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+        signal model parameters (list): T1 inversion times as a list 
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        list of estimated parameters from model fit including T1_estimated: estimated T1 (ms), T1_apparent: apparent T1 (ms), B, A
+        Returns
+        -------
+        fit (list): signal model fit per pixel
+        fitted_parameters (list): list of estimated parameters from model fit including T1_estimated - estimated T1 (ms), 
+        T1_apparent - apparent T1 (ms), and B, and A.
     &#34;&#34;&#34;
 
     fitted_parameters = []
@@ -383,38 +359,32 @@ list of estimated parameters from model fit including T1_estimated: estimated T1
 <span>def <span class="ident">read_inversion_times_and_sort</span></span>(<span>fname, lstFilesDCM)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This function reads the inversion times for T1 sequences and sorts the files according to these inversion times.</p>
-<h2 id="parameters">Parameters</h2>
-<p>fname: list
-dicom filenames to process
-lstFilesDCM: list
-list of
-dicom files to process</p>
-<h2 id="return-values">Return Values</h2>
-<p>inversion_times: list
-sorted list of inversion times
-slice_sorted_inv_time: list
-sorted list of DICOMs from corresponding inversion times (TI)</p></div>
+<div class="desc"><p>This function reads the inversion times for the T1 sequence and sorts the files according to these inversion times.</p>
+<h2 id="args">Args</h2>
+<p>fname (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>inversion_times (list): sorted list</code> of <code>inversion times </code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>slice_sorted_inv_time (list): sorted list of DICOMs from corresponding inversion times (TI).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_inversion_times_and_sort(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function reads the inversion times for T1 sequences and sorts the files according to these inversion times.
+    &#34;&#34;&#34; This function reads the inversion times for the T1 sequence and sorts the files according to these inversion times.
     
-    Parameters
-    ---------- 
-    fname: list
-    dicom filenames to process
-    lstFilesDCM: list
-    list of  dicom files to process
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    inversion_times: list
-    sorted list of inversion times 
-    slice_sorted_inv_time: list
-    sorted list of DICOMs from corresponding inversion times (TI)
+    Returns
+    -------
+    inversion_times (list): sorted list of inversion times 
+    slice_sorted_inv_time (list): sorted list of DICOMs from corresponding inversion times (TI).
     &#34;&#34;&#34;
 
     inversion_times = []

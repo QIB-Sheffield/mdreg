@@ -48,17 +48,14 @@ np.set_printoptions(threshold=sys.maxsize)
 def load_txt(full_path_txt):
     &#34;&#34;&#34; reads the AIF text file to find the AIF values and associated time-points.
 
-        Parameters
-        ---------- 
-        full_path_txt: string
-        file path to the AIF text file.
+        Args
+        ----
+        full_path_txt (string): file path to the AIF text file
 
-        Return values
-        ------------
-        aif: list
-        arterial input function at each timepoint
-        time: list
-        corresponding timepoints for each AIF 
+        Returns
+        -------
+        aif (list): arterial input function at each timepoint
+        time (list): corresponding timepoints at each AIF 
     &#34;&#34;&#34;
     counter_file = open(full_path_txt, &#39;r+&#39;)
     content_lines = []
@@ -85,20 +82,23 @@ def Integral_Trapezoidal_Rule_second(first_pass,time):
     return second_pass
 
 def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45): 
-    &#34;&#34;&#34; Linear least squares 2-Compartment filtration model fit.
+    &#34;&#34;&#34; Linear least squares 2-compartment filtration model fit.
 
-    Parameters
-    ---------- 
-    ct: concentration
-    timepoints: DCE dynamic timepoints
-    aif: arterial input function
-    timepoint: maximum-timepoint
-    Hct: hematocrit
+    Args
+    ----
+    ct (numpy.ndarray): pixel value (concentration) for time-series (i.e. at each dynamic measurement) with shape [x,:] 
+    timepoints (list): DCE dynamic timepoints
+    aif (list): arterial input function
+    timepoint (int): maximum-timepoint
+    Hct (float): hematocrit
 
-    Return values
-    ------------
-    fit: pixel level signal fit 
-    Fp, Tp, PS, Te: fit parameters
+    Returns
+    -------
+    fit (int): signal model fit per pixel
+    Fp (numpy.float64): fitted parameter &#39;Fp&#39; per pixel 
+    Tp (int): fitted parameter &#39;Tp&#39;
+    PS (int): fitted parameter &#39;PS&#39;
+    Te (int): fit parameter &#39;Te&#39;
     &#34;&#34;&#34;
       
     time =  timepoints
@@ -159,56 +159,33 @@ def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45):
             #params = [Fp, Tp, PS, Te]
             fit =X[0]*A[:,0] + X[1]*A[:,1] + X[2]*A[:,2] + X[3]*A[:,3]
             fit=ct0+fit
-    
+
+
     return fit, Fp, Tp, PS, Te 
 
-# def DCE_find_timepoint(aif):
-#     &#34;&#34;&#34;
-#     input: AIF
-#     output: DCE maximum timepoint
-#     &#34;&#34;&#34;
-#     # find timepoint
-#     idx = np.argmax(aif)
-#     minima = argrelextrema(np.asarray(aif), np.less)[0]
-#     maxima = argrelextrema(np.asarray(aif), np.greater)[0]
-#     assert idx in maxima, &#34;The global maximum was not found in the maxima list&#34;
-#     wanted_minimum = np.nan
-#     for ix, val in enumerate(minima):
-#         if ix==len(minima)-1:
-#             continue
-#         elif val&lt;idx and minima[ix+1]&gt;idx:
-#             wanted_minimum = val
-#     assert wanted_minimum + 1 &lt; idx, &#34;Minimum + 1 position equals to Global Maximum&#34;
-#     return wanted_minimum + 1
 
 
 def main(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; main function that performs 2-compartment filtration DCE model fitting at single pixel level. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel-wise signal time curve for the time-series with shape: [x,:]
-    signal_model_parameters: list
-    [MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each dynamic measurement) with shape [x,:]
+    signal_model_parameters (list): AIF and corresponging timepoints as a list
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    fitted_parameters: list
-    [Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO
-    
+
+    Returns
+    -------
+    fit (int): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters [Fp, Tp, Ps, Te]    
     &#34;&#34;&#34;
     
-    AIF = signal_model_parameters[1][0]
-   
-    timepoints = signal_model_parameters[1][1]
-    
-    #max_timepoint = DCE_find_timepoint(AIF)
-
+    AIF = signal_model_parameters[0]
+ 
+    timepoints = signal_model_parameters[1]
+  
     fit, Fp, Tp, Ps, Te = Linear_Least_Squares_2CFM(images_to_be_fitted, timepoints, AIF, timepoint = 39,Hct = 0.45)   
-    
+                                          
     fitted_parameters = [Fp, Tp, Ps, Te] 
 
     return fit, fitted_parameters</code></pre>
@@ -257,35 +234,48 @@ def main(images_to_be_fitted, signal_model_parameters):
 <span>def <span class="ident">Linear_Least_Squares_2CFM</span></span>(<span>ct, timepoints, aif, timepoint=39, Hct=0.45)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Linear least squares 2-Compartment filtration model fit.</p>
-<h2 id="parameters">Parameters</h2>
-<p>ct: concentration
-timepoints: DCE dynamic timepoints
-aif: arterial input function
-timepoint: maximum-timepoint
-Hct: hematocrit</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: pixel level signal fit
-Fp, Tp, PS, Te: fit parameters</p></div>
+<div class="desc"><p>Linear least squares 2-compartment filtration model fit.</p>
+<h2 id="args">Args</h2>
+<p>ct (numpy.ndarray): pixel value (concentration) for time-series (i.e. at each dynamic measurement) with shape [x,:]
+timepoints (list): DCE dynamic timepoints
+aif (list): arterial input function
+timepoint (int): maximum-timepoint
+Hct (float): hematocrit</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (int): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>Fp (numpy.float64): fitted parameter 'Fp' per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>Tp (int): fitted parameter 'Tp'</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>PS (int): fitted parameter 'PS'</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>Te (int): fit parameter 'Te'</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45): 
-    &#34;&#34;&#34; Linear least squares 2-Compartment filtration model fit.
+    &#34;&#34;&#34; Linear least squares 2-compartment filtration model fit.
 
-    Parameters
-    ---------- 
-    ct: concentration
-    timepoints: DCE dynamic timepoints
-    aif: arterial input function
-    timepoint: maximum-timepoint
-    Hct: hematocrit
+    Args
+    ----
+    ct (numpy.ndarray): pixel value (concentration) for time-series (i.e. at each dynamic measurement) with shape [x,:] 
+    timepoints (list): DCE dynamic timepoints
+    aif (list): arterial input function
+    timepoint (int): maximum-timepoint
+    Hct (float): hematocrit
 
-    Return values
-    ------------
-    fit: pixel level signal fit 
-    Fp, Tp, PS, Te: fit parameters
+    Returns
+    -------
+    fit (int): signal model fit per pixel
+    Fp (numpy.float64): fitted parameter &#39;Fp&#39; per pixel 
+    Tp (int): fitted parameter &#39;Tp&#39;
+    PS (int): fitted parameter &#39;PS&#39;
+    Te (int): fit parameter &#39;Te&#39;
     &#34;&#34;&#34;
       
     time =  timepoints
@@ -346,7 +336,8 @@ Fp, Tp, PS, Te: fit parameters</p></div>
             #params = [Fp, Tp, PS, Te]
             fit =X[0]*A[:,0] + X[1]*A[:,1] + X[2]*A[:,2] + X[3]*A[:,3]
             fit=ct0+fit
-    
+
+
     return fit, Fp, Tp, PS, Te </code></pre>
 </details>
 </dd>
@@ -355,14 +346,15 @@ Fp, Tp, PS, Te: fit parameters</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>reads the AIF text file to find the AIF values and associated time-points.</p>
-<h2 id="parameters">Parameters</h2>
-<p>full_path_txt: string
-file path to the AIF text file.</p>
-<h2 id="return-values">Return Values</h2>
-<p>aif: list
-arterial input function at each timepoint
-time: list
-corresponding timepoints for each AIF</p></div>
+<h2 id="args">Args</h2>
+<p>full_path_txt (string): file path to the AIF text file</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>aif (list): arterial input function at each timepoint</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>time (list): corresponding timepoints at each AIF</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -370,17 +362,14 @@ corresponding timepoints for each AIF</p></div>
 <pre><code class="python">def load_txt(full_path_txt):
     &#34;&#34;&#34; reads the AIF text file to find the AIF values and associated time-points.
 
-        Parameters
-        ---------- 
-        full_path_txt: string
-        file path to the AIF text file.
+        Args
+        ----
+        full_path_txt (string): file path to the AIF text file
 
-        Return values
-        ------------
-        aif: list
-        arterial input function at each timepoint
-        time: list
-        corresponding timepoints for each AIF 
+        Returns
+        -------
+        aif (list): arterial input function at each timepoint
+        time (list): corresponding timepoints at each AIF 
     &#34;&#34;&#34;
     counter_file = open(full_path_txt, &#39;r+&#39;)
     content_lines = []
@@ -400,16 +389,16 @@ corresponding timepoints for each AIF</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>main function that performs 2-compartment filtration DCE model fitting at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel-wise signal time curve for the time-series with shape: [x,:]
-signal_model_parameters: list
-[MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-fitted_parameters: list
-[Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each dynamic measurement) with shape [x,:]
+signal_model_parameters (list): AIF and corresponging timepoints as a list</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (int): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>fitted_parameters (list): list with signal model fitted parameters [Fp, Tp, Ps, Te]</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -417,30 +406,24 @@ fitted_parameters: list
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; main function that performs 2-compartment filtration DCE model fitting at single pixel level. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel-wise signal time curve for the time-series with shape: [x,:]
-    signal_model_parameters: list
-    [MODEL NAME, aif: arterial input function, times: time-point for each DCE dynamic acquisition] # TODO
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each dynamic measurement) with shape [x,:]
+    signal_model_parameters (list): AIF and corresponging timepoints as a list
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    fitted_parameters: list
-    [Fp: perfusion fraction, Tp:, Ps:, Te:] # TODO
-    
+
+    Returns
+    -------
+    fit (int): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters [Fp, Tp, Ps, Te]    
     &#34;&#34;&#34;
     
-    AIF = signal_model_parameters[1][0]
-   
-    timepoints = signal_model_parameters[1][1]
-    
-    #max_timepoint = DCE_find_timepoint(AIF)
-
+    AIF = signal_model_parameters[0]
+ 
+    timepoints = signal_model_parameters[1]
+  
     fit, Fp, Tp, Ps, Te = Linear_Least_Squares_2CFM(images_to_be_fitted, timepoints, AIF, timepoint = 39,Hct = 0.45)   
-    
+                                          
     fitted_parameters = [Fp, Tp, Ps, Te] 
 
     return fit, fitted_parameters</code></pre>

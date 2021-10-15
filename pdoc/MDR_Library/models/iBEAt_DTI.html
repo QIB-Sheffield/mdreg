@@ -42,27 +42,23 @@ import sys
 import pydicom
 np.set_printoptions(threshold=sys.maxsize)
 
-#TODO: correct FA map generation - bug in this code!  
-    
+#TODO: correct FA map generation bug! 
+
+
 def read_dicom_tags_DTI(fname,lstFilesDCM):
     &#34;&#34;&#34; This function reads the DICOM tags from the DTI sequence and returns the corresponding DTI tags.
 
-    Parameters
-    ---------- 
-    fname: int
-    dicom filename to process
-    lstFilesDCM: list
-    list of  dicom files
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    b-values: list
-    DTI b-values as list
-    b_Vec_original: list
-    original b-vectors as list
-    image_orientation_patient: list
-    patient orientation
-
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    
     &#34;&#34;&#34;
     b_values = []
     b_Vec_original = []
@@ -77,39 +73,19 @@ def read_dicom_tags_DTI(fname,lstFilesDCM):
     return b_values, b_Vec_original, image_orientation_patient 
 
 
-# def mono_exp_model(x, b):
-#     &#34;&#34;&#34;
-#     mono-exponential function used to perform DTI-fitting
-
-#     Parameters
-#     ---------- 
-#     x: signal at each pixel
-#     b: b-values for DTI (s/mm2)
-
-#     Return values
-#     ------------
-#     curve_fit returns: DiffusionTensor (M), Bv_new, FA_mask, ADC_mask, fit
-#     S0: fitted parameter &#39;S0&#39; and &#39;ADC&#39;: fitted parameter apparent diffusion coefficent (sec/mm2) per pixel
-
-#     &#34;&#34;&#34;
-#     return x[:, 6] * np.exp(np.matmul(-x[:,1:6], b))
-
-
- #TODO: correct FA map generation - bug in this code!   
 def DTI_fitting(im, b, thresh_val, method=&#39;linear&#39;):
     &#34;&#34;&#34; DTI fit function. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each b-value and for all directions (iBEAt) and slices  (shape: [1, total slices]) 
-    signal_model_parameters: 
-    signal model parameters to extract &#39;b_values&#39; from IVIM sequence
+    Args:
+    ----
+    im (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    b (list): list of b_values
+    thresh_val (numpy.ndarray): B matrix
 
-    Return values
-    ------------
-    fit: signal model fit per pixel
-    Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel 
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameters -  DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
    
     sz = np.shape(im)
@@ -160,8 +136,8 @@ def DTI_fitting(im, b, thresh_val, method=&#39;linear&#39;):
     M[np.isnan(M)]=0
     M[np.isinf(M)]=0
     ### Initialize Variables
-    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1])
-    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1])
+    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
+    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
 
     #start = time.time()
     for i in range(np.shape(M)[0]):
@@ -182,7 +158,7 @@ def DTI_fitting(im, b, thresh_val, method=&#39;linear&#39;):
 
         # Calculate the eigenvalues and vectors, and sort the 
         # eigenvalues from small to large
-        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor);
+        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor)
         if np.sum(EigenValues)!=0:
             EigenValues, EigenVectors = zip(*sorted(zip(EigenValues, EigenVectors)))
         
@@ -210,28 +186,25 @@ def DTI_fitting(im, b, thresh_val, method=&#39;linear&#39;):
 
 
 def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function to perform model fitting at single pixel level. 
-    
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        [MODEL NAME, [b_values, bVec_original]] #TODO
+    &#34;&#34;&#34; main function to perform DTI model fitting at single pixel level. 
+   
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
-        Return values
-        ------------
-        fit: np-array 
-        signal model fit per pixel
-        fitted_parameters: list
-        [M_new.T[:, :], Bv_new[:, :], fa, adc] #TODO
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;ADC&#39;.  
     &#34;&#34;&#34;
-    b_values = signal_model_parameters[1][0]
-    bVec_original = signal_model_parameters[1][1]
+    b_values = signal_model_parameters[0]
+   
+    bVec_original = signal_model_parameters[1]
+ 
     image_orientation_patient = signal_model_parameters[2]
-
-    fitted_parameters = []
-
+ 
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], &#34;Error in image_orientation_patient for DTI&#34;
  
@@ -249,16 +222,7 @@ def main(images_to_be_fitted, signal_model_parameters):
     ### Mask
     sz_mask = np.shape(images_to_be_fitted)
     
-
-    #print(&#34;size of sz_mask&#34;)
-    #print(np.shape(sz_mask))
-    #size of sz_mask
-    #(1,)
-
     mask = np.ones(sz_mask)
-
-    # print(&#34;size of mask&#34;)
-    # print(np.shape(mask)) # (146,)
 
     ### Fitting
     B = np.zeros((3, 3, len(b_values)))
@@ -267,9 +231,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 
     M_new, Bv_new, fa, adc, fit = DTI_fitting(images_to_be_fitted, B, mask, &#39;linear&#39;)
 
-    #fitted_parameters = [M_new.T[:, :], Bv_new[:, :], fa, adc]
-  
-    fitted_parameters = fa #[fa, adc]
+    fitted_parameters = [M_new.T[:, :], Bv_new[:, :], fa, adc]
     
     return fit, fitted_parameters</code></pre>
 </details>
@@ -286,15 +248,17 @@ def main(images_to_be_fitted, signal_model_parameters):
 </code></dt>
 <dd>
 <div class="desc"><p>DTI fit function. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel value at each b-value and for all directions (iBEAt) and slices
-(shape: [1, total slices])
-signal_model_parameters:
-signal model parameters to extract 'b_values' from IVIM sequence</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: signal model fit per pixel
-Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel</p></div>
+<h2 id="args">Args:</h2>
+<p>im (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+b (list): list of b_values
+thresh_val (numpy.ndarray): B matrix</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>Params (list): list consisting of fitted parameters -
+DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -302,17 +266,16 @@ Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotrop
 <pre><code class="python">def DTI_fitting(im, b, thresh_val, method=&#39;linear&#39;):
     &#34;&#34;&#34; DTI fit function. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each b-value and for all directions (iBEAt) and slices  (shape: [1, total slices]) 
-    signal_model_parameters: 
-    signal model parameters to extract &#39;b_values&#39; from IVIM sequence
+    Args:
+    ----
+    im (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    b (list): list of b_values
+    thresh_val (numpy.ndarray): B matrix
 
-    Return values
-    ------------
-    fit: signal model fit per pixel
-    Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel 
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameters -  DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
    
     sz = np.shape(im)
@@ -363,8 +326,8 @@ Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotrop
     M[np.isnan(M)]=0
     M[np.isinf(M)]=0
     ### Initialize Variables
-    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1])
-    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1])
+    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
+    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
 
     #start = time.time()
     for i in range(np.shape(M)[0]):
@@ -385,7 +348,7 @@ Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotrop
 
         # Calculate the eigenvalues and vectors, and sort the 
         # eigenvalues from small to large
-        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor);
+        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor)
         if np.sum(EigenValues)!=0:
             EigenValues, EigenVectors = zip(*sorted(zip(EigenValues, EigenVectors)))
         
@@ -415,44 +378,40 @@ Params: fitted parameter - DiffusionTensor (M), Bv_new, FA (Fractional Anisotrop
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>main function to perform model fitting at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel-wise signal time curve for the time-series with shape: [x,:]
-signal_model_parameters: list
-[MODEL NAME, [b_values, bVec_original]] #TODO</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-fitted_parameters: list
-[M_new.T[:, :], Bv_new[:, :], fa, adc] #TODO</p></div>
+<div class="desc"><p>main function to perform DTI model fitting at single pixel level. </p>
+<h2 id="args">Args:</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value) with shape [x,:]
+signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>fitted_parameters (list): list with signal model fitted parameters 'S0' and 'ADC'.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function to perform model fitting at single pixel level. 
-    
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        [MODEL NAME, [b_values, bVec_original]] #TODO
+    &#34;&#34;&#34; main function to perform DTI model fitting at single pixel level. 
+   
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
-        Return values
-        ------------
-        fit: np-array 
-        signal model fit per pixel
-        fitted_parameters: list
-        [M_new.T[:, :], Bv_new[:, :], fa, adc] #TODO
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;ADC&#39;.  
     &#34;&#34;&#34;
-    b_values = signal_model_parameters[1][0]
-    bVec_original = signal_model_parameters[1][1]
+    b_values = signal_model_parameters[0]
+   
+    bVec_original = signal_model_parameters[1]
+ 
     image_orientation_patient = signal_model_parameters[2]
-
-    fitted_parameters = []
-
+ 
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], &#34;Error in image_orientation_patient for DTI&#34;
  
@@ -470,16 +429,7 @@ fitted_parameters: list
     ### Mask
     sz_mask = np.shape(images_to_be_fitted)
     
-
-    #print(&#34;size of sz_mask&#34;)
-    #print(np.shape(sz_mask))
-    #size of sz_mask
-    #(1,)
-
     mask = np.ones(sz_mask)
-
-    # print(&#34;size of mask&#34;)
-    # print(np.shape(mask)) # (146,)
 
     ### Fitting
     B = np.zeros((3, 3, len(b_values)))
@@ -488,9 +438,7 @@ fitted_parameters: list
 
     M_new, Bv_new, fa, adc, fit = DTI_fitting(images_to_be_fitted, B, mask, &#39;linear&#39;)
 
-    #fitted_parameters = [M_new.T[:, :], Bv_new[:, :], fa, adc]
-  
-    fitted_parameters = fa #[fa, adc]
+    fitted_parameters = [M_new.T[:, :], Bv_new[:, :], fa, adc]
     
     return fit, fitted_parameters</code></pre>
 </details>
@@ -500,19 +448,19 @@ fitted_parameters: list
 </code></dt>
 <dd>
 <div class="desc"><p>This function reads the DICOM tags from the DTI sequence and returns the corresponding DTI tags.</p>
-<h2 id="parameters">Parameters</h2>
-<p>fname: int
-dicom filename to process
-lstFilesDCM: list
-list of
-dicom files</p>
-<h2 id="return-values">Return Values</h2>
-<p>b-values: list
-DTI b-values as list
-b_Vec_original: list
-original b-vectors as list
-image_orientation_patient: list
-patient orientation</p></div>
+<h2 id="args">Args</h2>
+<p>filenameDCM (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>b-values (list): list</code> of <code>DWI/IVIM b-values (s/mm2)</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>b_Vec_original (list): original b-vectors as list</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>image_orientation_patient (list):
+patient orientation as list</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -520,22 +468,17 @@ patient orientation</p></div>
 <pre><code class="python">def read_dicom_tags_DTI(fname,lstFilesDCM):
     &#34;&#34;&#34; This function reads the DICOM tags from the DTI sequence and returns the corresponding DTI tags.
 
-    Parameters
-    ---------- 
-    fname: int
-    dicom filename to process
-    lstFilesDCM: list
-    list of  dicom files
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    b-values: list
-    DTI b-values as list
-    b_Vec_original: list
-    original b-vectors as list
-    image_orientation_patient: list
-    patient orientation
-
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    
     &#34;&#34;&#34;
     b_values = []
     b_Vec_original = []

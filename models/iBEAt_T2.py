@@ -23,7 +23,7 @@ def read_prep_times():
 def exp_func(T2_prep_times,S0,T2):
     """ mono-exponential decay function performing T2-fitting.
 
-    Args:
+    Args
     ----
     T2_prep_times (int): T2-preparation time for per time-series point for the T2 mapping sequence
 
@@ -40,7 +40,7 @@ def exp_func(T2_prep_times,S0,T2):
 def T2_fitting(images_to_be_fitted, T2_prep_times):
     """ curve_fit function for T2-mapping.
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
     T2_prep_times (list): list of T2-preparation times
@@ -74,7 +74,7 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
 def main(images_to_be_fitted, signal_model_parameters):
     """ main function that performs the T2 model-fit at single pixel level. 
 
-    Args:
+    Args
     ----
     images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
     signal_model_parameters (list): T2-prep times as a list

@@ -58,21 +58,16 @@ def read_prep_times():
 def exp_func(T2_prep_times,S0,T2):
     &#34;&#34;&#34; mono-exponential decay function performing T2-fitting.
 
-    Parameters
-    ---------- 
-    T2_prep_times: list
-    T2-preparation times for the T2 mapping sequence
+    Args
+    ----
+    T2_prep_times (int): T2-preparation time for per time-series point for the T2 mapping sequence
 
-    Return values
-    ------------
-    S0: array
-    fitted parameter &#39;S0&#39; per pixel 
-    T2: array
-    fitted parameter &#39;T2&#39; (ms) per pixel
+    Returns
+    -------
+    S0, T2 (numpy.ndarray): signal model fitted parameters in np.ndarray.
+    
     &#34;&#34;&#34;
-    print(&#34;T2_prep_times type&#34;)
-    print(type(T2_prep_times))
-
+  
     return S0*np.exp(-T2_prep_times/T2)
 
 
@@ -80,22 +75,16 @@ def exp_func(T2_prep_times,S0,T2):
 def T2_fitting(images_to_be_fitted, T2_prep_times):
     &#34;&#34;&#34; curve_fit function for T2-mapping.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total T2-prep times  * numer of slices]
-    T2_prep_times: list
-    T2-preparation times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    T2_prep_times (list): list of T2-preparation times
 
-    Return values
-    ------------
-    fit: list
-    signal model fit per pixel
-    S0: numpy.float64
-    fitted parameter &#39;S0&#39; per pixel 
-    T2: numpy.float64
-    fitted parameter &#39;T2&#39; (ms) per pxel
-
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    S0 (numpy.float64): fitted parameter &#39;S0&#39; per pixel 
+    T2 (numpy.float64): fitted parameter &#39;T2&#39; (ms) per pixel.
     &#34;&#34;&#34;
     
     lb = [0,0]
@@ -104,9 +93,6 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
 
     popt, pcov = curve_fit(exp_func, xdata = T2_prep_times, ydata = images_to_be_fitted, p0=initial_guess, bounds=(lb,ub), method=&#39;trf&#39;)
     
-    print(&#34;popt type&#34;)
-    print(type(popt))
-
     T2_prep_times
     fit = []
 
@@ -123,30 +109,17 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
 def main(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; main function that performs the T2 model-fit at single pixel level. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: numpy nd-array
-    pixel-wise signal time curve for the time-series (i.e. T2-prep times) with shape: [x,:]
-    signal_model_parameters: list
-    T2-prep times as a list
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    signal_model_parameters (list): T2-prep times as a list
 
 
-    Return values
-    ------------
-    fit: list
-    signal model fit per pixel
-    fitted_parameters: list
-    list with signal model fitted parameters &#39;S0&#39; and &#39;T2&#39; 
-    
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;T2&#39;.  
     &#34;&#34;&#34;
-
-    print(&#34;in t2 model now&#34;)
-
-    print(&#34;signal_model_parameters type&#34;)
-    print(type(signal_model_parameters))
-
-    print(&#34;images_to_be_fitted type&#34;)
-    print(type(images_to_be_fitted))
 
     T2_prep_times = signal_model_parameters
     results = T2_fitting(images_to_be_fitted, T2_prep_times)
@@ -172,19 +145,17 @@ def main(images_to_be_fitted, signal_model_parameters):
 </code></dt>
 <dd>
 <div class="desc"><p>curve_fit function for T2-mapping.</p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel value at each T2-prep time for all slices with shape: [1, total T2-prep times
-* numer of slices]
-T2_prep_times: list
-T2-preparation times</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: list
-signal model fit per pixel
-S0: numpy.float64
-fitted parameter 'S0' per pixel
-T2: numpy.float64
-fitted parameter 'T2' (ms) per pxel</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+T2_prep_times (list): list of T2-preparation times</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>S0 (numpy.float64): fitted parameter 'S0' per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>T2 (numpy.float64): fitted parameter 'T2' (ms) per pixel.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -192,22 +163,16 @@ fitted parameter 'T2' (ms) per pxel</p></div>
 <pre><code class="python">def T2_fitting(images_to_be_fitted, T2_prep_times):
     &#34;&#34;&#34; curve_fit function for T2-mapping.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each T2-prep time for all slices with shape: [1, total T2-prep times  * numer of slices]
-    T2_prep_times: list
-    T2-preparation times
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    T2_prep_times (list): list of T2-preparation times
 
-    Return values
-    ------------
-    fit: list
-    signal model fit per pixel
-    S0: numpy.float64
-    fitted parameter &#39;S0&#39; per pixel 
-    T2: numpy.float64
-    fitted parameter &#39;T2&#39; (ms) per pxel
-
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    S0 (numpy.float64): fitted parameter &#39;S0&#39; per pixel 
+    T2 (numpy.float64): fitted parameter &#39;T2&#39; (ms) per pixel.
     &#34;&#34;&#34;
     
     lb = [0,0]
@@ -216,9 +181,6 @@ fitted parameter 'T2' (ms) per pxel</p></div>
 
     popt, pcov = curve_fit(exp_func, xdata = T2_prep_times, ydata = images_to_be_fitted, p0=initial_guess, bounds=(lb,ub), method=&#39;trf&#39;)
     
-    print(&#34;popt type&#34;)
-    print(type(popt))
-
     T2_prep_times
     fit = []
 
@@ -236,14 +198,10 @@ fitted parameter 'T2' (ms) per pxel</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>mono-exponential decay function performing T2-fitting.</p>
-<h2 id="parameters">Parameters</h2>
-<p>T2_prep_times: list
-T2-preparation times for the T2 mapping sequence</p>
-<h2 id="return-values">Return Values</h2>
-<p>S0: array
-fitted parameter 'S0' per pixel
-T2: array
-fitted parameter 'T2' (ms) per pixel</p></div>
+<h2 id="args">Args</h2>
+<p>T2_prep_times (int): T2-preparation time for per time-series point for the T2 mapping sequence</p>
+<h2 id="returns">Returns</h2>
+<p>S0, T2 (numpy.ndarray): signal model fitted parameters in np.ndarray.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -251,21 +209,16 @@ fitted parameter 'T2' (ms) per pixel</p></div>
 <pre><code class="python">def exp_func(T2_prep_times,S0,T2):
     &#34;&#34;&#34; mono-exponential decay function performing T2-fitting.
 
-    Parameters
-    ---------- 
-    T2_prep_times: list
-    T2-preparation times for the T2 mapping sequence
+    Args
+    ----
+    T2_prep_times (int): T2-preparation time for per time-series point for the T2 mapping sequence
 
-    Return values
-    ------------
-    S0: array
-    fitted parameter &#39;S0&#39; per pixel 
-    T2: array
-    fitted parameter &#39;T2&#39; (ms) per pixel
+    Returns
+    -------
+    S0, T2 (numpy.ndarray): signal model fitted parameters in np.ndarray.
+    
     &#34;&#34;&#34;
-    print(&#34;T2_prep_times type&#34;)
-    print(type(T2_prep_times))
-
+  
     return S0*np.exp(-T2_prep_times/T2)</code></pre>
 </details>
 </dd>
@@ -274,16 +227,15 @@ fitted parameter 'T2' (ms) per pixel</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>main function that performs the T2 model-fit at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: numpy nd-array
-pixel-wise signal time curve for the time-series (i.e. T2-prep times) with shape: [x,:]
-signal_model_parameters: list
-T2-prep times as a list</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: list
-signal model fit per pixel
-fitted_parameters: list
-list with signal model fitted parameters 'S0' and 'T2'</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+signal_model_parameters (list): T2-prep times as a list</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>fitted_parameters (list): list with signal model fitted parameters 'S0' and 'T2'.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -291,30 +243,17 @@ list with signal model fitted parameters 'S0' and 'T2'</p></div>
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; main function that performs the T2 model-fit at single pixel level. 
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: numpy nd-array
-    pixel-wise signal time curve for the time-series (i.e. T2-prep times) with shape: [x,:]
-    signal_model_parameters: list
-    T2-prep times as a list
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    signal_model_parameters (list): T2-prep times as a list
 
 
-    Return values
-    ------------
-    fit: list
-    signal model fit per pixel
-    fitted_parameters: list
-    list with signal model fitted parameters &#39;S0&#39; and &#39;T2&#39; 
-    
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;T2&#39;.  
     &#34;&#34;&#34;
-
-    print(&#34;in t2 model now&#34;)
-
-    print(&#34;signal_model_parameters type&#34;)
-    print(type(signal_model_parameters))
-
-    print(&#34;images_to_be_fitted type&#34;)
-    print(type(images_to_be_fitted))
 
     T2_prep_times = signal_model_parameters
     results = T2_fitting(images_to_be_fitted, T2_prep_times)

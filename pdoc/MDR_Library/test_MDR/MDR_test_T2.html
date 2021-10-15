@@ -7,7 +7,7 @@
 <title>MDR_Library.test_MDR.MDR_test_T2 API documentation</title>
 <meta name="description" content="MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for T2 sequence using Model driven registration …" />
+Test script for T2 sequence using Model Driven Registration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -26,7 +26,7 @@ Test script for T2 sequence using Model driven registration …" />
 <section id="section-intro">
 <p>MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for T2 sequence using Model driven registration Library</p>
+Test script for T2 sequence using Model Driven Registration Library</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -34,7 +34,7 @@ Test script for T2 sequence using Model driven registration Library</p>
 <pre><code class="python">&#34;&#34;&#34;
 MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for T2 sequence using Model driven registration Library
+Test script for T2 sequence using Model Driven Registration Library
 &#34;&#34;&#34;
 import sys
 import glob
@@ -146,25 +146,21 @@ def sort_all_slice_files_acquisition_time(files):
                     
 def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters):
     &#34;&#34;&#34; Example application of MDR in renal T2(iBEAt data).
-    
-    Parameters
-    ----------
-    Elastix_Parameter_file_PATH: string
-    complete path to the Elastix parameter file to be used
-    output_dir: string
-    directory where results are saved
-    slice_sorted_files: list
-    selected slices to process using MDR - sorted according to acquisition time 
-    ArrayDicomiBEAt: np-array
-    input DICOM to numpy array (unsorted)
-    image_parameters: list
-    distance between pixels (in mm) along each dimension
-  
+     
     Description
     -----------
     This function performs model driven registration for selected T2-star sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
     fitted parameters S0 and T2 map, and the final diagnostics.
+
+    Args
+    ----
+    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+    output_dir (string): directory where results are saved
+    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK tuple): distance between pixels (in mm) along each dimension.
+
     &#34;&#34;&#34;
 
     start_computation_time = time.time()
@@ -179,14 +175,11 @@ def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, A
     
     # generate a module named as a string
     full_module_name = &#34;models.iBEAt_T2&#34;
-   # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(full_module_name)
     # read signal model parameters
-    
+    signal_model_parameters = read_signal_model_parameters(full_module_name)
+    # read elastix model parameters 
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
-    print(&#34;Elastix_Parameter_file_PATH type&#34;)
-    print(type(Elastix_Parameter_file_PATH))
-    
+
     
     #Perform MDR
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
@@ -235,6 +228,7 @@ def export_images(MDR_output, folder):
     for i in range(shape[2]):
         im = Image.fromarray(MDR_output[:,:,i])
         im.save(folder + str(i) + &#34;.tiff&#34;)
+
 
 ## Fitted Parameters to output folder
 def export_maps(MDR_output, folder, shape):
@@ -307,53 +301,37 @@ def export_maps(MDR_output, folder, shape):
 </code></dt>
 <dd>
 <div class="desc"><p>Example application of MDR in renal T2(iBEAt data).</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>Elastix_Parameter_file_PATH</code></strong> :&ensp;<code>string</code></dt>
-<dd>&nbsp;</dd>
-<dt>complete path to the Elastix parameter file to be used</dt>
-<dt><strong><code>output_dir</code></strong> :&ensp;<code>string</code></dt>
-<dd>&nbsp;</dd>
-<dt>directory where results are saved</dt>
-<dt><strong><code>slice_sorted_files</code></strong> :&ensp;<code>list</code></dt>
-<dd>&nbsp;</dd>
-<dt>selected slices to process using MDR - sorted according to acquisition time</dt>
-<dt><strong><code>ArrayDicomiBEAt</code></strong> :&ensp;<code>np-array</code></dt>
-<dd>&nbsp;</dd>
-<dt>input DICOM to numpy array (unsorted)</dt>
-<dt><strong><code>image_parameters</code></strong> :&ensp;<code>list</code></dt>
-<dd>&nbsp;</dd>
-</dl>
-<p>distance between pixels (in mm) along each dimension</p>
 <h2 id="description">Description</h2>
 <p>This function performs model driven registration for selected T2-star sequence on a single selected slice
 and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y,
-fitted parameters S0 and T2 map, and the final diagnostics.</p></div>
+fitted parameters S0 and T2 map, and the final diagnostics.</p>
+<h2 id="args">Args</h2>
+<p>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+output_dir (string): directory where results are saved
+slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time
+ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+image_parameters (SITK tuple): distance between pixels (in mm) along each dimension.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters):
     &#34;&#34;&#34; Example application of MDR in renal T2(iBEAt data).
-    
-    Parameters
-    ----------
-    Elastix_Parameter_file_PATH: string
-    complete path to the Elastix parameter file to be used
-    output_dir: string
-    directory where results are saved
-    slice_sorted_files: list
-    selected slices to process using MDR - sorted according to acquisition time 
-    ArrayDicomiBEAt: np-array
-    input DICOM to numpy array (unsorted)
-    image_parameters: list
-    distance between pixels (in mm) along each dimension
-  
+     
     Description
     -----------
     This function performs model driven registration for selected T2-star sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
     fitted parameters S0 and T2 map, and the final diagnostics.
+
+    Args
+    ----
+    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+    output_dir (string): directory where results are saved
+    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK tuple): distance between pixels (in mm) along each dimension.
+
     &#34;&#34;&#34;
 
     start_computation_time = time.time()
@@ -368,14 +346,11 @@ fitted parameters S0 and T2 map, and the final diagnostics.</p></div>
     
     # generate a module named as a string
     full_module_name = &#34;models.iBEAt_T2&#34;
-   # read signal model parameters
-    signal_model_parameters = read_signal_model_parameters(full_module_name)
     # read signal model parameters
-    
+    signal_model_parameters = read_signal_model_parameters(full_module_name)
+    # read elastix model parameters 
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
-    print(&#34;Elastix_Parameter_file_PATH type&#34;)
-    print(type(Elastix_Parameter_file_PATH))
-    
+
     
     #Perform MDR
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)

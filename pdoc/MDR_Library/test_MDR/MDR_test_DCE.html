@@ -128,9 +128,8 @@ def get_sitk_image_details_from_DICOM(slice_path):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing
+    return spacing
 
 # sort all input slices based on acquisition time
 def sort_all_slice_files_acquisition_time(files):
@@ -149,16 +148,15 @@ def sort_all_slice_files_acquisition_time(files):
 def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder):
     &#34;&#34;&#34; Example application of MDR in renal DCE (iBEAt data)
     
-    Parameters
-    ----------
+    Args
+    ----
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files: selected slices to process using MDR: sorted according to acquisition time 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
-    patient_folder: patient folder with AIFs text file
+    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
+    AIFs_PATH (string): string with full AIF path
+    patient_folder (string): patient folder with AIFs text file
 
     Description
     -----------
@@ -295,9 +293,8 @@ def export_maps(MDR_output, folder, shape):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing</code></pre>
+    return spacing</code></pre>
 </details>
 </dd>
 <dt id="MDR_Library.test_MDR.MDR_test_DCE.iBEAt_test_DCE"><code class="name flex">
@@ -305,23 +302,14 @@ def export_maps(MDR_output, folder, shape):
 </code></dt>
 <dd>
 <div class="desc"><p>Example application of MDR in renal DCE (iBEAt data)</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used</dt>
-<dt>output_dir (string): directory where results are saved</dt>
-<dt><strong><code>slice_sorted_files</code></strong> :&ensp;<code>selected slices to process using MDR: sorted according to acquisition time</code></dt>
-<dd>&nbsp;</dd>
-<dt><strong><code>ArrayDicomiBEAt</code></strong> :&ensp;<code>input DICOM to numpy array (unsorted)</code></dt>
-<dd>&nbsp;</dd>
-<dt>image_parameters SITK input: [image origin, image spacing]</dt>
-<dt><strong><code>filenameDCM</code></strong> :&ensp;<code>dicom filenames to process</code></dt>
-<dd>&nbsp;</dd>
-<dt><strong><code>lstFilesDCM</code></strong> :&ensp;<code>list</code> of
-<code>dicom files to process</code></dt>
-<dd>&nbsp;</dd>
-<dt><strong><code>patient_folder</code></strong> :&ensp;<code>patient folder with AIFs text file</code></dt>
-<dd>&nbsp;</dd>
-</dl>
+<h2 id="args">Args</h2>
+<p>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+output_dir (string): directory where results are saved
+slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time
+ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
+AIFs_PATH (string): string with full AIF path
+patient_folder (string): patient folder with AIFs text file</p>
 <h2 id="description">Description</h2>
 <p>This function performs model driven registration for selected DCE sequence on a single selected slice
 and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y,
@@ -333,16 +321,15 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
 <pre><code class="python">def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder):
     &#34;&#34;&#34; Example application of MDR in renal DCE (iBEAt data)
     
-    Parameters
-    ----------
+    Args
+    ----
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files: selected slices to process using MDR: sorted according to acquisition time 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
-    patient_folder: patient folder with AIFs text file
+    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
+    AIFs_PATH (string): string with full AIF path
+    patient_folder (string): patient folder with AIFs text file
 
     Description
     -----------

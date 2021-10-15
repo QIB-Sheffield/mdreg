@@ -15,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 def read_inversion_times_and_sort(fname,lstFilesDCM):
     """ This function reads the inversion times for the T1 sequence and sorts the files according to these inversion times.
     
-    Args:
+    Args
     ----
     fname (pathlib.PosixPath): dicom filenames to process
     lstFilesDCM (list): list of dicom files to process

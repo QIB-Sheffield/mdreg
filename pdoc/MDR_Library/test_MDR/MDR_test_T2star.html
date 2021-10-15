@@ -99,8 +99,6 @@ def main():
             files, ArrayDicomiBEAt, filenameDCM = read_DICOM_files(lstFilesDCM)
             # get sitk image parameters for registration (origin and spacing)
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
-            # sort slices correctly - based on acquisition time for model driven registration
-            sorted_slice_files = sort_all_slice_files_acquisition_time(files)
             # run T2 star MDR test function
             iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
@@ -126,36 +124,21 @@ def get_sitk_image_details_from_DICOM(slice_path):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing
-
-# sort all input slices based on acquisition time
-def sort_all_slice_files_acquisition_time(files):
-    slice_sorted_acq_time = []
-    skipcount = 0
-    for f in files: 
-        if hasattr(f, &#39;AcquisitionTime&#39;):
-            slice_sorted_acq_time.append(f)
-        else:
-            skipcount = skipcount + 1
-    print(&#34;skipped, no AcquisitionTime: {}&#34;.format(skipcount))
-
-    return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)  
-
+    return spacing
 
                     
 def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    &#34;&#34;&#34; Example application of MDR in renal T2* (iBEAt data)
+    &#34;&#34;&#34; Example application of MDR in renal T2* (iBEAt data).
     
     Parameters
     ----------
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
@@ -207,8 +190,7 @@ def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
     
     # generate a module named as a string 
     MODEL = importlib.import_module(full_module_name)
-    
-     ## ## read sequence acquisition parameter for signal modelling
+    # read sequence acquisition parameter for signal modelling
     echo_times, slice_sorted_echo_time = MODEL.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
     signal_model_parameters = [MODEL, echo_times]
 
@@ -291,29 +273,22 @@ def export_maps(MDR_output, folder, shape):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing</code></pre>
+    return spacing</code></pre>
 </details>
 </dd>
 <dt id="MDR_Library.test_MDR.MDR_test_T2star.iBEAt_test_T2star"><code class="name flex">
 <span>def <span class="ident">iBEAt_test_T2star</span></span>(<span>Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Example application of MDR in renal T2* (iBEAt data)</p>
+<div class="desc"><p>Example application of MDR in renal T2* (iBEAt data).</p>
 <h2 id="parameters">Parameters</h2>
-<dl>
-<dt>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used</dt>
-<dt>output_dir (string): directory where results are saved</dt>
-<dt><strong><code>ArrayDicomiBEAt</code></strong> :&ensp;<code>input DICOM to numpy array (unsorted)</code></dt>
-<dd>&nbsp;</dd>
-<dt>image_parameters SITK input: [image origin, image spacing]</dt>
-<dt><strong><code>filenameDCM</code></strong> :&ensp;<code>dicom filenames to process</code></dt>
-<dd>&nbsp;</dd>
-<dt><strong><code>lstFilesDCM</code></strong> :&ensp;<code>list</code> of
-<code>dicom files to process</code></dt>
-<dd>&nbsp;</dd>
-</dl>
+<p>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+output_dir (string): directory where results are saved
+ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+image_parameters (SITK input): image spacing
+filenameDCM (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
 <h2 id="description">Description</h2>
 <p>This function performs model driven registration for selected T2-star sequence on a single selected slice
 and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y,
@@ -323,16 +298,16 @@ fitted parameters S0 and T2*map, and the final diagnostics.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    &#34;&#34;&#34; Example application of MDR in renal T2* (iBEAt data)
+    &#34;&#34;&#34; Example application of MDR in renal T2* (iBEAt data).
     
     Parameters
     ----------
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
@@ -434,8 +409,6 @@ fitted parameters S0 and T2*map, and the final diagnostics.</p></div>
             files, ArrayDicomiBEAt, filenameDCM = read_DICOM_files(lstFilesDCM)
             # get sitk image parameters for registration (origin and spacing)
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
-            # sort slices correctly - based on acquisition time for model driven registration
-            sorted_slice_files = sort_all_slice_files_acquisition_time(files)
             # run T2 star MDR test function
             iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</code></pre>
 </details>
@@ -496,34 +469,11 @@ fitted parameters S0 and T2*map, and the final diagnostics.</p></div>
     
     # generate a module named as a string 
     MODEL = importlib.import_module(full_module_name)
-    
-     ## ## read sequence acquisition parameter for signal modelling
+    # read sequence acquisition parameter for signal modelling
     echo_times, slice_sorted_echo_time = MODEL.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
     signal_model_parameters = [MODEL, echo_times]
 
     return signal_model_parameters, slice_sorted_echo_time</code></pre>
-</details>
-</dd>
-<dt id="MDR_Library.test_MDR.MDR_test_T2star.sort_all_slice_files_acquisition_time"><code class="name flex">
-<span>def <span class="ident">sort_all_slice_files_acquisition_time</span></span>(<span>files)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def sort_all_slice_files_acquisition_time(files):
-    slice_sorted_acq_time = []
-    skipcount = 0
-    for f in files: 
-        if hasattr(f, &#39;AcquisitionTime&#39;):
-            slice_sorted_acq_time.append(f)
-        else:
-            skipcount = skipcount + 1
-    print(&#34;skipped, no AcquisitionTime: {}&#34;.format(skipcount))
-
-    return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)  </code></pre>
 </details>
 </dd>
 </dl>
@@ -552,7 +502,6 @@ fitted parameters S0 and T2*map, and the final diagnostics.</p></div>
 <li><code><a title="MDR_Library.test_MDR.MDR_test_T2star.read_DICOM_files" href="#MDR_Library.test_MDR.MDR_test_T2star.read_DICOM_files">read_DICOM_files</a></code></li>
 <li><code><a title="MDR_Library.test_MDR.MDR_test_T2star.read_elastix_model_parameters" href="#MDR_Library.test_MDR.MDR_test_T2star.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
 <li><code><a title="MDR_Library.test_MDR.MDR_test_T2star.read_signal_model_parameters" href="#MDR_Library.test_MDR.MDR_test_T2star.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_T2star.sort_all_slice_files_acquisition_time" href="#MDR_Library.test_MDR.MDR_test_T2star.sort_all_slice_files_acquisition_time">sort_all_slice_files_acquisition_time</a></code></li>
 </ul>
 </li>
 </ul>

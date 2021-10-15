@@ -126,7 +126,7 @@ def iBEAt_test_T2(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, A
     output_dir (string): directory where results are saved
     slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
     ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-    image_parameters (list): distance between pixels (in mm) along each dimension.
+    image_parameters (SITK tuple): distance between pixels (in mm) along each dimension.
 
     """
 

@@ -49,21 +49,21 @@ np.set_printoptions(threshold=sys.maxsize)
  
     
 def read_dicom_tags_IVIM(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags
+    &#34;&#34;&#34; This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags.
 
-    Parameters
-    ---------- 
-    fname: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    b-values: DWI/IVIM b-values as list (s/mm2)
-    b_Vec_original: original b-vectors as list
-    image_orientation_patient:  patient orientation
-    slice_sorted_b_values: slices sorted according to b-values
-
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    slice_sorted_b_values (list): list of slices sorted according to b-values
     &#34;&#34;&#34;
+
     b_values = []
     b_values_sort = []
     b_Vec_original = []
@@ -82,9 +82,6 @@ def read_dicom_tags_IVIM(fname,lstFilesDCM):
 
     for i in range(21,30):
         b_Vec_original.append(g_dir_03)
-
-    print(&#34;b_Vec_original&#34;)
-    print(b_Vec_original)
 
     #TODO: calculate from gradient file instead of manual list
     b_values = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
@@ -114,55 +111,44 @@ def read_dicom_tags_IVIM(fname,lstFilesDCM):
     return b_values, b_Vec_original, image_orientation_patient, slice_sorted_b_values 
 
 
+#TODO: read v-values from gradient vec file instead.
 def exp_func(b, S0, ADC):
+    &#34;&#34;&#34; mono-exponential decay function used to perform DWI-fitting.
+
+    Args
+    ----
+    b (numpy.float64): object containing b values
+
+    Returns
+    -------
+    &#39;S0&#39; and &#39;ADC&#39; (numpy.ndarray): fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
-    mono-exponential decay function used to perform DWI-fitting
-
-    Parameters
-    ---------- 
-    b: listt
-    b-values for DWI
-
-    Return values
-    ------------
-    curve_fit: list 
-    returns S0: fitted parameter &#39;S0&#39; and &#39;ADC&#39;: fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel
-
-    &#34;&#34;&#34;
-    
     b_v = []
-    # b-values not stored in the DICOM header for iBEAt study
-    b_v = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
-    S = []
-
+    for i in b: # convert to list
+        b_v.append(i)
+   
     return S0*np.exp(-np.array(b_v)*ADC)
 
 
 def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and ADC.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each b-value and for all 3 repetitions per slice (iBEAt) for all slices  (shape: [1, total b-value * 3-repetitions* total number of slices]) 
-    signal_model_parameters: list
-    signal model parameters to extract &#39;b_values&#39; from IVIM sequence
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    signal_model_parameters (list): list of b_values
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    Params: list
-    fitted parameter &#39;S0&#39; per pixel and &#39;ADC&#39; per pixel (mm2/sec*10^-3)
-    
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameter &#39;S0&#39; and &#39;ADC&#39; (mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
-    b_values = signal_model_parameters[1][0]
+
+    b_val = signal_model_parameters[0][0]
 
     lb = [0,0]
     ub = [np.inf,1]
-
-    b_val = functools.reduce(operator.iconcat, b_values, []) # flatten b-vals list to 1D
-    
+ 
     K = 10
     
     # computing strt, and end index 
@@ -208,34 +194,26 @@ def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
 
     fit = functools.reduce(operator.iconcat, fit, [])
 
-    Params = []
     Params = [S0, ADC]
 
     return fit, Params
 
 
 def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function for model fitting at single pixel level. 
+    &#34;&#34;&#34; main function for DWI model fitting at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        [MODEL NAME, [b_values, bVec_original]]
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at b-value) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        [S0, ADC]
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;ADC&#39;.  
     &#34;&#34;&#34;
- 
-    image_orientation_patient = signal_model_parameters[2]
-
-    fit = []
-    fitted_parameters = []
+    image_orientation_patient = signal_model_parameters[2] 
 
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], &#34;Error in image_orientation_patient for IVIM&#34;
@@ -257,17 +235,15 @@ def main(images_to_be_fitted, signal_model_parameters):
 </code></dt>
 <dd>
 <div class="desc"><p>curve fit function which returns the fit, and fitted params: S0 and ADC.</p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel value at each b-value and for all 3 repetitions per slice (iBEAt) for all slices
-(shape: [1, total b-value * 3-repetitions* total number of slices])
-signal_model_parameters: list
-signal model parameters to extract 'b_values' from IVIM sequence</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-Params: list
-fitted parameter 'S0' per pixel and 'ADC' per pixel (mm2/sec*10^-3)</p></div>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+signal_model_parameters (list): list of b_values</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>Params (list): list consisting of fitted parameter 'S0' and 'ADC' (mm2/sec*10^-3) per pixel.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -275,28 +251,22 @@ fitted parameter 'S0' per pixel and 'ADC' per pixel (mm2/sec*10^-3)</p></div>
 <pre><code class="python">def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
     &#34;&#34;&#34; curve fit function which returns the fit, and fitted params: S0 and ADC.
 
-    Parameters
-    ---------- 
-    images_to_be_fitted: np-array
-    pixel value at each b-value and for all 3 repetitions per slice (iBEAt) for all slices  (shape: [1, total b-value * 3-repetitions* total number of slices]) 
-    signal_model_parameters: list
-    signal model parameters to extract &#39;b_values&#39; from IVIM sequence
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    signal_model_parameters (list): list of b_values
 
-    Return values
-    ------------
-    fit: np-array
-    signal model fit per pixel
-    Params: list
-    fitted parameter &#39;S0&#39; per pixel and &#39;ADC&#39; per pixel (mm2/sec*10^-3)
-    
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameter &#39;S0&#39; and &#39;ADC&#39; (mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
-    b_values = signal_model_parameters[1][0]
+
+    b_val = signal_model_parameters[0][0]
 
     lb = [0,0]
     ub = [np.inf,1]
-
-    b_val = functools.reduce(operator.iconcat, b_values, []) # flatten b-vals list to 1D
-    
+ 
     K = 10
     
     # computing strt, and end index 
@@ -342,7 +312,6 @@ fitted parameter 'S0' per pixel and 'ADC' per pixel (mm2/sec*10^-3)</p></div>
 
     fit = functools.reduce(operator.iconcat, fit, [])
 
-    Params = []
     Params = [S0, ADC]
 
     return fit, Params</code></pre>
@@ -352,38 +321,30 @@ fitted parameter 'S0' per pixel and 'ADC' per pixel (mm2/sec*10^-3)</p></div>
 <span>def <span class="ident">exp_func</span></span>(<span>b, S0, ADC)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>mono-exponential decay function used to perform DWI-fitting</p>
-<h2 id="parameters">Parameters</h2>
-<p>b: listt
-b-values for DWI</p>
-<h2 id="return-values">Return Values</h2>
-<p>curve_fit: list
-returns S0: fitted parameter 'S0' and 'ADC': fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel</p></div>
+<div class="desc"><p>mono-exponential decay function used to perform DWI-fitting.</p>
+<h2 id="args">Args</h2>
+<p>b (numpy.float64): object containing b values</p>
+<h2 id="returns">Returns</h2>
+<p>'S0' and 'ADC' (numpy.ndarray): fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exp_func(b, S0, ADC):
+    &#34;&#34;&#34; mono-exponential decay function used to perform DWI-fitting.
+
+    Args
+    ----
+    b (numpy.float64): object containing b values
+
+    Returns
+    -------
+    &#39;S0&#39; and &#39;ADC&#39; (numpy.ndarray): fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel.
     &#34;&#34;&#34;
-    mono-exponential decay function used to perform DWI-fitting
-
-    Parameters
-    ---------- 
-    b: listt
-    b-values for DWI
-
-    Return values
-    ------------
-    curve_fit: list 
-    returns S0: fitted parameter &#39;S0&#39; and &#39;ADC&#39;: fitted parameter apparent diffusion coefficent (mm2/sec*10^-3) per pixel
-
-    &#34;&#34;&#34;
-    
     b_v = []
-    # b-values not stored in the DICOM header for iBEAt study
-    b_v = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
-    S = []
-
+    for i in b: # convert to list
+        b_v.append(i)
+   
     return S0*np.exp(-np.array(b_v)*ADC)</code></pre>
 </details>
 </dd>
@@ -391,43 +352,35 @@ returns S0: fitted parameter 'S0' and 'ADC': fitted parameter apparent diffusion
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>main function for model fitting at single pixel level. </p>
-<h2 id="parameters">Parameters</h2>
-<p>images_to_be_fitted: np-array
-pixel-wise signal time curve for the time-series with shape: [x,:]
-signal_model_parameters: list
-[MODEL NAME, [b_values, bVec_original]]</p>
-<h2 id="return-values">Return Values</h2>
-<p>fit: np-array
-signal model fit per pixel
-fitted_parameters: list
-[S0, ADC]</p></div>
+<div class="desc"><p>main function for DWI model fitting at single pixel level. </p>
+<h2 id="args">Args</h2>
+<p>images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at b-value) with shape [x,:]
+signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>fit (list): signal model fit per pixel</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>fitted_parameters (list): list with signal model fitted parameters 'S0' and 'ADC'.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def main(images_to_be_fitted, signal_model_parameters):
-    &#34;&#34;&#34; main function for model fitting at single pixel level. 
+    &#34;&#34;&#34; main function for DWI model fitting at single pixel level. 
 
-        Parameters
-        ---------- 
-        images_to_be_fitted: np-array
-        pixel-wise signal time curve for the time-series with shape: [x,:]
-        signal_model_parameters: list
-        [MODEL NAME, [b_values, bVec_original]]
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at b-value) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
-        Return values
-        ------------
-        fit: np-array
-        signal model fit per pixel
-        fitted_parameters: list
-        [S0, ADC]
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters &#39;S0&#39; and &#39;ADC&#39;.  
     &#34;&#34;&#34;
- 
-    image_orientation_patient = signal_model_parameters[2]
-
-    fit = []
-    fitted_parameters = []
+    image_orientation_patient = signal_model_parameters[2] 
 
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], &#34;Error in image_orientation_patient for IVIM&#34;
@@ -441,37 +394,42 @@ fitted_parameters: list
 <span>def <span class="ident">read_dicom_tags_IVIM</span></span>(<span>fname, lstFilesDCM)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags</p>
-<h2 id="parameters">Parameters</h2>
-<p>fname: dicom filenames to process
-lstFilesDCM: list of
-dicom files to process</p>
-<h2 id="return-values">Return Values</h2>
-<p>b-values: DWI/IVIM b-values as list (s/mm2)
-b_Vec_original: original b-vectors as list
-image_orientation_patient:
-patient orientation
-slice_sorted_b_values: slices sorted according to b-values</p></div>
+<div class="desc"><p>This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags.</p>
+<h2 id="args">Args</h2>
+<p>filenameDCM (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>b-values (list): list</code> of <code>DWI/IVIM b-values (s/mm2)</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>b_Vec_original (list): original b-vectors as list</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>image_orientation_patient (list):
+patient orientation as list</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>slice_sorted_b_values (list): list</code> of <code>slices sorted according to b-values</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_dicom_tags_IVIM(fname,lstFilesDCM):
-    &#34;&#34;&#34; This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags
+    &#34;&#34;&#34; This function reads the DICOM tags from the IVIM sequence and returns the corresponding DWI/IVIM tags.
 
-    Parameters
-    ---------- 
-    fname: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
-    Return values
-    ------------
-    b-values: DWI/IVIM b-values as list (s/mm2)
-    b_Vec_original: original b-vectors as list
-    image_orientation_patient:  patient orientation
-    slice_sorted_b_values: slices sorted according to b-values
-
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    slice_sorted_b_values (list): list of slices sorted according to b-values
     &#34;&#34;&#34;
+
     b_values = []
     b_values_sort = []
     b_Vec_original = []
@@ -490,9 +448,6 @@ slice_sorted_b_values: slices sorted according to b-values</p></div>
 
     for i in range(21,30):
         b_Vec_original.append(g_dir_03)
-
-    print(&#34;b_Vec_original&#34;)
-    print(b_Vec_original)
 
     #TODO: calculate from gradient file instead of manual list
     b_values = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
