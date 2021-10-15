@@ -1,5 +1,7 @@
 """
 @KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
+iBEAt study DTI model fit for the MDR Library
+2021
 """
 
 import numpy as np
@@ -7,15 +9,23 @@ import sys
 import pydicom
 np.set_printoptions(threshold=sys.maxsize)
 
- 
-    
+#TODO: correct FA map generation bug! 
+
+
 def read_dicom_tags_DTI(fname,lstFilesDCM):
-    """
-    This function reads dicoms (fname, lstFilesDCM)
-    and returns: 
-    the list of b-values "b_values"
-    the original b-vectors "b_Vec_original"
-    the patient orientation "image_orientation_patient"
+    """ This function reads the DICOM tags from the DTI sequence and returns the corresponding DTI tags.
+
+    Args
+    ----
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
+
+    Returns
+    -------
+    b-values (list): list of DWI/IVIM b-values (s/mm2) 
+    b_Vec_original (list): original b-vectors as list
+    image_orientation_patient (list):  patient orientation as list
+    
     """
     b_values = []
     b_Vec_original = []
@@ -30,12 +40,20 @@ def read_dicom_tags_DTI(fname,lstFilesDCM):
     return b_values, b_Vec_original, image_orientation_patient 
 
 
-def mono_exp_model(x, b):
-    return x[:, 6] * np.exp(np.matmul(-x[:,1:6], b))
-
-
-    
 def DTI_fitting(im, b, thresh_val, method='linear'):
+    """ DTI fit function. 
+
+    Args:
+    ----
+    im (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
+    b (list): list of b_values
+    thresh_val (numpy.ndarray): B matrix
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    Params (list): list consisting of fitted parameters -  DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel.
+    """
    
     sz = np.shape(im)
 
@@ -85,8 +103,8 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     M[np.isnan(M)]=0
     M[np.isinf(M)]=0
     ### Initialize Variables
-    FA_mask = np.empty(sz)#(sz[0]*sz[1])
-    ADC_mask = np.empty(sz)#(sz[0]*sz[1])
+    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
+    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
 
     #start = time.time()
     for i in range(np.shape(M)[0]):
@@ -107,7 +125,7 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
 
         # Calculate the eigenvalues and vectors, and sort the 
         # eigenvalues from small to large
-        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor);
+        [EigenValues, EigenVectors]=np.linalg.eig(DiffusionTensor)
         if np.sum(EigenValues)!=0:
             EigenValues, EigenVectors = zip(*sorted(zip(EigenValues, EigenVectors)))
         
@@ -134,15 +152,25 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
 
 
 
-def fitting(images_to_be_fitted, signal_model_parameters):
+def main(images_to_be_fitted, signal_model_parameters):
+    """ main function to perform DTI model fitting at single pixel level. 
+   
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value) with shape [x,:]
+    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
-    b_values = signal_model_parameters[1][0]
-    bVec_original = signal_model_parameters[1][1]
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters 'S0' and 'ADC'.  
+    """
+    b_values = signal_model_parameters[0]
+   
+    bVec_original = signal_model_parameters[1]
+ 
     image_orientation_patient = signal_model_parameters[2]
-
-    fitted_parameters = []
-
-    sz = np.shape(images_to_be_fitted)
  
     for i in range(len(image_orientation_patient)-1):
         assert image_orientation_patient[i] == image_orientation_patient[i+1], "Error in image_orientation_patient for DTI"
@@ -160,6 +188,7 @@ def fitting(images_to_be_fitted, signal_model_parameters):
     
     ### Mask
     sz_mask = np.shape(images_to_be_fitted)
+    
     mask = np.ones(sz_mask)
 
     ### Fitting

@@ -172,7 +172,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 
     Args:
     ----
-    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each T2-prep time) with shape [x,:]
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at b-value) with shape [x,:]
     signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
 
 
