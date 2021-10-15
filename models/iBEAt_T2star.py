@@ -1,7 +1,9 @@
 #!/ur/bin/python
 # -*- coding: utf-8 -*-
 """
-@author: Kanishka Sharma; iBEAt study; T2* mapping
+@author: Kanishka Sharma
+iBEAt study T2* model fit
+2021
 """
 
 import numpy as np
@@ -9,9 +11,18 @@ import pydicom
 from scipy.optimize import curve_fit
 
 def read_and_sort_echo_times(fname,lstFilesDCM):
-    """
-    This function takes as argument as fname, lstFilesDCM
-    and returns the sorted list of echo times and DICOMs from corresponding echo times
+    """ This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).
+
+    Args:
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
+
+    Returns
+    -------
+    echo_times (list): sorted list of echo times 
+    slice_sorted_echo_time (list): sorted list of DICOMs from sorted list of echo times (TE).
+
     """
     echo_times = []
     files = []
@@ -40,8 +51,16 @@ def read_and_sort_echo_times(fname,lstFilesDCM):
 
 
 def exp_func(TE,S0,T2star):
-    """
-    mono-exponential function used to perform T2star-fitting
+    """ mono-exponential decay function used to perform T2star-fitting.
+
+    Args:
+    ----
+    TE (int): Echo times (TE) for per time-series point for the T2* mapping sequence
+
+    Returns
+    -------
+    S0, T2star(numpy.ndarray): signal model fitted parameters as np.ndarray.
+
     """
   
     return S0*np.exp(-TE/T2star)
@@ -49,8 +68,19 @@ def exp_func(TE,S0,T2star):
 
 
 def T2star_fitting(images_to_be_fitted, echo_times):
-    """
-    curve fit function which returns the fit, and fitted params: S0 and T2*
+    """ curve fit function which returns the fit and fitted params S0 and T2*.
+
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE time) with shape [x,:]
+    echo_times (list): list of TE times
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    S0 (numpy.float64): fitted parameter 'S0' per pixel 
+    T2star (numpy.float64): fitted parameter 'T2*' (ms) per pixel.
+
     """
     
     lb = [0,10]
@@ -71,15 +101,22 @@ def T2star_fitting(images_to_be_fitted, echo_times):
 
 
 
-def fitting(images_to_be_fitted, signal_model_parameters):
-    '''
-    main fitting function
-    images_to_be_fitted: single_pixel at all echo times
-    '''
+def main(images_to_be_fitted, signal_model_parameters):
+    """ main function for model fitting of T2* at single pixel level. 
+
+    Args:
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TE) with shape [x,:]
+    signal_model_parameters (list): TE times as a list
+
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    fitted_parameters (list): list with signal model fitted parameters 'S0' and 'T2star'.  
+    """
     
-    fitted_parameters = []
-   
-    echo_times = signal_model_parameters[1]
+    echo_times = signal_model_parameters
 
     results = T2star_fitting(images_to_be_fitted, echo_times)
 

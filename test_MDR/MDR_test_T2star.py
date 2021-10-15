@@ -10,10 +10,11 @@ import numpy as np
 import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
+import importlib
 import time
 from PIL import Image
-from pyMDR.MDR import model_driven_registration  
-from models  import iBEAt_T2star
+from MDR import model_driven_registration  
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -65,8 +66,6 @@ def main():
             files, ArrayDicomiBEAt, filenameDCM = read_DICOM_files(lstFilesDCM)
             # get sitk image parameters for registration (origin and spacing)
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
-            # sort slices correctly - based on acquisition time for model driven registration
-            sorted_slice_files = sort_all_slice_files_acquisition_time(files)
             # run T2 star MDR test function
             iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
@@ -92,36 +91,21 @@ def get_sitk_image_details_from_DICOM(slice_path):
     dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
     reader.SetFileNames(dicom_names)
     image = reader.Execute()
-    origin = image.GetOrigin() 
     spacing = image.GetSpacing() 
-    return origin, spacing
-
-# sort all input slices based on acquisition time
-def sort_all_slice_files_acquisition_time(files):
-    slice_sorted_acq_time = []
-    skipcount = 0
-    for f in files: 
-        if hasattr(f, 'AcquisitionTime'):
-            slice_sorted_acq_time.append(f)
-        else:
-            skipcount = skipcount + 1
-    print("skipped, no AcquisitionTime: {}".format(skipcount))
-
-    return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)  
-
+    return spacing
 
                     
 def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    """ Example application of MDR in renal T2* (iBEAt data)
+    """ Example application of MDR in renal T2* (iBEAt data).
     
     Parameters
     ----------
     Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
     output_dir (string): directory where results are saved 
-    ArrayDicomiBEAt: input DICOM to numpy array (unsorted)
-    image_parameters SITK input: [image origin, image spacing]
-    filenameDCM: dicom filenames to process
-    lstFilesDCM: list of  dicom files to process
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
@@ -136,7 +120,8 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, 
     original_images = np.zeros(image_shape)
 
     # read signal model parameters and slice sorted per T2* echo time
-    signal_model_parameters, slice_sorted_echo_time = read_signal_model_parameters(filenameDCM, lstFilesDCM)
+    full_module_name = "models.iBEAt_T2star"
+    signal_model_parameters, slice_sorted_echo_time = read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM)
 
     # initialise original_images with sorted images per T2* echo times to run MDR
     for i, s in enumerate(slice_sorted_echo_time):
@@ -168,12 +153,12 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, 
  
  # read sequence acquisition parameter for signal modelling
  # sort slices according to T2* echo times
-def read_signal_model_parameters(filenameDCM, lstFilesDCM):
-    ## ## read sequence acquisition parameter for signal modelling
-    echo_times, slice_sorted_echo_time = iBEAt_T2star.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
-    # select model
-    MODEL = [iBEAt_T2star,'fitting']
-    # select signal model paramters
+def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
+    
+    # generate a module named as a string 
+    MODEL = importlib.import_module(full_module_name)
+    # read sequence acquisition parameter for signal modelling
+    echo_times, slice_sorted_echo_time = MODEL.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
     signal_model_parameters = [MODEL, echo_times]
 
     return signal_model_parameters, slice_sorted_echo_time
