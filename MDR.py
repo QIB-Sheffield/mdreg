@@ -15,7 +15,7 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
 
     Args:
     ----
-        images (numpy nd-array): unregistered 2D images (uint16) with shape [x-dim,y-dim, number of slices]
+        images (numpy.ndarray): unregistered 2D images (uint16) with shape [x-dim,y-dim, number of slices]
         image_parameters (sitk tuple): distance between pixels (in mm) along each dimension
         signal_model_parameters (list): a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
         eg - [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
@@ -24,9 +24,9 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
 
     Returns:
     -------
-        coregistered (numpy nd-array): ffd based co-registered (uint16) 2D images as np-array with shape: [x-dim,y-dim, number of slices]
-        fit (numpy nd-array): signal model fit image (uint16) as np-array and shape [x-dim,y-dim, num of slices]
-        deformation_field (numpy nd-array): output deformation fields - deformation_field_x and deformation_field_y as np-array with shape [x-dim, y-dim, 2, num of slices]
+        coregistered (numpy.ndarray): ffd based co-registered (uint16) 2D images as np-array with shape: [x-dim,y-dim, number of slices]
+        fit (numpy.ndarray: signal model fit image (uint16) as np-array and shape [x-dim,y-dim, num of slices]
+        deformation_field (numpy.ndarray): output deformation fields - deformation_field_x and deformation_field_y as np-array with shape [x-dim, y-dim, 2, num of slices]
         par (list): signal model-fit parameters as a list
         improvement (dataframe): maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field appended to a dataframe until convergence criterion is met.
     
@@ -65,13 +65,13 @@ def fit_signal_model_image(shape, coregistered, signal_model_parameters):
     Args:
     ----
     shape (tuple): tuple with original image shape [x-dim,y-dim,z-dim]
-    coregistered (numpy nd-array): co-registerd 2D images as np-array with shape [x-dim * y-dim, number of slices]
+    coregistered (numpy.ndarray): co-registerd 2D images as np-array with shape [x-dim * y-dim, number of slices]
     signal_model_parameters (list): a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
     eg - [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
     
     Returns:
     -------
-    fit (numpy nd-array): signal model fit images (2D slices) as np-array with shape: [x-dim,y-dim, num of slices]
+    fit (numpy.ndarray): signal model fit images (2D slices) as np-array with shape: [x-dim,y-dim, num of slices]
     par (list): signal model-fit parameters as a list.
     """
 
@@ -90,15 +90,15 @@ def fit_coregistration(shape, fit, images, image_parameters, elastix_model_param
     Args:
     ----
     shape (tuple): tuple with original image shape [x-dim,y-dim,z-dim]
-    fit (numpy nd-array): signal model fit images (2D slices) with shape: [x-dim,y-dim, num of slices]
-    images (numpy nd-array): unregistered 2D images (uint16) as np-array with shape [x-dim,y-dim, number of slices]
+    fit (numpy.ndarray): signal model fit images (2D slices) with shape: [x-dim,y-dim, num of slices]
+    images (numpy.ndarray): unregistered 2D images (uint16) as np-array with shape [x-dim,y-dim, number of slices]
     image_parameters (sitk tuple): image parameters define the pixel spacing in the image
     elastix_model_parameters (list): elastix parameter file parameters
 
     Returns:
     -------
-    coregistered (numpy nd-array): coregisterd 2D images with shape [x-dim * y-dim, number of slices]
-    deformation_field (numpy nd-array): output deformation fields with shape [x-dim, y-dim, 2, num of slices]. Dimension '2' corresponds to deformation_field_x and deformation_field_y. 
+    coregistered (numpy.ndarray: coregisterd 2D images with shape [x-dim * y-dim, number of slices]
+    deformation_field (numpy.ndarray): output deformation fields with shape [x-dim, y-dim, 2, num of slices]. Dimension '2' corresponds to deformation_field_x and deformation_field_y. 
     """
 
     coregistered = np.zeros((shape[0]*shape[1],shape[2]))
