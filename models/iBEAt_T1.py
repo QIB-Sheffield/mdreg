@@ -1,5 +1,8 @@
 """
 @KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
+@author: Kanishka Sharma
+iBEAt study T1-MOLLI model fit
+2021
 """
 
 import numpy as np
@@ -9,14 +12,20 @@ from scipy.optimize import curve_fit
 np.set_printoptions(threshold=sys.maxsize)
 
 
-### T1-MOLLI FUNCTION
-
 def read_inversion_times_and_sort(fname,lstFilesDCM):
+    """ This function reads the inversion times for the T1 sequence and sorts the files according to these inversion times.
+    
+    Args:
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
+
+    Returns
+    -------
+    inversion_times (list): sorted list of inversion times 
+    slice_sorted_inv_time (list): sorted list of DICOMs from corresponding inversion times (TI).
     """
-    This function reads the inversion times for T1 sequences and sorts the files according to these inversion times.
-    It takes as argument a list of dicoms as: fname,lstFilesDCM
-    and returns a sorted list of inversion times and slices (as per the sorted inversion times)
-    """
+
     inversion_times = []
     files = []
     for fname in lstFilesDCM:
@@ -42,14 +51,34 @@ def read_inversion_times_and_sort(fname,lstFilesDCM):
     
 
 def exp_func(x, a, b, T1):
+    """ exponential function used to perform T1-fitting.
+
+    Args
+    ----
+    x (list): list of inversion times (TI) 
+    
+    Returns
+    -------
+    a, b, S0, T1 (numpy.ndarray): signal model fitted parameters as np.ndarray.
     """
-    Exponential function used to perform T1-fitting
-    """
+
     return a - b * np.exp(-x/T1) #S = a-b*exp(-TI/T1)
 
 
 
 def T1_fitting(images_to_be_fitted, inversion_times):
+    """ curve fit function which returns the fit, and fitted params: S0 and apparent T1.
+
+    Args
+    ----
+    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+    inversion_times (list): T1 inversion times
+
+    Returns
+    -------
+    fit (list): signal model fit per pixel
+    results (list): fitted parameters inluding 'T1_estimated' - estimated T1 (ms) and 'T1_apparent' - T1 (ms), and B, and A.
+    """
 
     lb = [0, 0, 0]
     ub = [np.inf, np.inf, 2000]
@@ -97,14 +126,24 @@ def T1_fitting(images_to_be_fitted, inversion_times):
     
 
 
-def fitting(images_to_be_fitted, signal_model_parameters):
-    '''
-    images_to_be_fitted: single_pixel at different inversion times
-    signal model parameters for T1: [MODEL, inversion_times]
-    '''
+def main(images_to_be_fitted, signal_model_parameters): 
+    """ main function for model fitting at single pixel level. 
+
+        Args
+        ----
+        images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each TI time) with shape [x,:]
+        signal model parameters (list): T1 inversion times as a list 
+
+        Returns
+        -------
+        fit (list): signal model fit per pixel
+        fitted_parameters (list): list of estimated parameters from model fit including T1_estimated - estimated T1 (ms), 
+        T1_apparent - apparent T1 (ms), and B, and A.
+    """
+
     fitted_parameters = []
    
-    inversion_times = signal_model_parameters[1]
+    inversion_times = signal_model_parameters 
 
     fit, results = T1_fitting(images_to_be_fitted, inversion_times)
     
