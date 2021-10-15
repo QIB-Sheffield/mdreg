@@ -9,7 +9,7 @@ import sys
 import pydicom
 np.set_printoptions(threshold=sys.maxsize)
 
-#TODO: correct FA map generation bug! 
+#TODO: correct FA map generation error!
 
 
 def read_dicom_tags_DTI(fname,lstFilesDCM):
