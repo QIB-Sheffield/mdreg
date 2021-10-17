@@ -14,7 +14,7 @@ from pathlib import Path
 import importlib
 import time
 from PIL import Image
-from MDR import model_driven_registration  
+from MDR.MDR import model_driven_registration  
 
 
 np.set_printoptions(threshold=sys.maxsize)
