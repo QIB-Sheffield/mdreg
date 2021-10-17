@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
-<title>MDR_Library.tests.MDR_test_T1 API documentation</title>
+<meta name="generator" content="pdoc 0.9.1" />
+<title>MDR-Library.tests.MDR_test_T1 API documentation</title>
 <meta name="description" content="MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
 Test script for T1 sequence using Model driven registration …" />
@@ -21,7 +21,7 @@ Test script for T1 sequence using Model driven registration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR_Library.tests.MDR_test_T1</code></h1>
+<h1 class="title">Module <code>MDR-Library.tests.MDR_test_T1</code></h1>
 </header>
 <section id="section-intro">
 <p>MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
@@ -40,6 +40,7 @@ import sys
 import glob
 import os
 import numpy as np
+import itk
 import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
@@ -197,11 +198,9 @@ def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
 
 ## read elastix parameters
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
-    elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_T1.txt&#34;)
-    elastix_model_parameters[&#39;MaximumNumberOfIterations&#39;] = [&#39;256&#39;] 
-    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
-
+    elastix_model_parameters = itk.ParameterObject.New()
+    elastix_model_parameters.AddParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_T1.txt&#34;)
+    elastix_model_parameters.SetParameter(&#39;MaximumNumberOfIterations&#39;, &#39;256&#39;)
     return elastix_model_parameters
 
 
@@ -229,7 +228,7 @@ def export_maps(MDR_output, folder, shape):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR_Library.tests.MDR_test_T1.export_images"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.export_images"><code class="name flex">
 <span>def <span class="ident">export_images</span></span>(<span>MDR_output, folder)</span>
 </code></dt>
 <dd>
@@ -245,7 +244,7 @@ def export_maps(MDR_output, folder, shape):
         im.save(folder + str(i) + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.export_maps"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.export_maps"><code class="name flex">
 <span>def <span class="ident">export_maps</span></span>(<span>MDR_output, folder, shape)</span>
 </code></dt>
 <dd>
@@ -262,7 +261,7 @@ def export_maps(MDR_output, folder, shape):
     Img.save(folder + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM"><code class="name flex">
 <span>def <span class="ident">get_sitk_image_details_from_DICOM</span></span>(<span>slice_path)</span>
 </code></dt>
 <dd>
@@ -280,7 +279,7 @@ def export_maps(MDR_output, folder, shape):
     return spacing</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.iBEAt_test_T1"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.iBEAt_test_T1"><code class="name flex">
 <span>def <span class="ident">iBEAt_test_T1</span></span>(<span>Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -357,7 +356,7 @@ fitted parameters S0 and T1 map, and the final diagnostics.</p></div>
     print(&#34;Finished processing Model Driven Registration case for iBEAt study T1 sequence!&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.main"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -417,7 +416,7 @@ fitted parameters S0 and T1 map, and the final diagnostics.</p></div>
             iBEAt_test_T1(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.read_DICOM_files"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.read_DICOM_files"><code class="name flex">
 <span>def <span class="ident">read_DICOM_files</span></span>(<span>lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -442,7 +441,7 @@ fitted parameters S0 and T1 map, and the final diagnostics.</p></div>
     return files, ArrayDicomiBEAt, filenameDCM</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.read_elastix_model_parameters"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.read_elastix_model_parameters"><code class="name flex">
 <span>def <span class="ident">read_elastix_model_parameters</span></span>(<span>Elastix_Parameter_file_PATH)</span>
 </code></dt>
 <dd>
@@ -452,15 +451,13 @@ fitted parameters S0 and T1 map, and the final diagnostics.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
-    elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_T1.txt&#34;)
-    elastix_model_parameters[&#39;MaximumNumberOfIterations&#39;] = [&#39;256&#39;] 
-    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
-
+    elastix_model_parameters = itk.ParameterObject.New()
+    elastix_model_parameters.AddParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_T1.txt&#34;)
+    elastix_model_parameters.SetParameter(&#39;MaximumNumberOfIterations&#39;, &#39;256&#39;)
     return elastix_model_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.tests.MDR_test_T1.read_signal_model_parameters"><code class="name flex">
+<dt id="MDR-Library.tests.MDR_test_T1.read_signal_model_parameters"><code class="name flex">
 <span>def <span class="ident">read_signal_model_parameters</span></span>(<span>full_module_name, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -493,26 +490,26 @@ fitted parameters S0 and T1 map, and the final diagnostics.</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR_Library.tests" href="index.html">MDR_Library.tests</a></code></li>
+<li><code><a title="MDR-Library.tests" href="index.html">MDR-Library.tests</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR_Library.tests.MDR_test_T1.export_images" href="#MDR_Library.tests.MDR_test_T1.export_images">export_images</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.export_maps" href="#MDR_Library.tests.MDR_test_T1.export_maps">export_maps</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM" href="#MDR_Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.iBEAt_test_T1" href="#MDR_Library.tests.MDR_test_T1.iBEAt_test_T1">iBEAt_test_T1</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.main" href="#MDR_Library.tests.MDR_test_T1.main">main</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.read_DICOM_files" href="#MDR_Library.tests.MDR_test_T1.read_DICOM_files">read_DICOM_files</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.read_elastix_model_parameters" href="#MDR_Library.tests.MDR_test_T1.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
-<li><code><a title="MDR_Library.tests.MDR_test_T1.read_signal_model_parameters" href="#MDR_Library.tests.MDR_test_T1.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.export_images" href="#MDR-Library.tests.MDR_test_T1.export_images">export_images</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.export_maps" href="#MDR-Library.tests.MDR_test_T1.export_maps">export_maps</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM" href="#MDR-Library.tests.MDR_test_T1.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.iBEAt_test_T1" href="#MDR-Library.tests.MDR_test_T1.iBEAt_test_T1">iBEAt_test_T1</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.main" href="#MDR-Library.tests.MDR_test_T1.main">main</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.read_DICOM_files" href="#MDR-Library.tests.MDR_test_T1.read_DICOM_files">read_DICOM_files</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.read_elastix_model_parameters" href="#MDR-Library.tests.MDR_test_T1.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
+<li><code><a title="MDR-Library.tests.MDR_test_T1.read_signal_model_parameters" href="#MDR-Library.tests.MDR_test_T1.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
 </ul>
 </li>
 </ul>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
 </footer>
 </body>
 </html>
