@@ -23,10 +23,20 @@ The prototype MDR algorithm (Tagkalakis F, et al. Model-based motion correction 
 
 For more details about the code, please consult the [Reference Manual](https://qib-sheffield.github.io/MDR-Library/)
 
-**Updating the Reference Manual: ** Run the command `pdoc --html --force --output-dir "docs" .` in the parent folder.
+
+**Updating the Reference Manual:** 
+
+First, run the command `pdoc --html --force --output-dir "docs" .` in the parent folder.
+Then, move all files in "docs/MDR-Library" to "docs" folder and delete the "MDR-Library" folder. Alternatively, you can type the following in the terminal:
+
+`mv docs/MDR-Library/* docs`
+
+`rmdir docs/MDR-Library`
+
+Finally, commit the newly generated files to Github so that the [website](https://qib-sheffield.github.io/MDR-Library/) is refreshed.
 
 
 ## Acknowledgement
-The iBEAt study is part of the BEAt-DKD project. The BEAt-DKD project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 115974. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation programme and EFPIA with JDRF. For a full list of BEAt-DKD partners, see www.beat-dkd.eu
+The iBEAt study is part of the BEAt-DKD project. The BEAt-DKD project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 115974. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation programme and EFPIA with JDRF. For a full list of BEAt-DKD partners, see www.beat-dkd.eu.
 
 For queries please email: kanishka.sharma@sheffield.ac.uk or s.sourbron@sheffield.ac.uk
