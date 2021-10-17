@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.models.iBEAt_DCE API documentation</title>
+<title>models.iBEAt_DCE API documentation</title>
 <meta name="description" content="@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
 @author: Kanishka Sharma
 iBEAt study DCE 2 compartment filtration …" />
@@ -21,7 +21,7 @@ iBEAt study DCE 2 compartment filtration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.models.iBEAt_DCE</code></h1>
+<h1 class="title">Module <code>models.iBEAt_DCE</code></h1>
 </header>
 <section id="section-intro">
 <p>@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
@@ -198,7 +198,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial"><code class="name flex">
+<dt id="models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial"><code class="name flex">
 <span>def <span class="ident">Integral_Trapezoidal_Rule_initial</span></span>(<span>x, time)</span>
 </code></dt>
 <dd>
@@ -214,7 +214,7 @@ def main(images_to_be_fitted, signal_model_parameters):
     return first_pass</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second"><code class="name flex">
+<dt id="models.iBEAt_DCE.Integral_Trapezoidal_Rule_second"><code class="name flex">
 <span>def <span class="ident">Integral_Trapezoidal_Rule_second</span></span>(<span>first_pass, time)</span>
 </code></dt>
 <dd>
@@ -230,7 +230,7 @@ def main(images_to_be_fitted, signal_model_parameters):
     return second_pass</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM"><code class="name flex">
+<dt id="models.iBEAt_DCE.Linear_Least_Squares_2CFM"><code class="name flex">
 <span>def <span class="ident">Linear_Least_Squares_2CFM</span></span>(<span>ct, timepoints, aif, timepoint=39, Hct=0.45)</span>
 </code></dt>
 <dd>
@@ -341,7 +341,7 @@ Hct (float): hematocrit</p>
     return fit, Fp, Tp, PS, Te </code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DCE.load_txt"><code class="name flex">
+<dt id="models.iBEAt_DCE.load_txt"><code class="name flex">
 <span>def <span class="ident">load_txt</span></span>(<span>full_path_txt)</span>
 </code></dt>
 <dd>
@@ -384,7 +384,7 @@ Hct (float): hematocrit</p>
     return aif, time</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DCE.main"><code class="name flex">
+<dt id="models.iBEAt_DCE.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -442,16 +442,16 @@ signal_model_parameters (list): AIF and corresponging timepoints as a list</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library.models" href="index.html">MDR-Library.models</a></code></li>
+<li><code><a title="models" href="index.html">models</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial" href="#MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial">Integral_Trapezoidal_Rule_initial</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second" href="#MDR-Library.models.iBEAt_DCE.Integral_Trapezoidal_Rule_second">Integral_Trapezoidal_Rule_second</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM" href="#MDR-Library.models.iBEAt_DCE.Linear_Least_Squares_2CFM">Linear_Least_Squares_2CFM</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DCE.load_txt" href="#MDR-Library.models.iBEAt_DCE.load_txt">load_txt</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DCE.main" href="#MDR-Library.models.iBEAt_DCE.main">main</a></code></li>
+<li><code><a title="models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial" href="#models.iBEAt_DCE.Integral_Trapezoidal_Rule_initial">Integral_Trapezoidal_Rule_initial</a></code></li>
+<li><code><a title="models.iBEAt_DCE.Integral_Trapezoidal_Rule_second" href="#models.iBEAt_DCE.Integral_Trapezoidal_Rule_second">Integral_Trapezoidal_Rule_second</a></code></li>
+<li><code><a title="models.iBEAt_DCE.Linear_Least_Squares_2CFM" href="#models.iBEAt_DCE.Linear_Least_Squares_2CFM">Linear_Least_Squares_2CFM</a></code></li>
+<li><code><a title="models.iBEAt_DCE.load_txt" href="#models.iBEAt_DCE.load_txt">load_txt</a></code></li>
+<li><code><a title="models.iBEAt_DCE.main" href="#models.iBEAt_DCE.main">main</a></code></li>
 </ul>
 </li>
 </ul>

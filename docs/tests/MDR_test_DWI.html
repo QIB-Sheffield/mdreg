@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.tests.MDR_test_DWI API documentation</title>
+<title>tests.MDR_test_DWI API documentation</title>
 <meta name="description" content="MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
 Test script for DWI sequence using Model driven registration …" />
@@ -21,7 +21,7 @@ Test script for DWI sequence using Model driven registration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.tests.MDR_test_DWI</code></h1>
+<h1 class="title">Module <code>tests.MDR_test_DWI</code></h1>
 </header>
 <section id="section-intro">
 <p>MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
@@ -244,7 +244,7 @@ def export_maps(MDR_output, folder, shape):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.tests.MDR_test_DWI.export_images"><code class="name flex">
+<dt id="tests.MDR_test_DWI.export_images"><code class="name flex">
 <span>def <span class="ident">export_images</span></span>(<span>MDR_output, folder)</span>
 </code></dt>
 <dd>
@@ -260,7 +260,7 @@ def export_maps(MDR_output, folder, shape):
         im.save(folder + str(i) + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.export_maps"><code class="name flex">
+<dt id="tests.MDR_test_DWI.export_maps"><code class="name flex">
 <span>def <span class="ident">export_maps</span></span>(<span>MDR_output, folder, shape)</span>
 </code></dt>
 <dd>
@@ -275,7 +275,7 @@ def export_maps(MDR_output, folder, shape):
     Img.save(folder + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.get_sitk_image_details_from_DICOM"><code class="name flex">
+<dt id="tests.MDR_test_DWI.get_sitk_image_details_from_DICOM"><code class="name flex">
 <span>def <span class="ident">get_sitk_image_details_from_DICOM</span></span>(<span>slice_path)</span>
 </code></dt>
 <dd>
@@ -293,7 +293,7 @@ def export_maps(MDR_output, folder, shape):
     return spacing</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.iBEAt_test_DWI"><code class="name flex">
+<dt id="tests.MDR_test_DWI.iBEAt_test_DWI"><code class="name flex">
 <span>def <span class="ident">iBEAt_test_DWI</span></span>(<span>Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -369,7 +369,7 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
     print(&#34;Finished processing Model Driven Registration case for iBEAt study DWI sequence!&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.main"><code class="name flex">
+<dt id="tests.MDR_test_DWI.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -431,7 +431,7 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
             iBEAt_test_DWI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.read_DICOM_files"><code class="name flex">
+<dt id="tests.MDR_test_DWI.read_DICOM_files"><code class="name flex">
 <span>def <span class="ident">read_DICOM_files</span></span>(<span>lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -457,7 +457,7 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
     return files, ArrayDicomiBEAt, filenameDCM</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.read_elastix_model_parameters"><code class="name flex">
+<dt id="tests.MDR_test_DWI.read_elastix_model_parameters"><code class="name flex">
 <span>def <span class="ident">read_elastix_model_parameters</span></span>(<span>Elastix_Parameter_file_PATH)</span>
 </code></dt>
 <dd>
@@ -473,7 +473,7 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
     return elastix_model_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.read_signal_model_parameters"><code class="name flex">
+<dt id="tests.MDR_test_DWI.read_signal_model_parameters"><code class="name flex">
 <span>def <span class="ident">read_signal_model_parameters</span></span>(<span>full_module_name, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -494,7 +494,7 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
     return signal_model_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.tests.MDR_test_DWI.sort_all_slice_files_acquisition_time"><code class="name flex">
+<dt id="tests.MDR_test_DWI.sort_all_slice_files_acquisition_time"><code class="name flex">
 <span>def <span class="ident">sort_all_slice_files_acquisition_time</span></span>(<span>files)</span>
 </code></dt>
 <dd>
@@ -529,20 +529,20 @@ fitted parameters S0 and ADC, and the final diagnostics.</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library.tests" href="index.html">MDR-Library.tests</a></code></li>
+<li><code><a title="tests" href="index.html">tests</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.export_images" href="#MDR-Library.tests.MDR_test_DWI.export_images">export_images</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.export_maps" href="#MDR-Library.tests.MDR_test_DWI.export_maps">export_maps</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.get_sitk_image_details_from_DICOM" href="#MDR-Library.tests.MDR_test_DWI.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.iBEAt_test_DWI" href="#MDR-Library.tests.MDR_test_DWI.iBEAt_test_DWI">iBEAt_test_DWI</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.main" href="#MDR-Library.tests.MDR_test_DWI.main">main</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.read_DICOM_files" href="#MDR-Library.tests.MDR_test_DWI.read_DICOM_files">read_DICOM_files</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.read_elastix_model_parameters" href="#MDR-Library.tests.MDR_test_DWI.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.read_signal_model_parameters" href="#MDR-Library.tests.MDR_test_DWI.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
-<li><code><a title="MDR-Library.tests.MDR_test_DWI.sort_all_slice_files_acquisition_time" href="#MDR-Library.tests.MDR_test_DWI.sort_all_slice_files_acquisition_time">sort_all_slice_files_acquisition_time</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.export_images" href="#tests.MDR_test_DWI.export_images">export_images</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.export_maps" href="#tests.MDR_test_DWI.export_maps">export_maps</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.get_sitk_image_details_from_DICOM" href="#tests.MDR_test_DWI.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.iBEAt_test_DWI" href="#tests.MDR_test_DWI.iBEAt_test_DWI">iBEAt_test_DWI</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.main" href="#tests.MDR_test_DWI.main">main</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.read_DICOM_files" href="#tests.MDR_test_DWI.read_DICOM_files">read_DICOM_files</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.read_elastix_model_parameters" href="#tests.MDR_test_DWI.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.read_signal_model_parameters" href="#tests.MDR_test_DWI.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
+<li><code><a title="tests.MDR_test_DWI.sort_all_slice_files_acquisition_time" href="#tests.MDR_test_DWI.sort_all_slice_files_acquisition_time">sort_all_slice_files_acquisition_time</a></code></li>
 </ul>
 </li>
 </ul>

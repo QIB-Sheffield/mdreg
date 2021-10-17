@@ -13,7 +13,7 @@ Models included: T1, T2, T2*, DTI, DWI, DCE-MRI. To be extended for: MT, PC-MRI,
 
 
 ## How to use
-Run `MDR_test_main.py` in the `tests` folder.
+Run `MDR_test_main.py` in the `tests` folder. Read the code in the other python files in the `tests` folder to find examples of how to use the `MDR` package.
 
 
 ## Context
@@ -26,14 +26,7 @@ For more details about the code, please consult the [Reference Manual](https://q
 
 **Updating the Reference Manual:** 
 
-First, run the command `pdoc --html --force --output-dir "docs" .` in the parent folder.
-Then, move all files in "docs/MDR-Library" to "docs" folder and delete the "MDR-Library" folder. Alternatively, you can type the following in the terminal:
-
-`mv docs/MDR-Library/* docs`
-
-`rmdir docs/MDR-Library`
-
-Finally, commit the newly generated files to Github so that the [website](https://qib-sheffield.github.io/MDR-Library/) is refreshed.
+First, run the command `pdoc --html --force --output-dir "docs" "models" "tests" "MDR"` in the parent folder. Commit the newly generated files to Github so that the [website](https://qib-sheffield.github.io/MDR-Library/) is refreshed.
 
 
 ## Acknowledgement

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.models.iBEAt_T2 API documentation</title>
+<title>models.iBEAt_T2 API documentation</title>
 <meta name="description" content="@author: Kanishka Sharma
 iBEAt study T2-mapping model-fit
 Siemens 3T PRISMA - Leeds
@@ -22,7 +22,7 @@ Siemens 3T PRISMA - Leeds
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.models.iBEAt_T2</code></h1>
+<h1 class="title">Module <code>models.iBEAt_T2</code></h1>
 </header>
 <section id="section-intro">
 <p>@author: Kanishka Sharma
@@ -140,7 +140,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.models.iBEAt_T2.T2_fitting"><code class="name flex">
+<dt id="models.iBEAt_T2.T2_fitting"><code class="name flex">
 <span>def <span class="ident">T2_fitting</span></span>(<span>images_to_be_fitted, T2_prep_times)</span>
 </code></dt>
 <dd>
@@ -193,7 +193,7 @@ T2_prep_times (list): list of T2-preparation times</p>
     return fit, S0, T2</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2.exp_func"><code class="name flex">
+<dt id="models.iBEAt_T2.exp_func"><code class="name flex">
 <span>def <span class="ident">exp_func</span></span>(<span>T2_prep_times, S0, T2)</span>
 </code></dt>
 <dd>
@@ -222,7 +222,7 @@ T2_prep_times (list): list of T2-preparation times</p>
     return S0*np.exp(-T2_prep_times/T2)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2.main"><code class="name flex">
+<dt id="models.iBEAt_T2.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -267,7 +267,7 @@ signal_model_parameters (list): T2-prep times as a list</p>
     return fit, fitted_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2.read_prep_times"><code class="name flex">
+<dt id="models.iBEAt_T2.read_prep_times"><code class="name flex">
 <span>def <span class="ident">read_prep_times</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -297,15 +297,15 @@ signal_model_parameters (list): T2-prep times as a list</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library.models" href="index.html">MDR-Library.models</a></code></li>
+<li><code><a title="models" href="index.html">models</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.models.iBEAt_T2.T2_fitting" href="#MDR-Library.models.iBEAt_T2.T2_fitting">T2_fitting</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2.exp_func" href="#MDR-Library.models.iBEAt_T2.exp_func">exp_func</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2.main" href="#MDR-Library.models.iBEAt_T2.main">main</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2.read_prep_times" href="#MDR-Library.models.iBEAt_T2.read_prep_times">read_prep_times</a></code></li>
+<li><code><a title="models.iBEAt_T2.T2_fitting" href="#models.iBEAt_T2.T2_fitting">T2_fitting</a></code></li>
+<li><code><a title="models.iBEAt_T2.exp_func" href="#models.iBEAt_T2.exp_func">exp_func</a></code></li>
+<li><code><a title="models.iBEAt_T2.main" href="#models.iBEAt_T2.main">main</a></code></li>
+<li><code><a title="models.iBEAt_T2.read_prep_times" href="#models.iBEAt_T2.read_prep_times">read_prep_times</a></code></li>
 </ul>
 </li>
 </ul>

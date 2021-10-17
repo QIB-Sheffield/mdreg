@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.models.iBEAt_T2star API documentation</title>
+<title>models.iBEAt_T2star API documentation</title>
 <meta name="description" content="@author: Kanishka Sharma
 iBEAt study T2* model fit
 2021" />
@@ -21,7 +21,7 @@ iBEAt study T2* model fit
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.models.iBEAt_T2star</code></h1>
+<h1 class="title">Module <code>models.iBEAt_T2star</code></h1>
 </header>
 <section id="section-intro">
 <p>@author: Kanishka Sharma
@@ -169,7 +169,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.models.iBEAt_T2star.T2star_fitting"><code class="name flex">
+<dt id="models.iBEAt_T2star.T2star_fitting"><code class="name flex">
 <span>def <span class="ident">T2star_fitting</span></span>(<span>images_to_be_fitted, echo_times)</span>
 </code></dt>
 <dd>
@@ -222,7 +222,7 @@ echo_times (list): list of TE times</p>
     return fit, S0, T2star</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2star.exp_func"><code class="name flex">
+<dt id="models.iBEAt_T2star.exp_func"><code class="name flex">
 <span>def <span class="ident">exp_func</span></span>(<span>TE, S0, T2star)</span>
 </code></dt>
 <dd>
@@ -251,7 +251,7 @@ echo_times (list): list of TE times</p>
     return S0*np.exp(-TE/T2star)</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2star.main"><code class="name flex">
+<dt id="models.iBEAt_T2star.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -297,7 +297,7 @@ signal_model_parameters (list): TE times as a list</p>
     return fit, fitted_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_T2star.read_and_sort_echo_times"><code class="name flex">
+<dt id="models.iBEAt_T2star.read_and_sort_echo_times"><code class="name flex">
 <span>def <span class="ident">read_and_sort_echo_times</span></span>(<span>fname, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -367,15 +367,15 @@ lstFilesDCM (list): list of dicom files to process</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library.models" href="index.html">MDR-Library.models</a></code></li>
+<li><code><a title="models" href="index.html">models</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.models.iBEAt_T2star.T2star_fitting" href="#MDR-Library.models.iBEAt_T2star.T2star_fitting">T2star_fitting</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2star.exp_func" href="#MDR-Library.models.iBEAt_T2star.exp_func">exp_func</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2star.main" href="#MDR-Library.models.iBEAt_T2star.main">main</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_T2star.read_and_sort_echo_times" href="#MDR-Library.models.iBEAt_T2star.read_and_sort_echo_times">read_and_sort_echo_times</a></code></li>
+<li><code><a title="models.iBEAt_T2star.T2star_fitting" href="#models.iBEAt_T2star.T2star_fitting">T2star_fitting</a></code></li>
+<li><code><a title="models.iBEAt_T2star.exp_func" href="#models.iBEAt_T2star.exp_func">exp_func</a></code></li>
+<li><code><a title="models.iBEAt_T2star.main" href="#models.iBEAt_T2star.main">main</a></code></li>
+<li><code><a title="models.iBEAt_T2star.read_and_sort_echo_times" href="#models.iBEAt_T2star.read_and_sort_echo_times">read_and_sort_echo_times</a></code></li>
 </ul>
 </li>
 </ul>

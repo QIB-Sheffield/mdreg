@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.models.iBEAt_DTI API documentation</title>
+<title>models.iBEAt_DTI API documentation</title>
 <meta name="description" content="@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
 iBEAt study DTI model fit for the MDR Library
 2021" />
@@ -21,7 +21,7 @@ iBEAt study DTI model fit for the MDR Library
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.models.iBEAt_DTI</code></h1>
+<h1 class="title">Module <code>models.iBEAt_DTI</code></h1>
 </header>
 <section id="section-intro">
 <p>@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
@@ -243,7 +243,7 @@ def main(images_to_be_fitted, signal_model_parameters):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.models.iBEAt_DTI.DTI_fitting"><code class="name flex">
+<dt id="models.iBEAt_DTI.DTI_fitting"><code class="name flex">
 <span>def <span class="ident">DTI_fitting</span></span>(<span>im, b, thresh_val, method='linear')</span>
 </code></dt>
 <dd>
@@ -374,7 +374,7 @@ DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) 
     return M, Bv_new, FA_mask, ADC_mask, fit</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DTI.main"><code class="name flex">
+<dt id="models.iBEAt_DTI.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>images_to_be_fitted, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -443,7 +443,7 @@ signal_model_parameters (list): list consisting of b-values, b-vec, and image_or
     return fit, fitted_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.models.iBEAt_DTI.read_dicom_tags_DTI"><code class="name flex">
+<dt id="models.iBEAt_DTI.read_dicom_tags_DTI"><code class="name flex">
 <span>def <span class="ident">read_dicom_tags_DTI</span></span>(<span>fname, lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -506,14 +506,14 @@ patient orientation as list</code></dt>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library.models" href="index.html">MDR-Library.models</a></code></li>
+<li><code><a title="models" href="index.html">models</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.models.iBEAt_DTI.DTI_fitting" href="#MDR-Library.models.iBEAt_DTI.DTI_fitting">DTI_fitting</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DTI.main" href="#MDR-Library.models.iBEAt_DTI.main">main</a></code></li>
-<li><code><a title="MDR-Library.models.iBEAt_DTI.read_dicom_tags_DTI" href="#MDR-Library.models.iBEAt_DTI.read_dicom_tags_DTI">read_dicom_tags_DTI</a></code></li>
+<li><code><a title="models.iBEAt_DTI.DTI_fitting" href="#models.iBEAt_DTI.DTI_fitting">DTI_fitting</a></code></li>
+<li><code><a title="models.iBEAt_DTI.main" href="#models.iBEAt_DTI.main">main</a></code></li>
+<li><code><a title="models.iBEAt_DTI.read_dicom_tags_DTI" href="#models.iBEAt_DTI.read_dicom_tags_DTI">read_dicom_tags_DTI</a></code></li>
 </ul>
 </li>
 </ul>
