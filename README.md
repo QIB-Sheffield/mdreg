@@ -7,13 +7,13 @@ Models included: T1, T2, T2*, DTI, DWI, DCE-MRI. To be extended for: MT, PC-MRI,
  
  
 ## Requirements
-1. Have [`Python >= 3.6`](https://www.python.org/) installed and type `pip install -r requirements.txt` in a terminal or in an IDE of your preference. This will install the Python Packages required to run this library, with special focus on [ITK-Elastix](https://github.com/InsightSoftwareConsortium/ITKElastix) which is the one used for the model-driven registration.
+1. Have [`Python >= 3.6`](https://www.python.org/) installed and type `pip install mdr-library`. If you are a developer, then you can run `pip install -r requirements.txt` in a terminal or in an IDE of your preference. This will install the Python Packages required to run this library, with special focus on [ITK-Elastix](https://github.com/InsightSoftwareConsortium/ITKElastix) which is the one used for the model-driven registration.
 
 2. Download test [DICOM data](https://shorturl.at/rwCUV), unzip file and place it in the 'tests/test_data' folder.
 
 
 ## How to use
-Run `MDR_test_main.py` in the 'tests' folder.
+Run `MDR_test_main.py` in the `tests` folder.
 
 
 ## Context
@@ -39,4 +39,4 @@ Finally, commit the newly generated files to Github so that the [website](https:
 ## Acknowledgement
 The iBEAt study is part of the BEAt-DKD project. The BEAt-DKD project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 115974. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation programme and EFPIA with JDRF. For a full list of BEAt-DKD partners, see www.beat-dkd.eu.
 
-For queries please email: kanishka.sharma@sheffield.ac.uk or s.sourbron@sheffield.ac.uk
+**For queries please email:** kanishka.sharma@sheffield.ac.uk or s.sourbron@sheffield.ac.uk

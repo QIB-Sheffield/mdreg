@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>MDR-Library.MDR API documentation</title>
+<title>MDR-Library.MDR.MDR API documentation</title>
 <meta name="description" content="MODEL DRIVEN REGISTRATION (MDR) for quantitative renal MRI
 MDR Library
 @Kanishka Sharma
@@ -23,7 +23,7 @@ MDR Library
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR-Library.MDR</code></h1>
+<h1 class="title">Module <code>MDR-Library.MDR.MDR</code></h1>
 </header>
 <section id="section-intro">
 <p>MODEL DRIVEN REGISTRATION (MDR) for quantitative renal MRI
@@ -229,7 +229,7 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR-Library.MDR.fit_coregistration"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.fit_coregistration"><code class="name flex">
 <span>def <span class="ident">fit_coregistration</span></span>(<span>shape, fit, images, image_parameters, elastix_model_parameters)</span>
 </code></dt>
 <dd>
@@ -271,7 +271,7 @@ deformation_field (numpy.ndarray): output deformation fields with shape [x-dim, 
     return coregistered, deformation_field</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.MDR.fit_signal_model_image"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.fit_signal_model_image"><code class="name flex">
 <span>def <span class="ident">fit_signal_model_image</span></span>(<span>shape, coregistered, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -313,7 +313,7 @@ par (list): signal model-fit parameters as a list.</p></div>
     return fit, par</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.MDR.fit_signal_model_pixel"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.fit_signal_model_pixel"><code class="name flex">
 <span>def <span class="ident">fit_signal_model_pixel</span></span>(<span>time_curve, signal_model_parameters)</span>
 </code></dt>
 <dd>
@@ -332,7 +332,7 @@ and returns the fitted signal and associated model parameters.</p></div>
     return fit, fitted_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.MDR.itkElastix_MDR_coregistration"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.itkElastix_MDR_coregistration"><code class="name flex">
 <span>def <span class="ident">itkElastix_MDR_coregistration</span></span>(<span>target, source, elastix_model_parameters, image_parameters)</span>
 </code></dt>
 <dd>
@@ -391,7 +391,7 @@ and returns ffd based co-registered image and corresponding deformation field.</
     return coregistered, deformation_field</code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.MDR.maximum_deformation_per_pixel"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.maximum_deformation_per_pixel"><code class="name flex">
 <span>def <span class="ident">maximum_deformation_per_pixel</span></span>(<span>deformation_field, new_deformation_field)</span>
 </code></dt>
 <dd>
@@ -422,7 +422,7 @@ the euclidean distance of difference between old and new deformation field.</p><
     return maximum_deformation_per_pixel </code></pre>
 </details>
 </dd>
-<dt id="MDR-Library.MDR.model_driven_registration"><code class="name flex">
+<dt id="MDR-Library.MDR.MDR.model_driven_registration"><code class="name flex">
 <span>def <span class="ident">model_driven_registration</span></span>(<span>images, image_parameters, signal_model_parameters, elastix_model_parameters, precision=1)</span>
 </code></dt>
 <dd>
@@ -506,17 +506,17 @@ improvement (dataframe): maximum deformation per pixel calculated as the euclide
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR-Library" href="index.html">MDR-Library</a></code></li>
+<li><code><a title="MDR-Library.MDR" href="index.html">MDR-Library.MDR</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR-Library.MDR.fit_coregistration" href="#MDR-Library.MDR.fit_coregistration">fit_coregistration</a></code></li>
-<li><code><a title="MDR-Library.MDR.fit_signal_model_image" href="#MDR-Library.MDR.fit_signal_model_image">fit_signal_model_image</a></code></li>
-<li><code><a title="MDR-Library.MDR.fit_signal_model_pixel" href="#MDR-Library.MDR.fit_signal_model_pixel">fit_signal_model_pixel</a></code></li>
-<li><code><a title="MDR-Library.MDR.itkElastix_MDR_coregistration" href="#MDR-Library.MDR.itkElastix_MDR_coregistration">itkElastix_MDR_coregistration</a></code></li>
-<li><code><a title="MDR-Library.MDR.maximum_deformation_per_pixel" href="#MDR-Library.MDR.maximum_deformation_per_pixel">maximum_deformation_per_pixel</a></code></li>
-<li><code><a title="MDR-Library.MDR.model_driven_registration" href="#MDR-Library.MDR.model_driven_registration">model_driven_registration</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.fit_coregistration" href="#MDR-Library.MDR.MDR.fit_coregistration">fit_coregistration</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.fit_signal_model_image" href="#MDR-Library.MDR.MDR.fit_signal_model_image">fit_signal_model_image</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.fit_signal_model_pixel" href="#MDR-Library.MDR.MDR.fit_signal_model_pixel">fit_signal_model_pixel</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.itkElastix_MDR_coregistration" href="#MDR-Library.MDR.MDR.itkElastix_MDR_coregistration">itkElastix_MDR_coregistration</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.maximum_deformation_per_pixel" href="#MDR-Library.MDR.MDR.maximum_deformation_per_pixel">maximum_deformation_per_pixel</a></code></li>
+<li><code><a title="MDR-Library.MDR.MDR.model_driven_registration" href="#MDR-Library.MDR.MDR.model_driven_registration">model_driven_registration</a></code></li>
 </ul>
 </li>
 </ul>
