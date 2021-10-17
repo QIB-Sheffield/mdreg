@@ -24,8 +24,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
 
       - name: Generate Reference Manual
-        run: |
-        pdoc3 --html --force --output-dir "docs" .
+        run: pdoc --html --force --output-dir "docs" .
 
       - name: Deploy manual to Github Page https://qib-sheffield.github.io/MDR-Library/
         uses: s0/git-publish-subdir-action@develop
