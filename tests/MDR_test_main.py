@@ -5,6 +5,10 @@ MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 Main script to test Model Driven Registration Library (MDR-Library)
 """
 
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__))) # Add folder "tests" to PYTHONPATH
+sys.path.append(os.path.dirname(sys.path[0])) # Add the parent directory of "tests" to the system
+
 # import the test script for your purpose
 # select from currently available test scripts below
 # T2:  MDR_test_T2

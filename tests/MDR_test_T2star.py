@@ -7,6 +7,7 @@ import sys
 import glob
 import os
 import numpy as np
+import itk
 import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
@@ -30,7 +31,7 @@ def main():
     # eg: /Users/kanishkasharma/Documents/GitHub/MDR_Library
     print(os.getcwd()) 
 
-    DATA_PATH = os.getcwd() + r'/test_MDR/test_data/DICOMs'
+    DATA_PATH = os.getcwd() + r'/tests/test_data/DICOMs'
     OUTPUT_REG_PATH = os.getcwd() + r'/MDR_registration_output'
     Elastix_Parameter_file_PATH = os.getcwd() + r'/Elastix_Parameters_Files/iBEAt' 
     output_dir =  OUTPUT_REG_PATH + '/T2star/'
@@ -166,11 +167,9 @@ def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
 
 ## read elastix parameters
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
-    elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + "/BSplines_T2star.txt")
-    elastix_model_parameters['MaximumNumberOfIterations'] = ['256'] 
-    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
-
+    elastix_model_parameters = itk.ParameterObject.New()
+    elastix_model_parameters.AddParameterFile(Elastix_Parameter_file_PATH + "/BSplines_T2star.txt")
+    elastix_model_parameters.SetParameter('MaximumNumberOfIterations', '256')
     return elastix_model_parameters
 
 

@@ -6,8 +6,10 @@ MDR Library
 2021
 """
 
+import os
 import numpy as np
 import SimpleITK as sitk
+import itk
 import pandas as pd
 
 def model_driven_registration(images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1): 
@@ -31,8 +33,6 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
         improvement (dataframe): maximum deformation per pixel calculated as the euclidean distance of difference between old and new deformation field appended to a dataframe until convergence criterion is met.
     
     """
-
-
     shape = np.shape(images)
     improvement = []  
 
@@ -104,7 +104,7 @@ def fit_coregistration(shape, fit, images, image_parameters, elastix_model_param
     coregistered = np.zeros((shape[0]*shape[1],shape[2]))
     deformation_field = np.zeros([shape[0]*shape[1], 2, shape[2]])
     for t in range(shape[2]): #dynamics
-      coregistered[:,t], deformation_field[:,:,t] = simpleElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
+      coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
     return coregistered, deformation_field
 
 
@@ -136,7 +136,7 @@ def fit_signal_model_pixel(time_curve, signal_model_parameters):
 
 
 # deformable registration for MDR
-def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
+def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
     """
         This function takes unregistered source image and target image as input 
         and returns ffd based co-registered image and corresponding deformation field. 
@@ -157,26 +157,30 @@ def simpleElastix_MDR_coregistration(target, source, elastix_model_parameters, i
     target = np.reshape(target, [shape_target[0], shape_target[1]])
     
     ## read the source and target images
-    elastixImageFilter = sitk.ElastixImageFilter()
-    elastixImageFilter.SetFixedImage(sitk.GetImageFromArray(source))
-    elastixImageFilter.SetMovingImage(sitk.GetImageFromArray(target))
+    elastixImageFilter = itk.ElastixRegistrationMethod.New()
+    elastixImageFilter.SetFixedImage(itk.GetImageFromArray(np.array(source, np.float32)))
+    elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
 
     ## call the parameter map file specifying the registration parameters
-    elastixImageFilter.SetParameterMap(elastix_model_parameters) 
-    elastixImageFilter.PrintParameterMap()
+    elastixImageFilter.SetParameterObject(elastix_model_parameters) 
+    ## print Parameter Map
+    print(elastix_model_parameters)
 
-    ## RUN ELASTIX using SimpleITK filters
-    elastixImageFilter.Execute()
-    coregistered = elastixImageFilter.GetResultImage()
+    ## set additional options
+    elastixImageFilter.SetNumberOfThreads(os.cpu_count()-1)
+    elastixImageFilter.SetLogToConsole(True)
+    ## update filter object (required)
+    elastixImageFilter.UpdateLargestPossibleRegion()
 
-    transformixImageFilter = sitk.TransformixImageFilter()
-    transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
+    ## RUN ELASTIX using ITK-Elastix filters
+    coregistered = itk.GetArrayFromImage(elastixImageFilter.GetOutput()).flatten()
+
+    transformixImageFilter = itk.TransformixFilter.New()
+    transformixImageFilter.SetTransformParameterObject(elastixImageFilter.GetTransformParameterObject())
     transformixImageFilter.ComputeDeformationFieldOn()
-    transformixImageFilter.Execute()
-    deformation_field = transformixImageFilter.GetDeformationField()
+    transformixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
+    deformation_field = itk.GetArrayFromImage(transformixImageFilter.GetOutputDeformationField()).flatten()
+    deformation_field = np.reshape(deformation_field, [int(len(deformation_field)/2), 2])
 
     return coregistered, deformation_field
 
-
-
-   

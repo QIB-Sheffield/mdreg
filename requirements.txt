@@ -1,5 +1,7 @@
+itk-elastix
 numpy
-scipy
-pydicom
 pandas
 Pillow
+pydicom
+scipy
+SimpleITK

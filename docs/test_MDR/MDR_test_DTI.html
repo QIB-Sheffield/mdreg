@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>MDR_Library.test_MDR.MDR_test_DCE API documentation</title>
+<title>MDR_Library.tests.MDR_test_DTI API documentation</title>
 <meta name="description" content="MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for DCE sequence using Model driven registration …" />
+Test script for DTI sequence using Model driven registration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -21,12 +21,12 @@ Test script for DCE sequence using Model driven registration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>MDR_Library.test_MDR.MDR_test_DCE</code></h1>
+<h1 class="title">Module <code>MDR_Library.tests.MDR_test_DTI</code></h1>
 </header>
 <section id="section-intro">
 <p>MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for DCE sequence using Model driven registration Library</p>
+Test script for DTI sequence using Model driven registration Library</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -34,7 +34,7 @@ Test script for DCE sequence using Model driven registration Library</p>
 <pre><code class="python">&#34;&#34;&#34;
 MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
 @Kanishka Sharma 2021
-Test script for DCE sequence using Model driven registration Library
+Test script for DTI sequence using Model driven registration Library
 &#34;&#34;&#34;
 import sys
 import glob
@@ -43,10 +43,10 @@ import numpy as np
 import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
+import importlib
 import time
 from PIL import Image
 from MDR import model_driven_registration  
-import importlib
 
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -54,20 +54,19 @@ np.set_printoptions(threshold=sys.maxsize)
 
 def main():
     # selected sequence to process
-    sequence = &#39;DCE&#39;
-    # number of expected slices to process (example: iBEAt study number of slice = 9)
-    slices = 9    
+    sequence = &#39;DTI&#39;
+    # number of expected slices to process (example: iBEAt study number of slice = 30)
+    slices = 30    
 
     # path definition  
     # your &#39;os.getcwd()&#39; path should point to your local directory containing the  MDR-Library 
     # eg: /Users/kanishkasharma/Documents/GitHub/MDR_Library
     print(os.getcwd()) 
 
-    DATA_PATH = os.getcwd() + r&#39;/test_MDR/test_data/DICOMs&#39;
-    AIFs_PATH = os.getcwd() + r&#39;/test_MDR/test_data/AIFs&#39; 
+    DATA_PATH = os.getcwd() + r&#39;/tests/test_data/DICOMs&#39;
     OUTPUT_REG_PATH = os.getcwd() + r&#39;/MDR_registration_output&#39;
     Elastix_Parameter_file_PATH = os.getcwd() + r&#39;/Elastix_Parameters_Files/iBEAt&#39; 
-    output_dir =  OUTPUT_REG_PATH + &#39;/DCE/&#39;
+    output_dir =  OUTPUT_REG_PATH + &#39;/DTI/&#39;
 
     # Organize files per each sequence:
     os.chdir(DATA_PATH)    
@@ -77,7 +76,7 @@ def main():
     for patient_folder in patients_folders:
         if patient_folder not in [&#39;test_case_iBEAt_4128009&#39;]: # eg: test case selected to be processed - change to your own test case
             continue
-        # read path to the sequence to be processed for selected test patient case: eg: DCE
+        # read path to the sequence to be processed for selected test patient case: eg: DTI
         sequence_images_path = patient_folder + &#39;/&#39; + str(sequence) + &#39;/DICOM&#39;
         os.chdir(DATA_PATH + &#39;/&#39; + sequence_images_path)
         # read all dicom files for selected sequence
@@ -87,13 +86,13 @@ def main():
         # slice to be processed from selected sequence
         for slice in range(1, slices+1):
             current_slice = sequence + &#39;_slice_&#39; + str(slice)
-            # single slice processing for DCE sequence (here selected slice number is 5)
-            if current_slice not in [sequence + &#39;_slice_5&#39;]:
+            # single slice processing for DTI sequence (here selected slice number is 15)
+            if current_slice not in [sequence + &#39;_slice_15&#39;]:
                 continue
             # read slice path to be processed
             slice_path = DATA_PATH + &#39;/&#39; + sequence_images_path + &#39;/&#39; + current_slice
             data = Path(slice_path)
-            # list of all DICOMs to be processed for the selected slice (example: slice number = 5 here)
+            # list of all DICOMs to be processed for the selected slice (example: slice number = 15 here)
             lstFilesDCM = list(data.glob(&#39;**/*.IMA&#39;)) 
     
             # read all dicom files for the selected sequence and slice
@@ -102,8 +101,8 @@ def main():
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
             # sort slices correctly - based on acquisition time for model driven registration
             sorted_slice_files = sort_all_slice_files_acquisition_time(files)
-            # run DCE MDR test 
-            iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder)
+            # run DTI MDR test 
+            iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
 # read input dicom files
 def read_DICOM_files(lstFilesDCM):
@@ -118,7 +117,6 @@ def read_DICOM_files(lstFilesDCM):
         ds = pydicom.dcmread(filenameDCM)
         # write pixel data into numpy array
         ArrayDicomiBEAt[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
-
 
     return files, ArrayDicomiBEAt, filenameDCM
 
@@ -144,25 +142,25 @@ def sort_all_slice_files_acquisition_time(files):
 
     return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime)  
 
-# test DCE using model driven registration
-def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder):
-    &#34;&#34;&#34; Example application of MDR in renal DCE (iBEAt data)
+# test DTI using model driven registration
+def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
+    &#34;&#34;&#34; Example application of MDR in renal DTI (iBEAt data)
     
     Args
     ----
-    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+    Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time 
     ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-    image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
-    AIFs_PATH (string): string with full AIF path
-    patient_folder (string): patient folder with AIFs text file
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
-    This function performs model driven registration for selected DCE sequence on a single selected slice 
+    This function performs model driven registration for selected DTI sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
-    fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.
+    fitted parameters FA and ADC, and the final diagnostics.
     &#34;&#34;&#34;
     start_computation_time = time.time()
     # define numpy array with same input shape as original DICOMs
@@ -175,51 +173,48 @@ def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
         original_images[:, :, i] = img2d
 
     # read signal model parameters
-    full_module_name = &#34;models.iBEAt_DCE&#34;
-    signal_model_parameters = read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder)
+    full_module_name = &#34;models.iBEAt_DTI&#34;
+    signal_model_parameters = read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM)
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
-    #Perform MDR
+    #Perform MDR 
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
 
     #Export results
-    export_images(MDR_output[0], output_dir +&#39;/coregistered/MDR-registered_DCE_&#39;)
+    export_images(MDR_output[0], output_dir +&#39;/coregistered/MDR-registered_DTI_&#39;)
     export_images(MDR_output[1], output_dir +&#39;/fit/fit_image_&#39;)
     export_images(MDR_output[2][:,:,0,:], output_dir +&#39;/deformation_field/final_deformation_x_&#39;)
     export_images(MDR_output[2][:,:,1,:], output_dir +&#39;/deformation_field/final_deformation_y_&#39;)
-    export_maps(MDR_output[3][::4], output_dir + &#39;/fitted_parameters/Fp&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][1::4], output_dir + &#39;/fitted_parameters/Tp&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][2::4], output_dir + &#39;/fitted_parameters/Ps&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][3::4], output_dir + &#39;/fitted_parameters/Te&#39;, np.shape(original_images))
-    MDR_output[4].to_csv(output_dir + &#39;DCE_largest_deformations.csv&#39;)
+    export_maps(MDR_output[3][2::4], output_dir + &#39;/fitted_parameters/FA&#39;, np.shape(original_images))
+    export_maps(MDR_output[3][3::4], output_dir + &#39;/fitted_parameters/ADC&#39;, np.shape(original_images))
+    MDR_output[4].to_csv(output_dir + &#39;DTI_largest_deformations.csv&#39;)
 
     # Report computation times
     end_computation_time = time.time()
     print(&#34;total computation time for MDR (minutes taken:)...&#34;)
     print(0.0166667*(end_computation_time - start_computation_time)) # in minutes
     print(&#34;completed MDR registration!&#34;)
-    print(&#34;Finished processing Model Driven Registration case for iBEAt study DCE sequence!&#34;)
+    print(&#34;Finished processing Model Driven Registration case for iBEAt study DTI sequence!&#34;)
 
 
 
 ## read sequence acquisition parameter for signal modelling
-def read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder):
-   
-   # generate a module named as a string
+def read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM):
+
+    # generate a module named as a string
     MODEL = importlib.import_module(full_module_name)
-    aif, times = MODEL.load_txt(AIFs_PATH + &#39;/&#39; + str(patient_folder) + &#39;/&#39; + &#39;AIF__2C Filtration__Curve.txt&#39;)
-    aif.append(aif[-1])
-    times.append(times[-1])
+    b_values, bVec_original, image_orientation_patient = MODEL.read_dicom_tags_DTI(filenameDCM, lstFilesDCM)
     # select signal model paramters
-    signal_model_parameters = [MODEL, [aif, times]]
+    signal_model_parameters = [MODEL]
+    signal_model_parameters.append([b_values, bVec_original, image_orientation_patient])
     return signal_model_parameters
 
 
 ## read elastix parameters
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
     elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_DCE.txt&#34;)
+    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_DTI.txt&#34;)
     elastix_model_parameters[&#39;MaximumNumberOfIterations&#39;] = [&#39;256&#39;] 
     elastixImageFilter.SetParameterMap(elastix_model_parameters)
     return elastix_model_parameters
@@ -238,6 +233,11 @@ def export_maps(MDR_output, folder, shape):
     array = np.reshape(MDR_output, [shape[0],shape[1]]) 
     Img = Image.fromarray(array)
     Img.save(folder + &#34;.tiff&#34;)
+    
+
+
+
+
     </code></pre>
 </details>
 </section>
@@ -248,7 +248,7 @@ def export_maps(MDR_output, folder, shape):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.export_images"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.export_images"><code class="name flex">
 <span>def <span class="ident">export_images</span></span>(<span>MDR_output, folder)</span>
 </code></dt>
 <dd>
@@ -264,7 +264,7 @@ def export_maps(MDR_output, folder, shape):
         im.save(folder + str(i) + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.export_maps"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.export_maps"><code class="name flex">
 <span>def <span class="ident">export_maps</span></span>(<span>MDR_output, folder, shape)</span>
 </code></dt>
 <dd>
@@ -279,7 +279,7 @@ def export_maps(MDR_output, folder, shape):
     Img.save(folder + &#34;.tiff&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.get_sitk_image_details_from_DICOM"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.get_sitk_image_details_from_DICOM"><code class="name flex">
 <span>def <span class="ident">get_sitk_image_details_from_DICOM</span></span>(<span>slice_path)</span>
 </code></dt>
 <dd>
@@ -297,45 +297,45 @@ def export_maps(MDR_output, folder, shape):
     return spacing</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.iBEAt_test_DCE"><code class="name flex">
-<span>def <span class="ident">iBEAt_test_DCE</span></span>(<span>Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder)</span>
+<dt id="MDR_Library.tests.MDR_test_DTI.iBEAt_test_DTI"><code class="name flex">
+<span>def <span class="ident">iBEAt_test_DTI</span></span>(<span>Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Example application of MDR in renal DCE (iBEAt data)</p>
+<div class="desc"><p>Example application of MDR in renal DTI (iBEAt data)</p>
 <h2 id="args">Args</h2>
-<p>Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+<p>Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used
 output_dir (string): directory where results are saved
-slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time
+slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time
 ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
-AIFs_PATH (string): string with full AIF path
-patient_folder (string): patient folder with AIFs text file</p>
+image_parameters (SITK input): image spacing
+filenameDCM (pathlib.PosixPath): dicom filenames to process
+lstFilesDCM (list): list of dicom files to process</p>
 <h2 id="description">Description</h2>
-<p>This function performs model driven registration for selected DCE sequence on a single selected slice
+<p>This function performs model driven registration for selected DTI sequence on a single selected slice
 and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y,
-fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
+fitted parameters FA and ADC, and the final diagnostics.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder):
-    &#34;&#34;&#34; Example application of MDR in renal DCE (iBEAt data)
+<pre><code class="python">def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
+    &#34;&#34;&#34; Example application of MDR in renal DTI (iBEAt data)
     
     Args
     ----
-    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
+    Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used
     output_dir (string): directory where results are saved
-    slice_sorted_files (list): selected slices to process using MDR - sorted according to acquisition time 
+    slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time 
     ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-    image_parameters (stik tuple): distance between pixels (in mm) along each dimension.
-    AIFs_PATH (string): string with full AIF path
-    patient_folder (string): patient folder with AIFs text file
+    image_parameters (SITK input): image spacing
+    filenameDCM (pathlib.PosixPath): dicom filenames to process
+    lstFilesDCM (list): list of dicom files to process
 
     Description
     -----------
-    This function performs model driven registration for selected DCE sequence on a single selected slice 
+    This function performs model driven registration for selected DTI sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
-    fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.
+    fitted parameters FA and ADC, and the final diagnostics.
     &#34;&#34;&#34;
     start_computation_time = time.time()
     # define numpy array with same input shape as original DICOMs
@@ -348,34 +348,32 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
         original_images[:, :, i] = img2d
 
     # read signal model parameters
-    full_module_name = &#34;models.iBEAt_DCE&#34;
-    signal_model_parameters = read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder)
+    full_module_name = &#34;models.iBEAt_DTI&#34;
+    signal_model_parameters = read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM)
     # read signal model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
     
-    #Perform MDR
+    #Perform MDR 
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
 
     #Export results
-    export_images(MDR_output[0], output_dir +&#39;/coregistered/MDR-registered_DCE_&#39;)
+    export_images(MDR_output[0], output_dir +&#39;/coregistered/MDR-registered_DTI_&#39;)
     export_images(MDR_output[1], output_dir +&#39;/fit/fit_image_&#39;)
     export_images(MDR_output[2][:,:,0,:], output_dir +&#39;/deformation_field/final_deformation_x_&#39;)
     export_images(MDR_output[2][:,:,1,:], output_dir +&#39;/deformation_field/final_deformation_y_&#39;)
-    export_maps(MDR_output[3][::4], output_dir + &#39;/fitted_parameters/Fp&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][1::4], output_dir + &#39;/fitted_parameters/Tp&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][2::4], output_dir + &#39;/fitted_parameters/Ps&#39;, np.shape(original_images))
-    export_maps(MDR_output[3][3::4], output_dir + &#39;/fitted_parameters/Te&#39;, np.shape(original_images))
-    MDR_output[4].to_csv(output_dir + &#39;DCE_largest_deformations.csv&#39;)
+    export_maps(MDR_output[3][2::4], output_dir + &#39;/fitted_parameters/FA&#39;, np.shape(original_images))
+    export_maps(MDR_output[3][3::4], output_dir + &#39;/fitted_parameters/ADC&#39;, np.shape(original_images))
+    MDR_output[4].to_csv(output_dir + &#39;DTI_largest_deformations.csv&#39;)
 
     # Report computation times
     end_computation_time = time.time()
     print(&#34;total computation time for MDR (minutes taken:)...&#34;)
     print(0.0166667*(end_computation_time - start_computation_time)) # in minutes
     print(&#34;completed MDR registration!&#34;)
-    print(&#34;Finished processing Model Driven Registration case for iBEAt study DCE sequence!&#34;)</code></pre>
+    print(&#34;Finished processing Model Driven Registration case for iBEAt study DTI sequence!&#34;)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.main"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -386,20 +384,19 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
 </summary>
 <pre><code class="python">def main():
     # selected sequence to process
-    sequence = &#39;DCE&#39;
-    # number of expected slices to process (example: iBEAt study number of slice = 9)
-    slices = 9    
+    sequence = &#39;DTI&#39;
+    # number of expected slices to process (example: iBEAt study number of slice = 30)
+    slices = 30    
 
     # path definition  
     # your &#39;os.getcwd()&#39; path should point to your local directory containing the  MDR-Library 
     # eg: /Users/kanishkasharma/Documents/GitHub/MDR_Library
     print(os.getcwd()) 
 
-    DATA_PATH = os.getcwd() + r&#39;/test_MDR/test_data/DICOMs&#39;
-    AIFs_PATH = os.getcwd() + r&#39;/test_MDR/test_data/AIFs&#39; 
+    DATA_PATH = os.getcwd() + r&#39;/tests/test_data/DICOMs&#39;
     OUTPUT_REG_PATH = os.getcwd() + r&#39;/MDR_registration_output&#39;
     Elastix_Parameter_file_PATH = os.getcwd() + r&#39;/Elastix_Parameters_Files/iBEAt&#39; 
-    output_dir =  OUTPUT_REG_PATH + &#39;/DCE/&#39;
+    output_dir =  OUTPUT_REG_PATH + &#39;/DTI/&#39;
 
     # Organize files per each sequence:
     os.chdir(DATA_PATH)    
@@ -409,7 +406,7 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
     for patient_folder in patients_folders:
         if patient_folder not in [&#39;test_case_iBEAt_4128009&#39;]: # eg: test case selected to be processed - change to your own test case
             continue
-        # read path to the sequence to be processed for selected test patient case: eg: DCE
+        # read path to the sequence to be processed for selected test patient case: eg: DTI
         sequence_images_path = patient_folder + &#39;/&#39; + str(sequence) + &#39;/DICOM&#39;
         os.chdir(DATA_PATH + &#39;/&#39; + sequence_images_path)
         # read all dicom files for selected sequence
@@ -419,13 +416,13 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
         # slice to be processed from selected sequence
         for slice in range(1, slices+1):
             current_slice = sequence + &#39;_slice_&#39; + str(slice)
-            # single slice processing for DCE sequence (here selected slice number is 5)
-            if current_slice not in [sequence + &#39;_slice_5&#39;]:
+            # single slice processing for DTI sequence (here selected slice number is 15)
+            if current_slice not in [sequence + &#39;_slice_15&#39;]:
                 continue
             # read slice path to be processed
             slice_path = DATA_PATH + &#39;/&#39; + sequence_images_path + &#39;/&#39; + current_slice
             data = Path(slice_path)
-            # list of all DICOMs to be processed for the selected slice (example: slice number = 5 here)
+            # list of all DICOMs to be processed for the selected slice (example: slice number = 15 here)
             lstFilesDCM = list(data.glob(&#39;**/*.IMA&#39;)) 
     
             # read all dicom files for the selected sequence and slice
@@ -434,11 +431,11 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
             # sort slices correctly - based on acquisition time for model driven registration
             sorted_slice_files = sort_all_slice_files_acquisition_time(files)
-            # run DCE MDR test 
-            iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, AIFs_PATH, patient_folder)</code></pre>
+            # run DTI MDR test 
+            iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.read_DICOM_files"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.read_DICOM_files"><code class="name flex">
 <span>def <span class="ident">read_DICOM_files</span></span>(<span>lstFilesDCM)</span>
 </code></dt>
 <dd>
@@ -460,11 +457,10 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
         # write pixel data into numpy array
         ArrayDicomiBEAt[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
 
-
     return files, ArrayDicomiBEAt, filenameDCM</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.read_elastix_model_parameters"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.read_elastix_model_parameters"><code class="name flex">
 <span>def <span class="ident">read_elastix_model_parameters</span></span>(<span>Elastix_Parameter_file_PATH)</span>
 </code></dt>
 <dd>
@@ -475,14 +471,14 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
 </summary>
 <pre><code class="python">def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
     elastixImageFilter = sitk.ElastixImageFilter()
-    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_DCE.txt&#34;)
+    elastix_model_parameters = elastixImageFilter.ReadParameterFile(Elastix_Parameter_file_PATH + &#34;/BSplines_DTI.txt&#34;)
     elastix_model_parameters[&#39;MaximumNumberOfIterations&#39;] = [&#39;256&#39;] 
     elastixImageFilter.SetParameterMap(elastix_model_parameters)
     return elastix_model_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.read_signal_model_parameters"><code class="name flex">
-<span>def <span class="ident">read_signal_model_parameters</span></span>(<span>full_module_name, AIFs_PATH, patient_folder)</span>
+<dt id="MDR_Library.tests.MDR_test_DTI.read_signal_model_parameters"><code class="name flex">
+<span>def <span class="ident">read_signal_model_parameters</span></span>(<span>full_module_name, filenameDCM, lstFilesDCM)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -490,19 +486,18 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def read_signal_model_parameters(full_module_name,AIFs_PATH, patient_folder):
-   
-   # generate a module named as a string
+<pre><code class="python">def read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM):
+
+    # generate a module named as a string
     MODEL = importlib.import_module(full_module_name)
-    aif, times = MODEL.load_txt(AIFs_PATH + &#39;/&#39; + str(patient_folder) + &#39;/&#39; + &#39;AIF__2C Filtration__Curve.txt&#39;)
-    aif.append(aif[-1])
-    times.append(times[-1])
+    b_values, bVec_original, image_orientation_patient = MODEL.read_dicom_tags_DTI(filenameDCM, lstFilesDCM)
     # select signal model paramters
-    signal_model_parameters = [MODEL, [aif, times]]
+    signal_model_parameters = [MODEL]
+    signal_model_parameters.append([b_values, bVec_original, image_orientation_patient])
     return signal_model_parameters</code></pre>
 </details>
 </dd>
-<dt id="MDR_Library.test_MDR.MDR_test_DCE.sort_all_slice_files_acquisition_time"><code class="name flex">
+<dt id="MDR_Library.tests.MDR_test_DTI.sort_all_slice_files_acquisition_time"><code class="name flex">
 <span>def <span class="ident">sort_all_slice_files_acquisition_time</span></span>(<span>files)</span>
 </code></dt>
 <dd>
@@ -537,20 +532,20 @@ fitted parameters Fp, Tp, Ps, Te, and the final diagnostics.</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="MDR_Library.test_MDR" href="index.html">MDR_Library.test_MDR</a></code></li>
+<li><code><a title="MDR_Library.tests" href="index.html">MDR_Library.tests</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.export_images" href="#MDR_Library.test_MDR.MDR_test_DCE.export_images">export_images</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.export_maps" href="#MDR_Library.test_MDR.MDR_test_DCE.export_maps">export_maps</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.get_sitk_image_details_from_DICOM" href="#MDR_Library.test_MDR.MDR_test_DCE.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.iBEAt_test_DCE" href="#MDR_Library.test_MDR.MDR_test_DCE.iBEAt_test_DCE">iBEAt_test_DCE</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.main" href="#MDR_Library.test_MDR.MDR_test_DCE.main">main</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.read_DICOM_files" href="#MDR_Library.test_MDR.MDR_test_DCE.read_DICOM_files">read_DICOM_files</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.read_elastix_model_parameters" href="#MDR_Library.test_MDR.MDR_test_DCE.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.read_signal_model_parameters" href="#MDR_Library.test_MDR.MDR_test_DCE.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
-<li><code><a title="MDR_Library.test_MDR.MDR_test_DCE.sort_all_slice_files_acquisition_time" href="#MDR_Library.test_MDR.MDR_test_DCE.sort_all_slice_files_acquisition_time">sort_all_slice_files_acquisition_time</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.export_images" href="#MDR_Library.tests.MDR_test_DTI.export_images">export_images</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.export_maps" href="#MDR_Library.tests.MDR_test_DTI.export_maps">export_maps</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.get_sitk_image_details_from_DICOM" href="#MDR_Library.tests.MDR_test_DTI.get_sitk_image_details_from_DICOM">get_sitk_image_details_from_DICOM</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.iBEAt_test_DTI" href="#MDR_Library.tests.MDR_test_DTI.iBEAt_test_DTI">iBEAt_test_DTI</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.main" href="#MDR_Library.tests.MDR_test_DTI.main">main</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.read_DICOM_files" href="#MDR_Library.tests.MDR_test_DTI.read_DICOM_files">read_DICOM_files</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.read_elastix_model_parameters" href="#MDR_Library.tests.MDR_test_DTI.read_elastix_model_parameters">read_elastix_model_parameters</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.read_signal_model_parameters" href="#MDR_Library.tests.MDR_test_DTI.read_signal_model_parameters">read_signal_model_parameters</a></code></li>
+<li><code><a title="MDR_Library.tests.MDR_test_DTI.sort_all_slice_files_acquisition_time" href="#MDR_Library.tests.MDR_test_DTI.sort_all_slice_files_acquisition_time">sort_all_slice_files_acquisition_time</a></code></li>
 </ul>
 </li>
 </ul>
