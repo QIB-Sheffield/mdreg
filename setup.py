@@ -7,7 +7,7 @@ from setuptools import setup
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
-VERSION = "0.0.2"
+VERSION = "0.0.6"
 
 if __name__ == '__main__':
     setup(
