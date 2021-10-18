@@ -14,7 +14,10 @@ from pathlib import Path
 import importlib
 import time
 from PIL import Image
-from MDR.MDR import model_driven_registration  
+from MDR.MDR import model_driven_registration 
+from MDR.Tools import (read_DICOM_files, get_sitk_image_details_from_DICOM, 
+                      sort_all_slice_files_acquisition_time, read_elastix_model_parameters,
+                      export_images, export_maps)
 
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -33,7 +36,7 @@ def main():
 
     DATA_PATH = os.getcwd() + r'/tests/test_data/DICOMs'
     OUTPUT_REG_PATH = os.getcwd() + r'/MDR_registration_output'
-    Elastix_Parameter_file_PATH = os.getcwd() + r'/Elastix_Parameters_Files/iBEAt' 
+    Elastix_Parameter_file_PATH = os.getcwd() + r'/Elastix_Parameters_Files/iBEAt/BSplines_T2star.txt' 
     output_dir =  OUTPUT_REG_PATH + '/T2star/'
 
     # Organize files per each sequence:
@@ -70,31 +73,6 @@ def main():
             # run T2 star MDR test function
             iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
-# read input dicom files
-def read_DICOM_files(lstFilesDCM):
-    files = []
-    RefDs = pydicom.dcmread(lstFilesDCM[0])
-    SeriesPixelDims = (int(RefDs.Rows), int(RefDs.Columns), len(lstFilesDCM))           
-    ArrayDicomiBEAt = np.zeros(SeriesPixelDims, dtype=RefDs.pixel_array.dtype)
-
-    # read all dicoms and output dicom files
-    for filenameDCM in lstFilesDCM: 
-        files.append(pydicom.dcmread(filenameDCM))
-        ds = pydicom.dcmread(filenameDCM)
-        # write pixel data into numpy array
-        ArrayDicomiBEAt[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
-
-    return files, ArrayDicomiBEAt, filenameDCM
-
-# get input image origin and spacing to set the numpy arrays for registration
-def get_sitk_image_details_from_DICOM(slice_path):
-    reader = sitk.ImageSeriesReader()
-    dicom_names = reader.GetGDCMSeriesFileNames(slice_path)
-    reader.SetFileNames(dicom_names)
-    image = reader.Execute()
-    spacing = image.GetSpacing() 
-    return spacing
-
                     
 def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
     """ Example application of MDR in renal T2* (iBEAt data).
@@ -130,7 +108,7 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, 
         original_images[:, :, i] = img2d
     
     # read signal model parameters
-    elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH)
+    elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH, ['MaximumNumberOfIterations', 256])
     
     #Perform MDR
     MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
@@ -164,24 +142,3 @@ def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
 
     return signal_model_parameters, slice_sorted_echo_time
 
-
-## read elastix parameters
-def read_elastix_model_parameters(Elastix_Parameter_file_PATH):
-    elastix_model_parameters = itk.ParameterObject.New()
-    elastix_model_parameters.AddParameterFile(Elastix_Parameter_file_PATH + "/BSplines_T2star.txt")
-    elastix_model_parameters.SetParameter('MaximumNumberOfIterations', '256')
-    return elastix_model_parameters
-
-
-## Save MDR results to folder
-def export_images(MDR_output, folder):
-    shape = np.shape(MDR_output)
-    for i in range(shape[2]):
-        im = Image.fromarray(MDR_output[:,:,i])
-        im.save(folder + str(i) + ".tiff")
-
-## Fitted Parameters to output folder
-def export_maps(MDR_output, folder, shape):
-    array = np.reshape(MDR_output, [shape[0],shape[1]]) 
-    Img = Image.fromarray(array)
-    Img.save(folder + ".tiff")

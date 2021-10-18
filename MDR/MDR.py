@@ -1,7 +1,8 @@
 """
 MODEL DRIVEN REGISTRATION (MDR) for quantitative renal MRI
 MDR Library
-@Kanishka Sharma 
+@Kanishka Sharma
+@Joao Almeida e Sousa
 @Steven Sourbron
 2021
 """
@@ -17,11 +18,11 @@ def model_driven_registration(images, image_parameters, signal_model_parameters,
 
     Args:
     ----
-        images (numpy.ndarray): unregistered 2D images (uint16) with shape [x-dim,y-dim, number of slices]
+        images (numpy.ndarray): unregistered 2D images (uint16) with shape [x-dim, y-dim, number of slices]
         image_parameters (sitk tuple): distance between pixels (in mm) along each dimension
         signal_model_parameters (list): a list consisting of a constant 'MODEL' which is the imported signal model and signal model specific parameters as the subsequent elements of the list.
         eg - [MODEL, T2_prep_times], where MODEL is the python script within the 'model' module containing the T2 signal model and 'T2_prep_times' are the T2 specific model input parameters. 
-        elastix_model_parameters (SimpleITK.ParameterMap): elastix file registration parameters
+        elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters
         precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1.
 
     Returns:
