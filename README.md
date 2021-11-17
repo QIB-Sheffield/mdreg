@@ -13,7 +13,7 @@ Models included: T1, T2, T2*, DTI, DWI, DCE-MRI. To be extended for: MT, PC-MRI,
 
 
 ## How to use
-Run `MDR_test_main.py` in the `tests` folder. Read the code in the other python files in the `tests` folder to find examples of how to use the `MDR` package.
+Run `MDR_test_main.py` (located in the `tests` folder) in the root directory. Read the code in the other python files in the `tests` folder to find examples of how to use the `MDR` package.
 
 
 ## Context
