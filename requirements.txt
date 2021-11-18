@@ -1,8 +1,0 @@
-itk-elastix
-numpy
-pandas
-pdoc3
-Pillow
-pydicom
-scipy
-SimpleITK
