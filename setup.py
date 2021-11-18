@@ -1,4 +1,6 @@
 from setuptools import setup
+import urllib.request
+import json
 
 # For more information about uploading the python package to PyPI, please check the link:
 # https://github.com/judy2k/publishing_python_packages_talk
@@ -7,10 +9,20 @@ from setuptools import setup
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
+# Get latest version published online in PYPI (https://pypi.org/project/mdr-library/) 
+# and increment 0.0.1 (or other) so that it's uploaded correctly during Github Action
+contents = urllib.request.urlopen('https://pypi.org/pypi/mdr-library/json').read()
+data = json.loads(contents)
+latest_version = data['info']['version']
+major, minor, patch = latest_version.split(".")
+new_patch = str(int(patch) + 1)  # The authors can modify this to be minor or major versions instead
+
+VERSION = major + "." + minor + "." + new_patch
 
 if __name__ == '__main__':
     setup(
         name="mdr-library",
+        version=VERSION,
         author="Kanishka Sharma, Joao Almeida e Sousa and Steven Sourbron",
         author_email="kanishka.sharma@sheffield.ac.uk, j.g.sousa@sheffield.ac.uk, s.sourbron@sheffield.ac.uk",
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",
@@ -20,7 +32,7 @@ if __name__ == '__main__':
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
         packages=['MDR'],
-        install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix"],
+        install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix", "pydicom", "Pillow", "pdoc3", "scipy"],
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],
         # Classifiers - the purpose is to create a wheel and upload it to PYPI
