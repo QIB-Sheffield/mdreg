@@ -11,7 +11,7 @@ with open('README.md', encoding='utf-8') as f:
 if __name__ == '__main__':
     setup(
         name="mdr-library",
-        use_autover=True,
+        use_autover={'root_version': '0.0', 'parse_tag': lambda tag: tag.lstrip('v'), 'create_version': lambda ver: '{}.post{}'.format(ver.latest_version, ver.distance),},
         author="Kanishka Sharma, Joao Almeida e Sousa and Steven Sourbron",
         author_email="kanishka.sharma@sheffield.ac.uk, j.g.sousa@sheffield.ac.uk, s.sourbron@sheffield.ac.uk",
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",
