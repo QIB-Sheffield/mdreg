@@ -1,0 +1,38 @@
+(Transform "BSplineTransform")
+(NumberOfParameters 98)
+(TransformParameters 0.523126 0.856494 0.655639 0.452674 0.514888 0.673274 0.893596 0.220636 0.579971 0.018335 -0.317330 -0.121826 0.249898 0.896471 -0.257882 -0.011986 -0.461532 -0.498129 -0.206015 0.358907 1.003488 -0.875353 -1.080624 -0.351771 0.155433 0.531910 1.053167 1.093230 -1.370924 -1.662793 -1.073812 -0.434139 0.188868 0.576721 0.898239 -1.665049 -1.962005 -1.788980 -1.403499 -0.971003 -0.422634 0.616105 -1.545014 -1.746784 -1.583673 -1.287370 -0.895489 -0.513672 0.179602 0.277726 -0.466271 -0.742752 -0.905330 -0.835864 -0.708722 -0.709175 0.307745 -0.537528 -1.029055 -1.171042 -1.347250 -1.250754 -1.221260 0.679559 0.850967 0.709767 0.625553 0.011267 -0.669014 -1.236557 0.994091 1.560070 1.960761 2.243794 1.488968 0.061315 -1.306792 1.033601 1.423253 1.437306 0.978777 0.479338 -0.133075 -1.626920 0.904157 0.915430 0.471032 -0.639894 -1.288472 -0.987228 -1.982740 0.164477 -0.318900 -0.867989 -1.564348 -2.045979 -2.236574 -2.304767)
+(InitialTransformParametersFileName "NoInitialTransform")
+(UseBinaryFormatForTransformationParameters "false")
+(HowToCombineTransforms "Compose")
+
+// Image specific
+(FixedImageDimension 2)
+(MovingImageDimension 2)
+(FixedInternalImagePixelType "float")
+(MovingInternalImagePixelType "float")
+(Size 172 172)
+(Index 0 0)
+(Spacing 1.0000000000 1.0000000000)
+(Origin 0.0000000000 0.0000000000)
+(Direction 1.0000000000 0.0000000000 0.0000000000 1.0000000000)
+(UseDirectionCosines "true")
+
+// BSplineTransform specific
+(GridSize 7 7)
+(GridIndex 0 0)
+(GridSpacing 50.0000000000 50.0000000000)
+(GridOrigin -64.5000000000 -64.5000000000)
+(GridDirection 1.0000000000 0.0000000000 0.0000000000 1.0000000000)
+(BSplineTransformSplineOrder 3)
+(UseCyclicTransform "false")
+
+// ResampleInterpolator specific
+(ResampleInterpolator "FinalBSplineInterpolator")
+(FinalBSplineInterpolationOrder 1)
+
+// Resampler specific
+(Resampler "DefaultResampler")
+(DefaultPixelValue 0.000000)
+(ResultImageFormat "mhd")
+(ResultImagePixelType "float")
+(CompressResultImage "false")
