@@ -11,7 +11,7 @@ with open('README.md', encoding='utf-8') as f:
 if __name__ == '__main__':
     setup(
         name="mdr-library",
-        use_scm_version = {"root": "..", "relative_to": __file__, "local_scheme": "node-and-timestamp"},
+        use_autover=True,
         author="Kanishka Sharma, Joao Almeida e Sousa and Steven Sourbron",
         author_email="kanishka.sharma@sheffield.ac.uk, j.g.sousa@sheffield.ac.uk, s.sourbron@sheffield.ac.uk",
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         python_requires='>=3.6, <4',
         packages=['MDR'],
         install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix"],
-        setup_requires=['setuptools_scm'],
+        setup_requires=['setuptools_autover'],
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],
         # Classifiers - the purpose is to create a wheel and upload it to PYPI
