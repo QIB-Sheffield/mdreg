@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import urllib.request
 import json
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         url="https://github.com/QIB-Sheffield/MDR-Library",
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
-        packages=['MDR'],
+        packages=find_packages(),
         install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix", "pydicom", "Pillow", "pdoc3", "scipy"],
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],
