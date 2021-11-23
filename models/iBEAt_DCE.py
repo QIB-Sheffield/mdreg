@@ -3,6 +3,17 @@
 @author: Kanishka Sharma
 iBEAt study DCE 2 compartment filtration model fit
 2021
+
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!! UNDER CONSTRUCTION !!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!! DO NOT USE !!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+    
 """
 
 import numpy as np
@@ -70,18 +81,22 @@ def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45):
     time =  timepoints
    
     ct0 = np.mean(ct[0:timepoint])
+
     aif0 =  np.mean(aif[0:timepoint])
     ct_new = ct-ct0
 
+
     aif_new = (aif-aif0)/(1-Hct)
 
-    #initialization of matrix A
     A=np.array([0,0,0,0]) 
 
     first_pass_ct_new=Integral_Trapezoidal_Rule_initial(ct_new,time)
+
     first_pass_aif_new=Integral_Trapezoidal_Rule_initial(aif_new,time)
+
     second_pass_ct_new=Integral_Trapezoidal_Rule_second(first_pass_ct_new,time)
     second_pass_aif_new=Integral_Trapezoidal_Rule_second(first_pass_aif_new,time)
+
     for t in range(0,len(time)):
         A1_1=second_pass_ct_new[t]
         A1_2=first_pass_ct_new[t]
@@ -90,10 +105,10 @@ def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45):
         A_next=np.array([-A1_1,-A1_2,A1_3,A1_4])
         A=np.vstack((A,A_next))    
 
-    # Drop first row of matrix [A] which is full of zeros and was used for initialization purposes
     A=np.delete(A,(0),axis=0)
 
     X = np.linalg.lstsq(A,ct_new,rcond=None)[0]
+
 
     # Extract physical parameters
     alpha = X[0]
@@ -123,6 +138,7 @@ def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45):
         else:    
             PS = Fp*(T-Tp)/Te                       
             #params = [Fp, Tp, PS, Te]
+
             fit =X[0]*A[:,0] + X[1]*A[:,1] + X[2]*A[:,2] + X[3]*A[:,3]
             fit=ct0+fit
 
@@ -133,6 +149,13 @@ def Linear_Least_Squares_2CFM(ct, timepoints, aif, timepoint = 39,Hct = 0.45):
 
 def main(images_to_be_fitted, signal_model_parameters):
     """ main function that performs 2-compartment filtration DCE model fitting at single pixel level. 
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!! UNDER CONSTRUCTION !!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!! DO NOT USE !!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     Args
     ----
