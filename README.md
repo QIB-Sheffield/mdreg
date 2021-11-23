@@ -3,7 +3,7 @@ New open-source, platform independent python based library for model-driven regi
 
 Currently developed for and tested on the iBEAt study dataset. Can be utilised for other quantitative MRI studies.
 
-Models included: T1, T2, T2*, DTI, DWI, DCE-MRI. To be extended for: MT, PC-MRI, ASL.
+Models included: T1, T2, T2*, DTI, DWI, DCE-MRI. To be extended for: MT, PC-MRI, ASL. *The models included so far are dummies to illustrate the code structure and use of MDR. They should not be used for image analysis.*
  
  
 ## Requirements
