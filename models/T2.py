@@ -84,7 +84,7 @@ def main(images_to_be_fitted, signal_model_parameters):
     S0 = results[1]
     T2 = results[2]
 
-    fitted_parameters_tuple = (S0, T2) # (2, 147456)
+    fitted_parameters_tuple = (S0, T2) 
     fitted_parameters = np.vstack(fitted_parameters_tuple)
 
     return fit, fitted_parameters
