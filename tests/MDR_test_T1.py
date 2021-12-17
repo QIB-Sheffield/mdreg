@@ -79,7 +79,7 @@ def iBEAt_test_T1(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, imag
     -----------
     This function performs model driven registration for selected T1 sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
-    fitted parameters S0 and T1 map, and the final diagnostics. 
+    fitted parameters T1_estimated map, T1_apparent map, A, B, and the final diagnostics. 
     
     Args
     ----
