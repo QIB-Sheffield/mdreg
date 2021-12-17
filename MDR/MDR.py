@@ -20,13 +20,13 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
 
     Args:
     ----
-        images (numpy.ndarray): unregistered 2D images (uint16) from the selected single MR slice with shape [x-dim, y-dim, total timeseries]   
-        image_parameters (sitk tuple): distance between pixels (in mm) along each dimension  
-        model (module): import module for the signal model to fit  
-        signal_model_parameters (list[int]): list consisting of signal model input parameters.    
-        eg: TE (echo times) as input parameter (independent variable) for T2*sequence model fit  
-        elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters  
-        precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1. Lower value means higher precision  
+        images (numpy.ndarray): unregistered 2D images (uint16) from the selected single MR slice with shape [x-dim, y-dim, total timeseries].     
+        image_parameters (sitk tuple): distance between pixels (in mm) along each dimension.    
+        model (module): import module for the signal model to fit.    
+        signal_model_parameters (list[int]): list consisting of signal model input parameters.   
+        eg: TE (echo times) as input parameter (independent variable) for T2*sequence model fit.    
+        elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters.    
+        precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1. Lower value means higher precision.    
         function (string attribute, optional): name (user-defined) of the main model-fit function. Default is 'main'.  
     
     Returns:

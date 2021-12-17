@@ -1,8 +1,8 @@
 #!/ur/bin/python
 # -*- coding: utf-8 -*-
 """
-@author: Kanishka Sharma
-T2-mapping signal model-fit
+@author: Kanishka Sharma  
+T2-mapping signal model-fit  
 2021
 """
 
@@ -14,7 +14,7 @@ def exp_func(T2_prep_times,S0,T2):
 
     Args
     ----
-    T2_prep_times (numpy.ndarray): T2-preparation times in the T2-mapping sequence as input for the signal model fit  
+    T2_prep_times (numpy.ndarray): T2-preparation times in the T2-mapping sequence as input for the signal model fit.    
 
     Returns
     -------
@@ -30,13 +30,13 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
 
     Args
     ----
-    images_to_be_fitted (numpy.ndarray): input image at all time-series (i.e. at each T2-prep time) with shape [x-dim*y-dim, total time-series]  
-    T2_prep_times (list): list containing T2-preparation times as input (independent variable) for the signal model fit  
+    images_to_be_fitted (numpy.ndarray): input image at all time-series (i.e. at each T2-prep time) with shape [x-dim*y-dim, total time-series].    
+    T2_prep_times (list): list containing T2-preparation times as input (independent variable) for the signal model fit.    
 
     Returns
     -------
-    fit (numpy.ndarray): signal model fit at all time-series with shape [x-dim*y-dim, total time-series]  
-    S0 (numpy.ndarray): fitted parameter 'S0' with shape [x-dim*y-dim]  
+    fit (numpy.ndarray): signal model fit at all time-series with shape [x-dim*y-dim, total time-series].    
+    S0 (numpy.ndarray): fitted parameter 'S0' with shape [x-dim*y-dim].    
     T2 (numpy.ndarray): fitted parameter 'T2' (ms) with shape [x-dim*y-dim].  
     """
     
@@ -67,13 +67,13 @@ def main(images_to_be_fitted, signal_model_parameters):
 
     Args
     ----
-    images_to_be_fitted (numpy.ndarray): input image at all time-series (i.e. at each T2-preparation time) with shape [x-dim*y-dim, total time-series]  
-    signal_model_parameters (list): list containing T2-prep times as list elements  
+    images_to_be_fitted (numpy.ndarray): input image at all time-series (i.e. at each T2-preparation time) with shape [x-dim*y-dim, total time-series].    
+    signal_model_parameters (list): list containing T2-prep times as list elements.    
 
     Returns
     -------
-    fit (numpy.ndarray): signal model fit at all time-series (i.e. at each T2-preparation time) with shape [x-dim*y-dim, total time-series]  
-    fitted_parameters (numpy.ndarray): output signal model fit parameters 'S0' and 'T2' stored in a single nd-array with shape [2, x-dim*y-dim].   
+    fit (numpy.ndarray): signal model fit at all time-series (i.e. at each T2-preparation time) with shape [x-dim*y-dim, total time-series].   
+    fitted_parameters (numpy.ndarray): output signal model fit parameters 'S0' and 'T2' stored in a single nd-array with shape [2, x-dim*y-dim].     
     """
 
     T2_prep_times = signal_model_parameters 
