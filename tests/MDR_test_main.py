@@ -22,9 +22,9 @@ sys.path.append(os.path.dirname(sys.path[0])) # Add the parent directory of "tes
 # DCE: MDR_test_DCE
 
 # example import script for the T2 sequence
-import MDR_test_T2
+import MDR_test_T1
 
 # main function to call MDR
 if __name__ == '__main__':
    # example use case for MDR test script using T2 sequence
-    MDR_test_T2.main()
+    MDR_test_T1.main()
