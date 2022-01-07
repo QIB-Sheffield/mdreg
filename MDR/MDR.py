@@ -23,7 +23,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         images (numpy.ndarray): unregistered 2D images (uint16) from the selected single MR slice with shape [x-dim, y-dim, total timeseries].     
         image_parameters (sitk tuple): distance between pixels (in mm) along each dimension.    
         model (module): import module for the signal model to fit.    
-        signal_model_parameters (list[int]): list consisting of signal model input parameters.   
+        signal_model_parameters (list()): list consisting of signal model input parameters.   
         eg: TE (echo times) as input parameter (independent variable) for T2*sequence model fit.    
         elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters.    
         precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1. Lower value means higher precision.    
@@ -50,7 +50,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
     while not converged: 
 
         # Update the solution
-        fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function='main')
+        fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function=function)
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
         # perform 2D image registration
         coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters)
