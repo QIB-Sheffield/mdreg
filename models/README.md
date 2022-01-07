@@ -1,6 +1,6 @@
 # Dummy models
 
-Note: This is a library of dummy models to illustrate code structure and how MDR is meant to be used. 
+**Note:** This is a library of dummy models to illustrate code structure and how MDR is meant to be used. 
 Some models themselves are not physically accurate and should not be used for image analysis.
 Users are expected to implement their own signal model fits for corresponding MR datasets to use as part of the MDR-Library. 
 The supplied models have been tested only on the MR data provided with this library and should only be used as a reference to understand how to apply your own signal model fit to the MDR-Library.
@@ -37,19 +37,19 @@ Test-script: 'MDR_test_MT.py'
 2-compartment filtration model implemented for DCE-MRI
 Test-script: 'MDR_test_DCE.py'
 
-HOW TO IMPLEMENT YOUR OWN MODEL INTO THE MDR-LIBRARY:
+# How to implement your own model into the MDR-Library:
 
 Your python script for the model defintion is expected to contain the following main function (see below).
 
-def main(images_to_be_fitted, signal_model_parameters):
+`def main(images_to_be_fitted, signal_model_parameters):`
 
 where,  
-images_to_be_fitted (numpy.ndarray) is the input image at different time-series with shape [x-dim*y-dim, total time-series].    
+*images_to_be_fitted (numpy.ndarray)* is the input image at different time-series with shape [x-dim\*y-dim, total time-series].    
 and    
-signal_model_parameters (list) is a list containing independent model-fit parameters as the list elements.   
+*signal_model_parameters (list)* is a list containing independent model-fit parameters as the list elements.   
 
 With the following 2 return parameters for the main function:
 
-fit (numpy.ndarray): is the signal model fit at all time-series with shape [x-dim*y-dim, total time-series].   
+*fit (numpy.ndarray):* is the signal model fit at all time-series with shape [x-dim\*y-dim, total time-series].   
 and, 
-fitted_parameters (numpy.ndarray) are the output signal model fit parameters stored in a single nd-array with shape [2, x-dim*y-dim].     
+*fitted_parameters (numpy.ndarray)* are the output signal model fit parameters stored in a single nd-array with shape [2, x-dim\*y-dim].     
