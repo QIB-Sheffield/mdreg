@@ -1,13 +1,13 @@
 # For more information see: https://jacobtomlinson.dev/posts/2021/automating-releases-of-python-packages-with-github-actions/
-
 name: Upload Python Package
-
-on: [push, pull_request]
-
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
   test:
     runs-on: "ubuntu-latest"
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
