@@ -1,19 +1,17 @@
 """
-MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
-@Kanishka Sharma 2021
-Test script for T2* sequence using Model driven registration Library
+MODEL DRIVEN REGISTRATION for quantitative renal MRI.    
+@Kanishka Sharma  
+2021  
+Test script for T2* sequence registration using Model driven registration Library  
 """
 import sys
 import glob
 import os
 import numpy as np
-import itk
-import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
 import importlib
 import time
-from PIL import Image
 from MDR.MDR import model_driven_registration 
 from MDR.Tools import (read_DICOM_files, get_sitk_image_details_from_DICOM, 
                       sort_all_slice_files_acquisition_time, read_elastix_model_parameters,
@@ -68,29 +66,30 @@ def main():
     
             # read all dicom files for the selected sequence and slice
             files, ArrayDicomiBEAt, filenameDCM = read_DICOM_files(lstFilesDCM)
-            # get sitk image parameters for registration (origin and spacing)
+            # get sitk image parameters for registration (pixel spacing)
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
             # run T2 star MDR test function
             iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM)
 
                     
 def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    """ Example application of MDR in renal T2* (iBEAt data).
+    """ Example application of MDR in renal T2* (iBEAt data).  
     
-    Parameters
-    ----------
-    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used
-    output_dir (string): directory where results are saved 
-    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-    image_parameters (SITK input): image spacing
-    filenameDCM (pathlib.PosixPath): dicom filenames to process
-    lstFilesDCM (list): list of dicom files to process
-
     Description
     -----------
     This function performs model driven registration for selected T2-star sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
     fitted parameters S0 and T2*map, and the final diagnostics.
+    
+    Parameters
+    ----------
+    Elastix_Parameter_file_PATH (string): complete path to the Elastix parameter file to be used.    
+    output_dir (string): directory where results are saved.   
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted).  
+    image_parameters (SITK input): image pixel spacing.  
+    filenameDCM (pathlib.PosixPath): dicom filenames to process.  
+    lstFilesDCM (list): list of dicom files to process.  
+
     """
 
     start_computation_time = time.time()
@@ -99,27 +98,30 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, 
     original_images = np.zeros(image_shape)
 
     # read signal model parameters and slice sorted per T2* echo time
-    full_module_name = "models.iBEAt_T2star"
-    signal_model_parameters, slice_sorted_echo_time = read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM)
+    full_module_name = "models.T2star"
+    # generate a module named as a string 
+    model = importlib.import_module(full_module_name)
+    # read signal model parameters and sort slices according to TE times for T2* sequence
+    signal_model_parameters, slice_sorted_echo_time = read_signal_model_parameters(filenameDCM, lstFilesDCM)
 
-    # initialise original_images with sorted images per T2* echo times to run MDR
+    # initialise original_images with sorted images per T2* echo times (TE) to run MDR
     for i, s in enumerate(slice_sorted_echo_time):
         img2d = s.pixel_array
         original_images[:, :, i] = img2d
     
-    # read signal model parameters
+    # read elastix model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH, ['MaximumNumberOfIterations', 256])
     
     #Perform MDR
-    MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
-
+    MDR_output = model_driven_registration(original_images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main')
+    
     #Export results
     export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_T2star_')
     export_images(MDR_output[1], output_dir +'/fit/fit_image_')
     export_images(MDR_output[2][:,:,0,:], output_dir +'/deformation_field/final_deformation_x_')
     export_images(MDR_output[2][:,:,1,:], output_dir +'/deformation_field/final_deformation_y_')
-    export_maps(MDR_output[3][::2], output_dir + '/fitted_parameters/S0', np.shape(original_images))
-    export_maps(MDR_output[3][1::2], output_dir + '/fitted_parameters/T2star', np.shape(original_images))
+    export_maps(MDR_output[3][0,:], output_dir + '/fitted_parameters/S0', np.shape(original_images))
+    export_maps(MDR_output[3][1,:], output_dir + '/fitted_parameters/T2star', np.shape(original_images))
     MDR_output[4].to_csv(output_dir + 'T2star_largest_deformations.csv')
 
     # Report computation times
@@ -132,13 +134,47 @@ def iBEAt_test_T2star(Elastix_Parameter_file_PATH, output_dir, ArrayDicomiBEAt, 
  
  # read sequence acquisition parameter for signal modelling
  # sort slices according to T2* echo times
-def read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM):
+def read_signal_model_parameters(filenameDCM, lstFilesDCM):
     
-    # generate a module named as a string 
-    MODEL = importlib.import_module(full_module_name)
     # read sequence acquisition parameter for signal modelling
-    echo_times, slice_sorted_echo_time = MODEL.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
-    signal_model_parameters = [MODEL, echo_times]
+    echo_times, slice_sorted_echo_time = read_and_sort_echo_times(filenameDCM, lstFilesDCM)
+    
+    return echo_times, slice_sorted_echo_time
 
-    return signal_model_parameters, slice_sorted_echo_time
+def read_and_sort_echo_times(fname,lstFilesDCM):
+    """ This function provides sorted list of DICOMs from a sorted list of T2* echo times (TE).  
 
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process.  
+    lstFilesDCM (list): list of dicom files to process.  
+
+    Returns
+    -------
+    echo_times (list): sorted list of echo times.   
+    slice_sorted_echo_time (list): sorted list of DICOMs from sorted list of echo times (TE).  
+
+    """
+    echo_times = []
+    files = []
+
+    for fname in lstFilesDCM:
+        dataset = pydicom.dcmread(fname)   
+        echo_times.append(dataset.EchoTime)
+        files.append(pydicom.dcmread(fname)) 
+
+    sort_index = np.argsort(echo_times)
+  
+    echo_times.sort()
+  
+    slice_echo_time = []
+    slice_sorted_echo_time = []
+
+    for f in files: 
+        slice_echo_time.append(f)
+
+    # sorted slices using sorted echo times
+    for i in range(0, len(slice_echo_time)):
+         slice_sorted_echo_time.append(slice_echo_time[sort_index[i]])
+   
+    return echo_times, slice_sorted_echo_time

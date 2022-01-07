@@ -1,74 +1,29 @@
 """
-@KanishkaS: modified for MDR-Library from previous implementation @Fotios Tagkalakis
-iBEAt study DTI model fit for the MDR Library
-2021
-
-
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!! UNDER CONSTRUCTION !!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!! DO NOT USE !!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
+@author: Kanishka Sharma - modified for MDR-Library from implementation of @Fotios Tagkalakis   
+iBEAt study DTI model fit for the MDR Library   
+2021 
 """
 
 import numpy as np
 import sys  
-import pydicom
 np.set_printoptions(threshold=sys.maxsize)
 
-#TODO: correct FA map generation error!
-
-
-def read_dicom_tags_DTI(fname,lstFilesDCM):
-    """ This function reads the DICOM tags from the DTI sequence and returns the corresponding DTI tags.
-
-    Args
-    ----
-    filenameDCM (pathlib.PosixPath): dicom filenames to process
-    lstFilesDCM (list): list of dicom files to process
-
-    Returns
-    -------
-    b-values (list): list of DWI/IVIM b-values (s/mm2) 
-    b_Vec_original (list): original b-vectors as list
-    image_orientation_patient (list):  patient orientation as list
-    
-    """
-    b_values = []
-    b_Vec_original = []
-    image_orientation_patient = []
-
-    for fname in lstFilesDCM:
-        dataset = pydicom.dcmread(fname)
-        b_values.append(dataset[0x19, 0x100c].value)
-        b_Vec_original.append(dataset[0x19, 0x100e].value)
-        image_orientation_patient.append(dataset.ImageOrientationPatient)
-
-    return b_values, b_Vec_original, image_orientation_patient 
-
-
 def DTI_fitting(im, b, thresh_val, method='linear'):
-    """ DTI fit function. 
+    """ DTI fit function.  
 
     Args:
     ----
-    im (numpy.ndarray): pixel value for time-series (i.e. at each b-value and for each of the 3 acquired directions) with shape [x,:]
-    b (list): list of b_values
-    thresh_val (numpy.ndarray): B matrix
+    im (numpy.ndarray): input image at all time-series (i.e. at each b-value and direction) with shape [x-dim*y-dim, total time-series].  
+    b (list): list of b_values  
+    thresh_val (numpy.ndarray): B matrix  
 
     Returns
     -------
-    fit (list): signal model fit per pixel
-    Params (list): list consisting of fitted parameters -  DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3) per pixel.
+    fit (numpy.ndarray): signal model fit at all time-series with shape [x-dim*y-dim, total time-series].    
+    DiffusionTensor (M), Bv_new, FA (Fractional Anisotropy), and ADC(mm2/sec*10^-3): fitted parameters 
     """
    
     sz = np.shape(im)
-
     if len(sz)==2 and sz[1]==1:
         im = np.transpose(im)
         sz = np.shape(im)
@@ -115,10 +70,9 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     M[np.isnan(M)]=0
     M[np.isinf(M)]=0
     ### Initialize Variables
-    FA_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
-    ADC_mask = np.empty(172*172) #np.empty(sz)#(sz[0]*sz[1]) #TODO
+    FA_mask = np.empty(sz[0]) 
+    ADC_mask = np.empty(sz[0]) 
 
-    #start = time.time()
     for i in range(np.shape(M)[0]):
         
         # The DiffusionTensor (Remember it is a symetric matrix,
@@ -156,38 +110,25 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
             FA_mask[i]=np.sqrt(1.5)*(np.sqrt((EigenValues[0]-ADCv)**2+(EigenValues[1]-ADCv)**2+(EigenValues[2]-ADCv)**2)/denominator)
         ADC_mask[i]=ADCv
 
-    
     Bv_new_times_M_new = np.moveaxis(np.dot(Bv_new, M.T),0,-1).reshape(sz) 
     fit = np.exp(-Bv_new_times_M_new)
     
-    return M, Bv_new, FA_mask, ADC_mask, fit
+    return fit, M, Bv_new, FA_mask, ADC_mask
 
 
 
 def main(images_to_be_fitted, signal_model_parameters):
-    """ main function to perform DTI model fitting at single pixel level. 
+    """ main function to perform DTI model fit. 
 
-
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!! UNDER CONSTRUCTION !!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!! DO NOT USE !!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-   
-    Args:
+    Args
     ----
-    images_to_be_fitted (numpy.ndarray): pixel value for time-series (i.e. at each b-value) with shape [x,:]
-    signal_model_parameters (list): list consisting of b-values, b-vec, and image_orientation_patient
-
+    images_to_be_fitted (numpy.ndarray): input image at all time-series (i.e. at each b-value and all directions) with shape [x-dim*y-dim, total time-series].    
+    signal_model_parameters (list): list containing 'b-values', 'b-vectors' and 'image_orientation_patient' as list elements.    
 
     Returns
     -------
-    fit (list): signal model fit per pixel
-    fitted_parameters (list): list with signal model fitted parameters 'S0' and 'ADC'.  
+    fit (numpy.ndarray): signal model fit at all time-series (i.e. at each b-value and direction) with shape [x-dim*y-dim, total time-series].   
+    fitted_parameters (numpy.ndarray): output signal model fit parameters 'FA' and 'ADC' stored in a single nd-array with shape [2, x-dim*y-dim].   
     """
     b_values = signal_model_parameters[0]
    
@@ -219,9 +160,15 @@ def main(images_to_be_fitted, signal_model_parameters):
     for idx_b in range(len(b_values)):
         B[:, :, idx_b] = np.outer(np.outer(b_values[idx_b], bVec[idx_b,:].T), bVec[idx_b,:])
 
-    M_new, Bv_new, fa, adc, fit = DTI_fitting(images_to_be_fitted, B, mask, 'linear')
+    results = DTI_fitting(images_to_be_fitted, B, mask, 'linear')
+    fit = results[0]
+    M_new = results[1]
+    Bv_new = results[2]
+    fa = results[3]
+    adc = results[4]
 
-    fitted_parameters = [M_new.T[:, :], Bv_new[:, :], fa, adc]
-    
+    fitted_parameters_tuple = (fa, adc) 
+    fitted_parameters = np.vstack(fitted_parameters_tuple)
+  
     return fit, fitted_parameters
 

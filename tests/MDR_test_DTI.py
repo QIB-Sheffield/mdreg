@@ -1,19 +1,17 @@
 """
-MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI
-@Kanishka Sharma 2021
-Test script for DTI sequence using Model driven registration Library
+MODEL DRIVEN REGISTRATION for iBEAt study: quantitative renal MRI  
+@Kanishka Sharma  
+2021  
+Test script for DTI sequence using Model driven registration Library  
 """
 import sys
 import glob
 import os
 import numpy as np
-import itk
-import SimpleITK as sitk
 import pydicom
 from pathlib import Path 
 import importlib
 import time
-from PIL import Image
 from MDR.MDR import model_driven_registration  
 from MDR.Tools import (read_DICOM_files, get_sitk_image_details_from_DICOM, 
                       sort_all_slice_files_acquisition_time, read_elastix_model_parameters,
@@ -27,7 +25,6 @@ def main():
     sequence = 'DTI'
     # number of expected slices to process (example: iBEAt study number of slice = 30)
     slices = 30    
-
     # path definition  
     # your 'os.getcwd()' path should point to your local directory containing the  MDR-Library 
     # eg: /Users/kanishkasharma/Documents/GitHub/MDR_Library
@@ -64,10 +61,9 @@ def main():
             data = Path(slice_path)
             # list of all DICOMs to be processed for the selected slice (example: slice number = 15 here)
             lstFilesDCM = list(data.glob('**/*.IMA')) 
-    
             # read all dicom files for the selected sequence and slice
             files, ArrayDicomiBEAt, filenameDCM = read_DICOM_files(lstFilesDCM)
-            # get sitk image parameters for registration (origin and spacing)
+            # get sitk image parameters for registration (pixel spacing)
             image_parameters = get_sitk_image_details_from_DICOM(slice_path)
             # sort slices correctly - based on acquisition time for model driven registration
             sorted_slice_files = sort_all_slice_files_acquisition_time(files)
@@ -77,23 +73,23 @@ def main():
 
 # test DTI using model driven registration
 def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, ArrayDicomiBEAt, image_parameters, filenameDCM, lstFilesDCM):
-    """ Example application of MDR in renal DTI (iBEAt data)
-    
-    Args
-    ----
-    Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used
-    output_dir (string): directory where results are saved
-    slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time 
-    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted)
-    image_parameters (SITK input): image spacing
-    filenameDCM (pathlib.PosixPath): dicom filenames to process
-    lstFilesDCM (list): list of dicom files to process
+    """ Example application of MDR in renal DTI (iBEAt data)  
 
     Description
     -----------
     This function performs model driven registration for selected DTI sequence on a single selected slice 
     and returns as output the MDR registered images, signal model fit, deformation field x, deformation field y, 
     fitted parameters FA and ADC, and the final diagnostics.
+    
+    Args
+    ----
+    Elastix_Parameter_file_PATH (string): complete path to the elastix parameter file to be used.  
+    output_dir (string): directory where results are saved.  
+    slice_sorted_files (list): selected slices to process using MDR: sorted according to acquisition time.   
+    ArrayDicomiBEAt (numpy.ndarray): input DICOM to numpy array (unsorted).  
+    image_parameters (SITK input): image pixel spacing.  
+    filenameDCM (pathlib.PosixPath): dicom filenames to process.  
+    lstFilesDCM (list): list of dicom files to process.  
     """
     start_computation_time = time.time()
     # define numpy array with same input shape as original DICOMs
@@ -105,22 +101,25 @@ def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
         img2d = s.pixel_array
         original_images[:, :, i] = img2d
 
+    # generate a module named as a string
+    full_module_name = "models.DTI"
+    # import model from the module
+    model = importlib.import_module(full_module_name)
     # read signal model parameters
-    full_module_name = "models.iBEAt_DTI"
-    signal_model_parameters = read_signal_model_parameters(full_module_name,filenameDCM, lstFilesDCM)
-    # read signal model parameters
+    signal_model_parameters = read_signal_model_parameters(filenameDCM, lstFilesDCM)
+    # read elastix model parameters
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH, ['MaximumNumberOfIterations', 1024])
     
     #Perform MDR 
-    MDR_output = model_driven_registration(original_images, image_parameters, signal_model_parameters, elastix_model_parameters, precision = 1)
-
+    MDR_output = model_driven_registration(original_images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main')
+    
     #Export results
     export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_DTI_')
     export_images(MDR_output[1], output_dir +'/fit/fit_image_')
     export_images(MDR_output[2][:,:,0,:], output_dir +'/deformation_field/final_deformation_x_')
     export_images(MDR_output[2][:,:,1,:], output_dir +'/deformation_field/final_deformation_y_')
-    export_maps(MDR_output[3][2::4], output_dir + '/fitted_parameters/FA', np.shape(original_images))
-    export_maps(MDR_output[3][3::4], output_dir + '/fitted_parameters/ADC', np.shape(original_images))
+    export_maps(MDR_output[3][0,:], output_dir + '/fitted_parameters/FA', np.shape(original_images))
+    export_maps(MDR_output[3][1,:], output_dir + '/fitted_parameters/ADC', np.shape(original_images))
     MDR_output[4].to_csv(output_dir + 'DTI_largest_deformations.csv')
 
     # Report computation times
@@ -131,15 +130,40 @@ def iBEAt_test_DTI(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
     print("Finished processing Model Driven Registration case for iBEAt study DTI sequence!")
 
 
-
 ## read sequence acquisition parameter for signal modelling
-def read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM):
+def read_signal_model_parameters(filenameDCM, lstFilesDCM):
+    
+    b_values, bVec_original, image_orientation_patient = read_dicom_tags_DTI(filenameDCM, lstFilesDCM)
+    # select signal model parameters
+    signal_model_parameters = []
+    signal_model_parameters.append(b_values)
+    signal_model_parameters.append(bVec_original)
+    signal_model_parameters.append(image_orientation_patient)
 
-    # generate a module named as a string
-    MODEL = importlib.import_module(full_module_name)
-    b_values, bVec_original, image_orientation_patient = MODEL.read_dicom_tags_DTI(filenameDCM, lstFilesDCM)
-    # select signal model paramters
-    signal_model_parameters = [MODEL]
-    signal_model_parameters.append([b_values, bVec_original, image_orientation_patient])
     return signal_model_parameters
 
+def read_dicom_tags_DTI(fname,lstFilesDCM):
+    """ This function reads the DICOM header from the DTI sequence and returns the corresponding DTI tags.
+
+    Args
+    ----
+    fname (pathlib.PosixPath): dicom filenames to process.  
+    lstFilesDCM (list): list of dicom files to process.  
+
+    Returns
+    -------
+    b-values (list): list of DTI b-values (s/mm2).   
+    b_Vec_original (list): original b-vectors as list.  
+    image_orientation_patient (list): patient orientation as list.  
+    """
+    b_values = []
+    b_Vec_original = []
+    image_orientation_patient = []
+
+    for fname in lstFilesDCM:
+        dataset = pydicom.dcmread(fname)
+        b_values.append(dataset[0x19, 0x100c].value)
+        b_Vec_original.append(dataset[0x19, 0x100e].value)
+        image_orientation_patient.append(dataset.ImageOrientationPatient)
+
+    return b_values, b_Vec_original, image_orientation_patient 

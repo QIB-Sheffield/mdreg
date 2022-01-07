@@ -8,6 +8,7 @@ import json
 # Use README.md as the long description
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
+    print(long_description)
 
 # Get latest version published online in PYPI (https://pypi.org/project/mdr-library/) 
 # and increment 0.0.1 (or other) so that it's uploaded correctly during Github Action
