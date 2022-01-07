@@ -53,11 +53,9 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
        popt, pcov = curve_fit(exp_func, xdata = T2_prep_times, ydata = images_to_be_fitted[x,:], p0=initial_guess, bounds=(lb,ub), method='trf')
        S0[x] =  popt[0] 
        T2[x] =  popt[1] 
-       
-    for x in range(shape[0]): # pixels (x-dim*y-dim)
        for i in range(shape[1]): # time-series (i)
            fit[x,i] = exp_func(T2_prep_times[i], S0[x], T2[x])
-    
+
     return fit, S0, T2
 
 

@@ -66,8 +66,6 @@ def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
        ADC_x[x] =  popt_x[1] 
        ADC_y[x] =  popt_y[1] 
        ADC_z[x] =  popt_z[1] 
-         
-    for x in range(shape[0]):
        for i in range(10): # time-series with 10 b-vals per image series
            fit_x[x,i] = exp_func(b_val[i], S0_x[x], ADC_x[x])
            fit_y[x,i] = exp_func(b_val[i], S0_y[x], ADC_y[x])
