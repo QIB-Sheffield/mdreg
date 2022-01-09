@@ -15,7 +15,7 @@ import copy
 import pandas as pd
 
 
-def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main'): 
+def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main', log = True): 
     """ main function that performs the model driven registration.
 
     Args:
@@ -53,7 +53,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function=function)
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
         # perform 2D image registration
-        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters)
+        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters, log=log)
         # check convergence    
         improvement.append(maximum_deformation_per_pixel(deformation_field, new_deformation_field))
         converged = improvement[-1] <= precision           
@@ -76,7 +76,7 @@ def fit_signal_model_image(time_curve, model, signal_model_parameters, function=
     return fit, fitted_parameters
 
 
-def fit_coregistration(fit, images, image_parameters, elastix_model_parameters):
+def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, log = True):
     """Co-register the 2D fit-image with the unregistered 2D input image.
 
     Args:
@@ -97,7 +97,7 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters):
     coregistered = np.empty((shape[0]*shape[1],shape[2]))
     deformation_field = np.empty([shape[0]*shape[1], 2, shape[2]])
     for t in range(shape[2]): #dynamics
-      coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
+        coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=log)
     return coregistered, deformation_field
 
 
@@ -120,7 +120,7 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
 
 
 # deformable registration for MDR
-def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
+def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters, log = True):
     """
         This function takes pair-wise unregistered source image and target image (per time-series point) as input 
         and returns ffd based co-registered target image and its corresponding deformation field. 
@@ -145,12 +145,15 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
 
     ## call the parameter map file specifying the registration parameters
     elastixImageFilter.SetParameterObject(elastix_model_parameters) 
-    ## print Parameter Map
-    print(elastix_model_parameters)
 
     ## set additional options
     elastixImageFilter.SetNumberOfThreads(os.cpu_count()-1)
-    elastixImageFilter.SetLogToConsole(True)
+    
+    # ITK-Elastix logging
+    if log == True:
+        elastixImageFilter.SetLogToConsole(True)
+        print("Parameter Map: ")
+        print(elastix_model_parameters)
     ## update filter object (required)
     elastixImageFilter.UpdateLargestPossibleRegion()
 

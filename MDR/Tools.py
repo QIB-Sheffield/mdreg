@@ -123,6 +123,7 @@ def export_images(MDR_individual_output, folder):
         MDR_individual_output (numpy.array): Numpy array representing one of the outputs of MDR.
         folder (string): Path to the folder that will host the results/output of this method.
     """
+    if not os.path.exists(os.path.dirname(folder)): os.makedirs(os.path.dirname(folder))
     shape = np.shape(MDR_individual_output)
     for i in range(shape[2]):
         im = Image.fromarray(MDR_individual_output[:,:,i])
@@ -137,6 +138,7 @@ def export_maps(MDR_individual_output, folder, shape):
         folder (string): Path to the folder that will host the results/output of this method.
         shape (list): Shape of the output array to which MDR_individual_output will be reshaped
     """
+    if not os.path.exists(os.path.dirname(folder)): os.makedirs(os.path.dirname(folder))
     array = np.reshape(MDR_individual_output, [shape[0],shape[1]]) 
     Img = Image.fromarray(array)
     Img.save(folder + ".tiff")
