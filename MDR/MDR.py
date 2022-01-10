@@ -13,9 +13,11 @@ import SimpleITK as sitk
 import itk
 import copy
 import pandas as pd
+import multiprocessing
+import MDR.Tools as Tools
 
 
-def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main', log = True): 
+def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', log = True): 
     """ main function that performs the model driven registration.
 
     Args:
@@ -27,7 +29,8 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         eg: TE (echo times) as input parameter (independent variable) for T2*sequence model fit.    
         elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters.    
         precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1. Lower value means higher precision.    
-        function (string attribute, optional): name (user-defined) of the main model-fit function. Default is 'main'.  
+        function (string, optional): name (user-defined) of the main model-fit function. Default is 'main'.
+        log (bool, optional): Default of this flag is 'True' and it prints the ITK-Elastix output in the terminal.
     
     Returns:
     -------
@@ -84,7 +87,8 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, 
     fit (numpy.ndarray): signal model fit images (single 2D slice with all time-series) with shape: [x-dim,y-dim, total timeseries]  
     images (numpy.ndarray): unregistered 2D images (uint16, single 2D slice with all time-series) as np-array with shape [x-dim,y-dim, total timeseries]  
     image_parameters (sitk tuple): distance between pixels (in mm) along each dimension  
-    elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters  
+    elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters
+    log (bool, optional): Default of this flag is 'True' and it prints the ITK-Elastix output in the terminal.
 
     Returns:
     -------
@@ -96,6 +100,14 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, 
     shape = np.shape(images)
     coregistered = np.empty((shape[0]*shape[1],shape[2]))
     deformation_field = np.empty([shape[0]*shape[1], 2, shape[2]])
+    #print("Start Parallel")
+    #pool = multiprocessing.Pool(processes=os.cpu_count()-1) 
+    #arguments = [(t, images, fit, elastix_model_parameters, image_parameters) for t in range(shape[2])] #dynamics
+    #results = pool.map(parallel_MDR_coregistration, arguments)
+    #print("Finished Parallel")
+    #for i, result in enumerate(results):
+    #    coregistered[:, i] = result[0]
+    #    deformation_field[:, :, i] = result[1]
     for t in range(shape[2]): #dynamics
         coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=log)
     return coregistered, deformation_field
@@ -116,7 +128,13 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
     maximum_deformation_per_pixel = np.nanmax(dist)
     
-    return maximum_deformation_per_pixel 
+    return maximum_deformation_per_pixel
+
+
+def parallel_MDR_coregistration(parallel_arguments):
+    t, images, fit, elastix_model_parameters, image_parameters = parallel_arguments
+    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=False)
+    return coregistered_t, deformation_field_t
 
 
 # deformable registration for MDR
@@ -144,6 +162,7 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
     elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
 
     ## call the parameter map file specifying the registration parameters
+    #elastix_model_parameters = Tools.read_elastix_model_parameters(elastix_model_parameters)
     elastixImageFilter.SetParameterObject(elastix_model_parameters) 
 
     ## set additional options

@@ -5,8 +5,10 @@ T1-MOLLI model fit
 """
 
 import numpy as np
+import os
 import sys  
 from scipy.optimize import curve_fit
+import multiprocessing
 np.set_printoptions(threshold=sys.maxsize)
 
 
@@ -27,7 +29,7 @@ def exp_func(x, a, b, T1):
 
 
 def T1_fitting(images_to_be_fitted, inversion_times):
-    """ curve fit function which returns the fit, and fitted parameters A,B, and T1.  
+    """ Calls T1_fitting_pixel which contains the curve_fit function and returns the fit, the fitted parameters A,B, and T1.  
 
     Args
     ----
@@ -54,26 +56,52 @@ def T1_fitting(images_to_be_fitted, inversion_times):
     shape = np.shape(images_to_be_fitted)
     images_to_be_fitted = np.abs(images_to_be_fitted)
 
-    for x in range(shape[0]):#pixels(xdim*ydim)
-        popt, pcov = curve_fit(exp_func, xdata = inversion_times, ydata = images_to_be_fitted[x,:], p0 = p0, bounds = (lb, ub), method = 'trf', maxfev=1000000) 
-        
-        a[x] =  popt[0] 
-        b[x] =  popt[1] 
-        T1_apparent[x] = popt[2]
+    # Run T1_fitting_pixel (which contains "curve_fit") in parallel processing
+    pool = multiprocessing.Pool(processes=os.cpu_count()-1)
+    arguments = [(x, images_to_be_fitted, p0, lb, ub, inversion_times) for x in range(shape[0])] #pixels (x-dim*y-dim)
+    results = pool.map(T1_fitting_pixel, arguments)
+    for i, result in enumerate(results):
+        a[i] = result[0]
+        b[i] = result[1]
+        T1_apparent[i] = result[2]
+        fit[i] = result[3]
 
-
-    for x in range(shape[0]):
-       for i in range(shape[1]):
-           fit[x,i] = exp_func(inversion_times[i], a[x], b[x], T1_apparent[x])
+    #for x in range(shape[0]):#pixels(xdim*ydim)
+    #    popt, pcov = curve_fit(exp_func, xdata = inversion_times, ydata = images_to_be_fitted[x,:], p0 = p0, bounds = (lb, ub), method = 'trf', maxfev=1000000) 
+    #    a[x] =  popt[0] 
+    #    b[x] =  popt[1] 
+    #    T1_apparent[x] = popt[2]
+    #    for i in range(shape[1]):
+    #        fit[x,i] = exp_func(inversion_times[i], a[x], b[x], T1_apparent[x])
        
-    try:
-        T1_estimated = T1_apparent * ((b / a) - 1)
+    T1_estimated = T1_apparent * (np.divide(b, a, out=np.zeros_like(b), where=a!=0) - 1)
        
-    except ZeroDivisionError:
-        T1_estimated = 0
-    
     return fit, T1_estimated, T1_apparent, b, a
-    
+
+
+def T1_fitting_pixel(parallel_arguments):
+    """ Runs the curve fit function for 1 pixel.
+
+    Args
+    ----
+    parallel_arguments (tuple): tuple containing the input arguments for curve_fit, such as the input images, the inversion times and more for the signal model fit.
+                                This tuple format is required for the success of the parallelisation process and consequent speed-up of the fitting.
+
+    Returns
+    -------
+    fitx (numpy.ndarray): signal model fit at all time-series with shape [total time-series].
+    T1_apparent_x, bx, ax (numpy.ndarray): fitted parameters each with shape [1].
+    """
+    pixel_index, images_to_be_fitted, p0, lb, ub, inversion_times = parallel_arguments
+    popt, pcov = curve_fit(exp_func, xdata = inversion_times, ydata = images_to_be_fitted[pixel_index,:], p0 = p0, bounds = (lb, ub), method = 'trf', maxfev=1000000) 
+    ax =  popt[0] 
+    bx =  popt[1] 
+    T1_apparent_x = popt[2]
+    fitx = []
+    for i in range(len(inversion_times)):
+        fitx.append(exp_func(inversion_times[i], ax, bx, T1_apparent_x))
+    return ax, bx, T1_apparent_x, fitx
+
 
 def main(images_to_be_fitted, signal_model_parameters): 
     """ main function that performs the T1-map signal model-fit for input 2D image at multiple time-points. 
