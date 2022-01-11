@@ -55,6 +55,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         # Update the solution
         fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function=function)
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
+        print("Model Fitted")
         # perform 2D image registration
         coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters, log=log)
         # check convergence    
@@ -100,17 +101,42 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, 
     shape = np.shape(images)
     coregistered = np.empty((shape[0]*shape[1],shape[2]))
     deformation_field = np.empty([shape[0]*shape[1], 2, shape[2]])
-    #print("Start Parallel")
-    #pool = multiprocessing.Pool(processes=os.cpu_count()-1) 
-    #arguments = [(t, images, fit, elastix_model_parameters, image_parameters) for t in range(shape[2])] #dynamics
-    #results = pool.map(parallel_MDR_coregistration, arguments)
-    #print("Finished Parallel")
-    #for i, result in enumerate(results):
-    #    coregistered[:, i] = result[0]
-    #    deformation_field[:, :, i] = result[1]
-    for t in range(shape[2]): #dynamics
-        coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=log)
+    print("Start Parallel")
+    pool = multiprocessing.Pool(processes=os.cpu_count()-1)
+    dict_param = get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters)
+    arguments = [(t, images, fit, dict_param, image_parameters) for t in range(shape[2])] #dynamics
+    results = pool.map(parallel_MDR_coregistration, arguments)
+    print("Finished Parallel")
+    for i, result in enumerate(results):
+        coregistered[:, i] = result[0]
+        deformation_field[:, :, i] = result[1]
+    #for t in range(shape[2]): #dynamics
+    #    coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=log)
     return coregistered, deformation_field
+
+
+def parallel_MDR_coregistration(parallel_arguments):
+    t, images, fit, elastix_model_parameters, image_parameters = parallel_arguments
+    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=False)
+    return coregistered_t, deformation_field_t
+
+
+def get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters):
+    list_dictionaries_parameters = []
+    for index in range(elastix_model_parameters.GetNumberOfParameterMaps()):
+        parameter_map = elastix_model_parameters.GetParameterMap(index)
+        one_parameter_map_dict = {}
+        for i in parameter_map:
+            one_parameter_map_dict[i] = parameter_map[i]
+        list_dictionaries_parameters.append(one_parameter_map_dict)
+    return list_dictionaries_parameters
+
+
+def get_elastix_parameters_from_dictionary_parameters(list_dictionaries_parameters):
+    elastix_model_parameters = itk.ParameterObject.New()
+    for one_map in list_dictionaries_parameters:
+        elastix_model_parameters.AddParameterMap(one_map)
+    return elastix_model_parameters
 
 
 def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
@@ -129,12 +155,6 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     maximum_deformation_per_pixel = np.nanmax(dist)
     
     return maximum_deformation_per_pixel
-
-
-def parallel_MDR_coregistration(parallel_arguments):
-    t, images, fit, elastix_model_parameters, image_parameters = parallel_arguments
-    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, log=False)
-    return coregistered_t, deformation_field_t
 
 
 # deformable registration for MDR
@@ -162,7 +182,7 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
     elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
 
     ## call the parameter map file specifying the registration parameters
-    #elastix_model_parameters = Tools.read_elastix_model_parameters(elastix_model_parameters)
+    elastix_model_parameters = get_elastix_parameters_from_dictionary_parameters(elastix_model_parameters)
     elastixImageFilter.SetParameterObject(elastix_model_parameters) 
 
     ## set additional options
@@ -173,6 +193,9 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
         elastixImageFilter.SetLogToConsole(True)
         print("Parameter Map: ")
         print(elastix_model_parameters)
+    else:
+        elastixImageFilter.SetLogToConsole(False)
+
     ## update filter object (required)
     elastixImageFilter.UpdateLargestPossibleRegion()
 
