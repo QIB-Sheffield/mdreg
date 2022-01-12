@@ -9,7 +9,6 @@ import os
 import sys  
 from scipy.optimize import curve_fit
 import multiprocessing
-from tqdm import tqdm
 np.set_printoptions(threshold=sys.maxsize)
 
 
