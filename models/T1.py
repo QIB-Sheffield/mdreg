@@ -9,6 +9,7 @@ import os
 import sys  
 from scipy.optimize import curve_fit
 import multiprocessing
+from tqdm import tqdm
 np.set_printoptions(threshold=sys.maxsize)
 
 
@@ -65,14 +66,6 @@ def T1_fitting(images_to_be_fitted, inversion_times):
         b[i] = result[1]
         T1_apparent[i] = result[2]
         fit[i] = result[3]
-
-    #for x in range(shape[0]):#pixels(xdim*ydim)
-    #    popt, pcov = curve_fit(exp_func, xdata = inversion_times, ydata = images_to_be_fitted[x,:], p0 = p0, bounds = (lb, ub), method = 'trf', maxfev=1000000) 
-    #    a[x] =  popt[0] 
-    #    b[x] =  popt[1] 
-    #    T1_apparent[x] = popt[2]
-    #    for i in range(shape[1]):
-    #        fit[x,i] = exp_func(inversion_times[i], a[x], b[x], T1_apparent[x])
        
     T1_estimated = T1_apparent * (np.divide(b, a, out=np.zeros_like(b), where=a!=0) - 1)
        

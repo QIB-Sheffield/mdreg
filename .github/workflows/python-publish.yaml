@@ -2,7 +2,7 @@
 
 name: Upload Python Package
 
-on: [push, pull_request]
+on: workflow_dispatch:
 
 jobs:
   test:
@@ -25,7 +25,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Publish package to PyPI
-        if: github.repository == 'QIB-Sheffield/MDR-Library' && github.event_name == 'push'
+        if: github.repository == 'QIB-Sheffield/MDR-Library' && github.event_name == 'workflow_dispatch'
         uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
