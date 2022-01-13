@@ -18,7 +18,7 @@ from tqdm import tqdm
 
 
 def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', parallel = False, log = True): 
-    """ main function that performs the model driven registration.
+    """ Main function that performs the Model Driven Registration (MDR).
 
     Args:
     ----
