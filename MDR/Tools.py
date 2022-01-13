@@ -21,11 +21,11 @@ import itk
 def read_DICOM_files(lstFilesDCM):
     """ Reads input DICOM Files.
 
-    Args
+    Args:
     ----
         lstFilesDCM (list): List containing the file paths of the DICOM Files.
 
-    Returns
+    Returns:
     -------
         files (list): List containing the pydicom datasets.
         ArrayDicom (numpy.array): Image resulting from the stack of the DICOM files in lstFilesDCM.
