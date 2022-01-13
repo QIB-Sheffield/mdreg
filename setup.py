@@ -14,16 +14,19 @@ with open('README.md', encoding='utf-8') as f:
 # and increment 0.0.1 (or other) so that it's uploaded correctly during Github Action
 contents = urllib.request.urlopen('https://pypi.org/pypi/mdr-library/json').read()
 data = json.loads(contents)
-latest_version = data['info']['version']
-major, minor, patch = latest_version.split(".")
-new_patch = str(int(patch) + 1)  # The authors can modify this to be minor or major versions instead
+LATEST_VERSION = data['info']['version']
+latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
+new_major = "0"
+new_minor = "1"
+new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
+new_patch = "0" # Create 0.1.0 for 1st release and then remove this line so that future versions are 0.1.1, 0.1.2, 0.1.x
 
-VERSION = major + "." + minor + "." + new_patch
+NEW_VERSION = new_major + "." + new_minor + "." + new_patch
 
 if __name__ == '__main__':
     setup(
         name="mdr-library",
-        version=VERSION,
+        version=NEW_VERSION,
         author="Kanishka Sharma, Joao Almeida e Sousa and Steven Sourbron",
         author_email="kanishka.sharma@sheffield.ac.uk, j.g.sousa@sheffield.ac.uk, s.sourbron@sheffield.ac.uk",
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",

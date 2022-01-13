@@ -114,7 +114,7 @@ def iBEAt_test_DCE(Elastix_Parameter_file_PATH, output_dir, sorted_slice_files, 
     elastix_model_parameters = read_elastix_model_parameters(Elastix_Parameter_file_PATH, ['MaximumNumberOfIterations', 256])
     
     #Perform MDR
-    MDR_output = model_driven_registration(original_images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 30, function = 'main')
+    MDR_output = model_driven_registration(original_images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 30, function = 'main', parallel=True, log=False)
 
     #Export results
     export_images(MDR_output[0], output_dir +'/coregistered/MDR-registered_DCE_')

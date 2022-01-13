@@ -6,3 +6,4 @@ Pillow
 pydicom
 scipy
 SimpleITK
+tqdm

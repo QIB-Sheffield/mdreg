@@ -13,9 +13,11 @@ import SimpleITK as sitk
 import itk
 import copy
 import pandas as pd
+import multiprocessing
+from tqdm import tqdm
 
 
-def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1, function = 'main'): 
+def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', parallel = False, log = True): 
     """ main function that performs the model driven registration.
 
     Args:
@@ -27,7 +29,9 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         eg: TE (echo times) as input parameter (independent variable) for T2*sequence model fit.    
         elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters.    
         precision (int, optional): precision (in mm) to define the convergence criterion for MDR. Defaults to 1. Lower value means higher precision.    
-        function (string attribute, optional): name (user-defined) of the main model-fit function. Default is 'main'.  
+        function (string, optional): name (user-defined) of the main model-fit function. Default is 'main'.
+        parallel (bool, optional): This flag determines if the co-registration is ran on 1 ('False', default) or multiple CPU cores ('True').
+        log (bool, optional): Default of this flag is 'True' and it prints the ITK-Elastix output in the terminal.
     
     Returns:
     -------
@@ -53,7 +57,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function=function)
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
         # perform 2D image registration
-        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters)
+        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel=parallel, log=log)
         # check convergence    
         improvement.append(maximum_deformation_per_pixel(deformation_field, new_deformation_field))
         converged = improvement[-1] <= precision           
@@ -72,11 +76,10 @@ def fit_signal_model_image(time_curve, model, signal_model_parameters, function=
         and returns the fitted signal and associated output model parameters.
     """
     fit, fitted_parameters = getattr(model, function)(time_curve, signal_model_parameters)
-    
     return fit, fitted_parameters
 
 
-def fit_coregistration(fit, images, image_parameters, elastix_model_parameters):
+def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel = False, log = True):
     """Co-register the 2D fit-image with the unregistered 2D input image.
 
     Args:
@@ -84,7 +87,9 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters):
     fit (numpy.ndarray): signal model fit images (single 2D slice with all time-series) with shape: [x-dim,y-dim, total timeseries]  
     images (numpy.ndarray): unregistered 2D images (uint16, single 2D slice with all time-series) as np-array with shape [x-dim,y-dim, total timeseries]  
     image_parameters (sitk tuple): distance between pixels (in mm) along each dimension  
-    elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters  
+    elastix_model_parameters (itk-elastix.ParameterObject): elastix file registration parameters
+    parallel (bool, optional): This flag determines if the co-registration is ran on 1 ('False', default) or multiple CPU cores ('True').
+    log (bool, optional): Default of this flag is 'True' and it prints the ITK-Elastix output in the terminal.
 
     Returns:
     -------
@@ -92,13 +97,57 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters):
     deformation_field (numpy.ndarray): output 2D deformation fields with shape [x-dim, y-dim, 2, num of dynamics].  
     Dimension '2' corresponds to deformation_field_x and deformation_field_y.  
     """
-    
     shape = np.shape(images)
     coregistered = np.empty((shape[0]*shape[1],shape[2]))
     deformation_field = np.empty([shape[0]*shape[1], 2, shape[2]])
-    for t in range(shape[2]): #dynamics
-      coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters)
+    if parallel == False:
+        for t in tqdm(range(shape[2]), desc='Co-registration progress'): #dynamics
+            coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=False, log=log)
+    else:
+        pool = multiprocessing.Pool(processes=os.cpu_count()-1)
+        dict_param = get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters)
+        arguments = [(t, images, fit, dict_param, image_parameters, log) for t in range(shape[2])] #dynamics
+        results = list(tqdm(pool.imap(parallel_MDR_coregistration, arguments), total=shape[2], desc='Co-registration progress'))
+        for i, result in enumerate(results):
+            coregistered[:, i] = result[0]
+            deformation_field[:, :, i] = result[1]
     return coregistered, deformation_field
+
+
+def parallel_MDR_coregistration(parallel_arguments):
+    """
+        This function calls itkElastix_MDR_coregistration when parallel=True. 
+        It runs and distributes the mentioned function to multiple cores.
+    """
+    t, images, fit, elastix_model_parameters, image_parameters, log = parallel_arguments
+    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=True, log=log)
+    return coregistered_t, deformation_field_t
+
+
+def get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters):
+    """
+        This function converts the non-pickable object elastix_model_parameters and converts it into a list of dictionaries.
+        This is only called when parallel=True and the purpose is to make the multiprocessing possible and successful.
+    """
+    list_dictionaries_parameters = []
+    for index in range(elastix_model_parameters.GetNumberOfParameterMaps()):
+        parameter_map = elastix_model_parameters.GetParameterMap(index)
+        one_parameter_map_dict = {}
+        for i in parameter_map:
+            one_parameter_map_dict[i] = parameter_map[i]
+        list_dictionaries_parameters.append(one_parameter_map_dict)
+    return list_dictionaries_parameters
+
+
+def get_elastix_parameters_from_dictionary_parameters(list_dictionaries_parameters):
+    """
+        This function converts the list of dictionaries to the non-pickable object elastix_model_parameters during the itkElastix_MDR_coregistration processing.
+        This is only called when parallel=True and the purpose is to make the multiprocessing possible and successful.
+    """
+    elastix_model_parameters = itk.ParameterObject.New()
+    for one_map in list_dictionaries_parameters:
+        elastix_model_parameters.AddParameterMap(one_map)
+    return elastix_model_parameters
 
 
 def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
@@ -116,11 +165,11 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
     dist = np.sqrt(np.add(df_difference_x_squared, df_difference_y_squared))
     maximum_deformation_per_pixel = np.nanmax(dist)
     
-    return maximum_deformation_per_pixel 
+    return maximum_deformation_per_pixel
 
 
 # deformable registration for MDR
-def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters):
+def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters, parallel = False, log = True):
     """
         This function takes pair-wise unregistered source image and target image (per time-series point) as input 
         and returns ffd based co-registered target image and its corresponding deformation field. 
@@ -144,13 +193,20 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
     elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
 
     ## call the parameter map file specifying the registration parameters
-    elastixImageFilter.SetParameterObject(elastix_model_parameters) 
-    ## print Parameter Map
-    print(elastix_model_parameters)
+    if parallel == True: elastix_model_parameters = get_elastix_parameters_from_dictionary_parameters(elastix_model_parameters)
+    elastixImageFilter.SetParameterObject(elastix_model_parameters)
 
     ## set additional options
     elastixImageFilter.SetNumberOfThreads(os.cpu_count()-1)
-    elastixImageFilter.SetLogToConsole(True)
+    
+    # ITK-Elastix logging
+    if log == True:
+        elastixImageFilter.SetLogToConsole(True)
+        print("Parameter Map: ")
+        print(elastix_model_parameters)
+    else:
+        elastixImageFilter.SetLogToConsole(False)
+
     ## update filter object (required)
     elastixImageFilter.UpdateLargestPossibleRegion()
 

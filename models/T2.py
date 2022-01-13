@@ -6,8 +6,11 @@ T2-mapping signal model-fit
 2021
 """
 
+import os
 import numpy as np
 from scipy.optimize import curve_fit
+import multiprocessing
+
 
 def exp_func(T2_prep_times,S0,T2):
     """ mono-exponential decay function performing T2-map fitting.
@@ -24,9 +27,8 @@ def exp_func(T2_prep_times,S0,T2):
     return S0*np.exp(-T2_prep_times/T2)
 
 
-
 def T2_fitting(images_to_be_fitted, T2_prep_times):
-    """ curve fit function which returns the fit and fitted params S0 and T2.
+    """ Calls T2_fitting_pixel which contains the curve_fit function and returns the fit and the fitted params S0 and T2.
 
     Args
     ----
@@ -49,15 +51,40 @@ def T2_fitting(images_to_be_fitted, T2_prep_times):
     T2 = np.empty(shape[0])
     fit = np.empty(shape)
 
-    for x in range(shape[0]):#pixels (x-dim*y-dim)
-       popt, pcov = curve_fit(exp_func, xdata = T2_prep_times, ydata = images_to_be_fitted[x,:], p0=initial_guess, bounds=(lb,ub), method='trf')
-       S0[x] =  popt[0] 
-       T2[x] =  popt[1] 
-       for i in range(shape[1]): # time-series (i)
-           fit[x,i] = exp_func(T2_prep_times[i], S0[x], T2[x])
+    # Run T2_fitting_pixel (which contains "curve_fit") in parallel processing
+    pool = multiprocessing.Pool(processes=os.cpu_count()-1)
+    arguments = [(x, images_to_be_fitted, initial_guess, lb, ub, T2_prep_times) for x in range(shape[0])] #pixels (x-dim*y-dim)
+    results = pool.map(T2_fitting_pixel, arguments)
+    for i, result in enumerate(results):
+        S0[i] = result[1]
+        T2[i] = result[2]
+        fit[i] = result[0]
 
     return fit, S0, T2
 
+
+def T2_fitting_pixel(parallel_arguments):
+    """ Runs the curve fit function for 1 pixel.
+
+    Args
+    ----
+    parallel_arguments (tuple): tuple containing the input arguments for curve_fit, such as the input images, the T2-preparation times and more for the signal model fit.
+                                This tuple format is required for the success of the parallelisation process and consequent speed-up of the fitting.
+
+    Returns
+    -------
+    fitx (numpy.ndarray): signal model fit at all time-series with shape [total time-series].    
+    S0x (numpy.ndarray): fitted parameter 'S0' with shape [1].    
+    T2x (numpy.ndarray): fitted parameter 'T2' (ms) with shape [1].  
+    """
+    pixel_index, images_to_be_fitted, initial_guess, lb, ub, T2_prep_times = parallel_arguments
+    popt, pcov = curve_fit(exp_func, xdata = T2_prep_times, ydata = images_to_be_fitted[pixel_index,:], p0=initial_guess, bounds=(lb,ub), method='trf')  
+    S0x = popt[0] 
+    T2x = popt[1]
+    fitx = []
+    for i in range(len(T2_prep_times)): # time-series (i)
+        fitx.append(exp_func(T2_prep_times[i], S0x, T2x))
+    return fitx, S0x, T2x
 
 
 def main(images_to_be_fitted, signal_model_parameters): 
@@ -86,7 +113,4 @@ def main(images_to_be_fitted, signal_model_parameters):
     fitted_parameters = np.vstack(fitted_parameters_tuple)
 
     return fit, fitted_parameters
-
-
-
 

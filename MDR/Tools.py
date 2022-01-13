@@ -20,11 +20,12 @@ import itk
 
 def read_DICOM_files(lstFilesDCM):
     """ Reads input DICOM Files.
-    Args:
+
+    Args
     ----
         lstFilesDCM (list): List containing the file paths of the DICOM Files.
 
-    Returns:
+    Returns
     -------
         files (list): List containing the pydicom datasets.
         ArrayDicom (numpy.array): Image resulting from the stack of the DICOM files in lstFilesDCM.
@@ -47,6 +48,7 @@ def read_DICOM_files(lstFilesDCM):
 
 def get_sitk_image_details_from_DICOM(filenameDCM):
     """ Reads and returns image spacing of the input DICOM File.
+
     Args:
     ----
         filenameDCM (string): File path to a DICOM File.
@@ -65,6 +67,7 @@ def get_sitk_image_details_from_DICOM(filenameDCM):
 
 def sort_all_slice_files_acquisition_time(files):
     """ Sort the DICOM files based on acquisition time.
+
     Args:
     ----
         files (list): List containing the pydicom datasets of the DICOM Files.
@@ -85,17 +88,9 @@ def sort_all_slice_files_acquisition_time(files):
     return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime) 
 
 
-#def read_signal_model_parameters(full_module_name, filenameDCM, lstFilesDCM):
-    # generate a module named as a string 
-    #MODEL = importlib.import_module(full_module_name)
-    # read sequence acquisition parameter for signal modelling
-    #echo_times, slice_sorted_echo_time = MODEL.read_and_sort_echo_times(filenameDCM, lstFilesDCM)
-    #signal_model_parameters = [MODEL, echo_times]
-    #return signal_model_parameters, slice_sorted_echo_time
-
-
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH, *argv):
     """ Read elastix parameters from given text file.
+
     Args:
     ----
         Elastix_Parameter_file_PATH (string): Path to text file containing motion correction parameters.
@@ -118,11 +113,13 @@ def read_elastix_model_parameters(Elastix_Parameter_file_PATH, *argv):
 
 def export_images(MDR_individual_output, folder):
     """ Save MDR results to given folder.
+
     Args:
     ----
         MDR_individual_output (numpy.array): Numpy array representing one of the outputs of MDR.
         folder (string): Path to the folder that will host the results/output of this method.
     """
+    if not os.path.exists(os.path.dirname(folder)): os.makedirs(os.path.dirname(folder))
     shape = np.shape(MDR_individual_output)
     for i in range(shape[2]):
         im = Image.fromarray(MDR_individual_output[:,:,i])
@@ -131,12 +128,14 @@ def export_images(MDR_individual_output, folder):
 
 def export_maps(MDR_individual_output, folder, shape):
     """ Save MDR results to given folder. Fitted Parameters to output folder.
+
     Args:
     ----
         MDR_individual_output (numpy.array): Numpy array representing one of the outputs of MDR.
         folder (string): Path to the folder that will host the results/output of this method.
         shape (list): Shape of the output array to which MDR_individual_output will be reshaped
     """
+    if not os.path.exists(os.path.dirname(folder)): os.makedirs(os.path.dirname(folder))
     array = np.reshape(MDR_individual_output, [shape[0],shape[1]]) 
     Img = Image.fromarray(array)
     Img.save(folder + ".tiff")
