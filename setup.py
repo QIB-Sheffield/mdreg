@@ -19,7 +19,6 @@ latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
 new_major = "0"
 new_minor = "1"
 new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
-new_patch = "0" # Create 0.1.0 for 1st release and then remove this line so that future versions are 0.1.1, 0.1.2, 0.1.x
 
 NEW_VERSION = new_major + "." + new_minor + "." + new_patch
 
