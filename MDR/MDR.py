@@ -208,7 +208,12 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
         elastixImageFilter.SetLogToConsole(False)
 
     ## update filter object (required)
-    elastixImageFilter.UpdateLargestPossibleRegion()
+    # It's not exactly clear why UpdateLargestPossibleRegion() works in some practical cases
+    # and in others it breaks. This try/except is a temporary solution/fix.
+    try:
+        elastixImageFilter.UpdateLargestPossibleRegion()
+    except:
+        pass
 
     ## RUN ELASTIX using ITK-Elastix filters
     coregistered = itk.GetArrayFromImage(elastixImageFilter.GetOutput()).flatten()
