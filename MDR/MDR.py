@@ -208,7 +208,10 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
         elastixImageFilter.SetLogToConsole(False)
 
     ## update filter object (required)
-    elastixImageFilter.UpdateLargestPossibleRegion()
+    try:
+        elastixImageFilter.UpdateLargestPossibleRegion()
+    except:
+        elastixImageFilter.Update()
 
     ## RUN ELASTIX using ITK-Elastix filters
     coregistered = itk.GetArrayFromImage(elastixImageFilter.GetOutput()).flatten()
