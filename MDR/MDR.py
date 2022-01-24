@@ -180,12 +180,12 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
     source = sitk.GetImageFromArray(source)
     source.SetSpacing(image_parameters)
     source.__SetPixelAsUInt16__
-    source = np.reshape(source, [shape_source[0], shape_source[1]]) 
+    source = np.nan_to_num(np.reshape(source, [shape_source[0], shape_source[1]]))
     
     target = sitk.GetImageFromArray(target)
     target.SetSpacing(image_parameters)
     target.__SetPixelAsUInt16__
-    target = np.reshape(target, [shape_target[0], shape_target[1]])
+    target = np.nan_to_num(np.reshape(target, [shape_target[0], shape_target[1]]))
     
     ## read the source and target images
     elastixImageFilter = itk.ElastixRegistrationMethod.New()
@@ -208,10 +208,7 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
         elastixImageFilter.SetLogToConsole(False)
 
     ## update filter object (required)
-    try:
-        elastixImageFilter.UpdateLargestPossibleRegion()
-    except:
-        elastixImageFilter.Update()
+    elastixImageFilter.UpdateLargestPossibleRegion()
 
     ## RUN ELASTIX using ITK-Elastix filters
     coregistered = itk.GetArrayFromImage(elastixImageFilter.GetOutput()).flatten()
