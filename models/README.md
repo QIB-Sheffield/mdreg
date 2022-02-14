@@ -2,12 +2,12 @@
 
 **Note:** This is a library of dummy models to illustrate code structure and how MDR is meant to be used. 
 Some models themselves are not physically accurate and should not be used for image analysis.
-Users are expected to implement their own signal model fits for corresponding MR datasets to use as part of the MDR-Library. 
-The supplied models have been tested only on the MR data provided with this library and should only be used as a reference to understand how to apply your own signal model fit to the MDR-Library.
+Users are expected to implement their own signal model fits for corresponding MR datasets to use as part of the MDR_Library. 
+The supplied models have been tested only on the MR data provided with this library and should only be used as a reference to understand how to apply your own signal model fit to the MDR_Library.
 
-The following models (found in the 'models' folder) have been implemented for the purpose of testing the MDR-Library on the MRI dataset acquired (and supplied with this library) as part of the iBEAt study.
+The following models (found in the 'models' folder) have been implemented for the purpose of testing the MDR_Library on the MRI dataset acquired (and supplied with this library) as part of the iBEAt study.
 
-The 'tests' folder within the MDR-Library consists of corresponding python test scripts for each of these models.
+The 'tests' folder within the MDR_Library consists of corresponding python test scripts for each of these models.
 
 **1.** T1.py (WARNING: dummy model only sufficient for MDR - may not be accurate for renal T1 map fit) \
 T1-MOLLI fitting following: Messroghli DR, Radjenovic A, Kozerke S, Higgins DM, Sivananthan MU, Ridgway JP. Modified Look-Locker inversion recovery (MOLLI) for high-resolution T1 mapping of the heart. Magn Reson Med. 2004 Jul;52(1):141-6. doi: 10.1002/mrm.20110. PMID: 15236377. \
@@ -39,7 +39,7 @@ Test-script: 'MDR_test_MT.py'
 2-compartment filtration model implemented for DCE-MRI \
 Test-script: 'MDR_test_DCE.py'
 
-# How to implement your own model into the MDR-Library:
+# How to implement your own model into the MDR_Library:
 
 Your python script for the model definition is expected to contain the following main function (see below).
 
