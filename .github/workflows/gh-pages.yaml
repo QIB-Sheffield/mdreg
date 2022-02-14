@@ -27,7 +27,7 @@ jobs:
         run: |
           pdoc --html --force --output-dir "docs" "MDR"
 
-      - name: Deploy manual to Github Page https://https://qib-sheffield.github.io/MDR-Library/
+      - name: Deploy manual to Github Page https://https://qib-sheffield.github.io/MDR_Library/
         uses: s0/git-publish-subdir-action@develop
         env:
           REPO: self
