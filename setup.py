@@ -32,7 +32,7 @@ if __name__ == '__main__':
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        url="https://github.com/QIB-Sheffield/MDR-Library",
+        url="https://github.com/QIB-Sheffield/MDR_Library",
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
         packages=['MDR'],
