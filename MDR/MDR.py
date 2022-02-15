@@ -48,7 +48,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
     # Initialise the solution
     coregistered = copy.deepcopy(images) 
     coregistered =  np.reshape(coregistered,(shape[0]*shape[1],shape[2]))
-    deformation_field = np.empty((shape[0]*shape[1],2,shape[2]))
+    deformation_field = np.zeros((shape[0]*shape[1],2,shape[2]))
 
     converged = False
     while not converged: 
