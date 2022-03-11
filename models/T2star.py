@@ -77,7 +77,8 @@ def T2star_fitting_pixel(parallel_arguments):
     T2x (numpy.ndarray): fitted parameter 'T2' (ms) with shape [1].  
     """
     pixel_index, images_to_be_fitted, initial_guess, lb, ub, echo_times = parallel_arguments
-    popt, pcov = curve_fit(exp_func, xdata = echo_times, ydata = images_to_be_fitted[pixel_index,:], p0=initial_guess, bounds=(lb,ub), method='trf')
+    #popt, pcov = curve_fit(exp_func, xdata = echo_times, ydata = images_to_be_fitted[pixel_index,:], p0=initial_guess, bounds=(lb,ub), method='trf')
+    popt, pcov = curve_fit(exp_func, xdata = echo_times, ydata = images_to_be_fitted[pixel_index,:], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
     S0x =  popt[0] 
     T2_star_x =  popt[1]
     fitx = []
