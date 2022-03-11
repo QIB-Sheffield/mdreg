@@ -17,7 +17,7 @@ import multiprocessing
 from tqdm import tqdm
 
 
-def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', parallel = False, log = True): 
+def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', parallel = False, log = True, mask = None): 
     """ Main function that performs the Model Driven Registration (MDR).
 
     Args:
@@ -57,7 +57,7 @@ def model_driven_registration(images, image_parameters, model, signal_model_para
         fit, par = fit_signal_model_image(coregistered, model, signal_model_parameters, function=function)
         fit = np.reshape(fit,(shape[0],shape[1],shape[2]))
         # perform 2D image registration
-        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel=parallel, log=log)
+        coregistered, new_deformation_field = fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel=parallel, log=log, mask=mask)
         # check convergence    
         improvement.append(maximum_deformation_per_pixel(deformation_field, new_deformation_field))
         converged = improvement[-1] <= precision           
@@ -79,7 +79,7 @@ def fit_signal_model_image(time_curve, model, signal_model_parameters, function=
     return fit, fitted_parameters
 
 
-def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel = False, log = True):
+def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, parallel = False, log = True, mask = None):
     """Co-register the 2D fit-image with the unregistered 2D input image.
 
     Args:
@@ -99,14 +99,18 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, 
     """
     shape = np.shape(images)
     coregistered = np.empty((shape[0]*shape[1],shape[2]))
-    deformation_field = np.empty([shape[0]*shape[1], 2, shape[2]])
+    deformation_field = np.empty((shape[0]*shape[1], 2, shape[2]))
+    if isinstance(mask, np.ndarray):
+        if np.shape(mask) != shape: mask = None  # If mask isn't same shape as images, then don't use it
     if parallel == False:
         for t in tqdm(range(shape[2]), desc='Co-registration progress'): #dynamics
-            coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=False, log=log)
+            if mask is not None: moco_mask = mask[:,:,t]
+            else: moco_mask = None
+            coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=False, log=log, mask=moco_mask)
     else:
         pool = multiprocessing.Pool(processes=os.cpu_count()-1)
         dict_param = get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters)
-        arguments = [(t, images, fit, dict_param, image_parameters, log) for t in range(shape[2])] #dynamics
+        arguments = [(t, images, fit, dict_param, image_parameters, log, mask) for t in range(shape[2])] #dynamics
         results = list(tqdm(pool.imap(parallel_MDR_coregistration, arguments), total=shape[2], desc='Co-registration progress'))
         for i, result in enumerate(results):
             coregistered[:, i] = result[0]
@@ -119,8 +123,10 @@ def parallel_MDR_coregistration(parallel_arguments):
         This function calls itkElastix_MDR_coregistration when parallel=True. 
         It runs and distributes the mentioned function to multiple cores.
     """
-    t, images, fit, elastix_model_parameters, image_parameters, log = parallel_arguments
-    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=True, log=log)
+    t, images, fit, elastix_model_parameters, image_parameters, log, mask = parallel_arguments
+    if mask is not None: moco_mask = mask[:,:,t]
+    else: moco_mask = None
+    coregistered_t, deformation_field_t = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=True, log=log, mask=moco_mask)
     return coregistered_t, deformation_field_t
 
 
@@ -169,7 +175,7 @@ def maximum_deformation_per_pixel(deformation_field, new_deformation_field):
 
 
 # deformable registration for MDR
-def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters, parallel = False, log = True):
+def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, image_parameters, parallel = False, log = True, mask = None):
     """
         This function takes pair-wise unregistered source image and target image (per time-series point) as input 
         and returns ffd based co-registered target image and its corresponding deformation field. 
@@ -191,6 +197,14 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
     elastixImageFilter = itk.ElastixRegistrationMethod.New()
     elastixImageFilter.SetFixedImage(itk.GetImageFromArray(np.array(source, np.float32)))
     elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
+    if mask is not None:
+        shape_mask = np.shape(mask)
+        mask = sitk.GetImageFromArray(mask)
+        mask.SetSpacing(image_parameters)
+        mask.__SetPixelAsUInt8__
+        mask = np.nan_to_num(np.reshape(mask, [shape_mask[0], shape_mask[1]]))
+        elastixImageFilter.SetFixedMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
+        elastixImageFilter.SetMovingMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
 
     ## call the parameter map file specifying the registration parameters
     if parallel == True: elastix_model_parameters = get_elastix_parameters_from_dictionary_parameters(elastix_model_parameters)
@@ -204,7 +218,17 @@ def itkElastix_MDR_coregistration(target, source, elastix_model_parameters, imag
         elastixImageFilter.SetLogToConsole(True)
         print("Parameter Map: ")
         print(elastix_model_parameters)
+        elastixImageFilter.SetLogToFile(True)
+        output_dir = os.path.join(os.getcwd(), "Elastix Log")
+        os.makedirs(output_dir, exist_ok=True)
+        #log_filename = "ITK-Elastix.log"
+        i = 0
+        while os.path.exists(os.path.join(output_dir, f"ITK-Elastix_{i}.log")): i += 1
+        log_filename = f"ITK-Elastix_{i}.log"
+        elastixImageFilter.SetOutputDirectory(output_dir)
+        elastixImageFilter.SetLogFileName(log_filename)
     else:
+        elastixImageFilter.SetLogToFile(False)
         elastixImageFilter.SetLogToConsole(False)
 
     ## update filter object (required)
