@@ -11,81 +11,10 @@ MDR Library
 
 import os
 import numpy as np
-import importlib
 from PIL import Image
-import pydicom
-import SimpleITK as sitk
 import itk
-
-
-def read_DICOM_files(lstFilesDCM):
-    """ Reads input DICOM Files.
-
-    Args:
-    ----
-        lstFilesDCM (list): List containing the file paths of the DICOM Files.
-
-    Returns:
-    -------
-        files (list): List containing the pydicom datasets.
-        ArrayDicom (numpy.array): Image resulting from the stack of the DICOM files in lstFilesDCM.
-        filenameDCM (string): Last element of lstFilesDCM. Should be a file path to a DICOM file.
-    """
-    files = []
-    RefDs = pydicom.dcmread(lstFilesDCM[0])
-    SeriesPixelDims = (int(RefDs.Rows), int(RefDs.Columns), len(lstFilesDCM))           
-    ArrayDicom = np.zeros(SeriesPixelDims, dtype=RefDs.pixel_array.dtype)
-
-    # read all dicoms and output dicom files
-    for filenameDCM in lstFilesDCM: 
-        files.append(pydicom.dcmread(filenameDCM))
-        ds = pydicom.dcmread(filenameDCM)
-        # write pixel data into numpy array
-        ArrayDicom[:, :, lstFilesDCM.index(filenameDCM)] = ds.pixel_array  
-
-    return files, ArrayDicom, filenameDCM
-
-
-def get_sitk_image_details_from_DICOM(filenameDCM):
-    """ Reads and returns image spacing of the input DICOM File.
-
-    Args:
-    ----
-        filenameDCM (string): File path to a DICOM File.
-
-    Returns:
-    -------
-        spacing (float): Float value describing the space between pixels in the given image.
-    """
-    reader = sitk.ImageSeriesReader()
-    dicom_names = reader.GetGDCMSeriesFileNames(filenameDCM)
-    reader.SetFileNames(dicom_names)
-    image = reader.Execute()
-    spacing = image.GetSpacing() 
-    return spacing
-
-
-def sort_all_slice_files_acquisition_time(files):
-    """ Sort the DICOM files based on acquisition time.
-
-    Args:
-    ----
-        files (list): List containing the pydicom datasets of the DICOM Files.
-
-    Returns:
-    -------
-        slice_sorted_acq_time (list): List containing the file paths of the DICOM Files sorted by acquisition time.
-    """
-    slice_sorted_acq_time = []
-    skipcount = 0
-    for f in files: 
-        if hasattr(f, 'AcquisitionTime'):
-            slice_sorted_acq_time.append(f)
-        else:
-            skipcount = skipcount + 1
-    print("skipped, no AcquisitionTime: {}".format(skipcount))
-
-    return sorted(slice_sorted_acq_time, key=lambda s: s.AcquisitionTime) 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 
 def read_elastix_model_parameters(Elastix_Parameter_file_PATH, *argv):
@@ -109,6 +38,38 @@ def read_elastix_model_parameters(Elastix_Parameter_file_PATH, *argv):
     for lstParameters in argv:
         elastix_model_parameters.SetParameter(str(lstParameters[0]), str(lstParameters[1]))
     return elastix_model_parameters
+   
+
+def export_results(MDR_output=(), path='', model='', pars=[], xy=()):
+
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    defx = np.squeeze(MDR_output[2][:,:,0,:])
+    defy = np.squeeze(MDR_output[2][:,:,1,:])
+
+    export_animation(MDR_output[0], os.path.join(path, model), 'coregistered')
+    export_animation(MDR_output[1], os.path.join(path, model), 'modelfit')
+    export_animation(defx, os.path.join(path, model), 'deformation_field_x')
+    export_animation(defx, os.path.join(path, model), 'deformation_field_x')
+    export_animation(np.sqrt(defx**2 + defy**2), os.path.join(path, model), 'deformation_field')
+    for i in range(len(pars)):
+    #    export_maps(MDR_output[3][i,:], os.path.join(path, model, pars[i]), xy)
+        export_imgs(MDR_output[3][i,:], os.path.join(path, model, pars[i]), xy)
+    MDR_output[4].to_csv(os.path.join(path, model, 'largest_deformations.csv'))
+
+
+def export_animation(arr, path, filename):
+
+    if not os.path.exists(path): os.mkdir(path)
+    file = os.path.join(path, filename + '.gif')
+    fig = plt.figure()
+    im = plt.imshow(np.squeeze(arr[:,:,0]), animated=True)
+    def updatefig(i):
+        im.set_array(np.squeeze(arr[:,:,i]))
+    anim = animation.FuncAnimation(fig, updatefig, interval=50, frames=arr.shape[2])
+    anim.save(file)
+    #plt.show()
 
 
 def export_images(MDR_individual_output, folder):
@@ -125,7 +86,6 @@ def export_images(MDR_individual_output, folder):
         im = Image.fromarray(MDR_individual_output[:,:,i])
         im.save(folder + str(i) + ".tiff")
 
-
 def export_maps(MDR_individual_output, folder, shape):
     """ Save MDR results to given folder. Fitted Parameters to output folder.
 
@@ -135,7 +95,20 @@ def export_maps(MDR_individual_output, folder, shape):
         folder (string): Path to the folder that will host the results/output of this method.
         shape (list): Shape of the output array to which MDR_individual_output will be reshaped
     """
-    if not os.path.exists(os.path.dirname(folder)): os.makedirs(os.path.dirname(folder))
+    if not os.path.exists(os.path.dirname(folder)): 
+        os.makedirs(os.path.dirname(folder))
     array = np.reshape(MDR_individual_output, [shape[0],shape[1]]) 
     Img = Image.fromarray(array)
     Img.save(folder + ".tiff")
+
+def export_imgs(array, folder, shape):
+
+    if not os.path.exists(os.path.dirname(folder)): 
+        os.makedirs(os.path.dirname(folder))
+    array = np.reshape(array, [shape[0],shape[1]])
+    plt.imshow(array)
+    #plt.clim(int(minValue), int(maxValue))
+    cBar = plt.colorbar()
+    cBar.minorticks_on()
+    plt.savefig(fname=folder + '.png')
+    plt.close()

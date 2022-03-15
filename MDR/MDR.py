@@ -17,7 +17,18 @@ import multiprocessing
 from tqdm import tqdm
 
 
-def model_driven_registration(images, image_parameters, model, signal_model_parameters, elastix_model_parameters, precision = 1,  function = 'main', parallel = False, log = True, mask = None): 
+def model_driven_registration(
+    images, 
+    image_parameters, 
+    model, 
+    signal_model_parameters, 
+    elastix_model_parameters, 
+    precision = 1,  
+    function = 'main', 
+    parallel = False, 
+    log = True, 
+    mask = None,
+    ): 
     """ Main function that performs the Model Driven Registration (MDR).
 
     Args:
@@ -106,7 +117,15 @@ def fit_coregistration(fit, images, image_parameters, elastix_model_parameters, 
         for t in tqdm(range(shape[2]), desc='Co-registration progress'): #dynamics
             if mask is not None: moco_mask = mask[:,:,t]
             else: moco_mask = None
-            coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(images[:,:,t], fit[:,:,t], elastix_model_parameters, image_parameters, parallel=False, log=log, mask=moco_mask)
+            coregistered[:,t], deformation_field[:,:,t] = itkElastix_MDR_coregistration(
+                images[:,:,t], 
+                fit[:,:,t], 
+                elastix_model_parameters, 
+                image_parameters, 
+                parallel=False, 
+                log=log, 
+                mask=moco_mask,
+            )
     else:
         pool = multiprocessing.Pool(processes=os.cpu_count()-1)
         dict_param = get_dictionary_parameters_from_elastix_parameters(elastix_model_parameters)
