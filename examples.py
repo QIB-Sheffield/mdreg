@@ -1,14 +1,14 @@
 """
-MDR tutorial showing how to motion-correct DICOM T2* data.
+MDR tutorial showing how to motion-correct DICOM T2*, T1, T2 (etc.) data.
 
-The tutorial uses the DICOM example data provided *here*. 
+The tutorial uses the DICOM example data provided [here](https://shorturl.at/rwCUV).
 
-The `dicomdb` package is used to read the DICOM data 
+The `dbdicom` package is used to read the DICOM data 
 and return numpy arrays. 
 
 In order to run the tutorial as is, extract the data in a folder 
-"mydata" in the same directory as this script.
-The results will be saved in a folder "myresults".
+"data" in the same directory as this script.
+The results will be saved in a folder "results".
 
 In order to read and write from other locations, 
 change the path names in the script below.
@@ -40,6 +40,8 @@ import models_signal.T2star_simple as T2star_simple
 # To read and write from/to other locations, change these path names
 data = os.path.join(os.path.dirname(__file__), 'data')
 results = os.path.join(os.path.dirname(__file__), 'results')
+# Check if `data` folder has more files besides README.md
+if len([files for path, subdirs, files in os.walk(data)]) <= 1: raise ValueError("Data folder is empty")
 
 
 def fit_DCE():
