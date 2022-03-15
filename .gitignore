@@ -3,6 +3,8 @@
 
 ### MDR-Library folder structure
 tests/test_data/*
+data/*
+results/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
