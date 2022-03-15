@@ -1,5 +1,6 @@
 itk-elastix
 matplotlib
+nibabel
 numpy
 pandas
 pdoc3
