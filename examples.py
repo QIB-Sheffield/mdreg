@@ -4,8 +4,7 @@ MDR tutorial showing how to motion-correct DICOM T2* data.
 The tutorial uses the DICOM example data provided *here*. 
 
 The `dicomdb` package is used to read the DICOM data 
-and return numpy arrays. `dicomdb` is currently available 
-as part of `weasel` v0.3.
+and return numpy arrays. 
 
 In order to run the tutorial as is, extract the data in a folder 
 "mydata" in the same directory as this script.
@@ -21,26 +20,26 @@ import os, time
 import numpy as np
 import pandas as pd
 
-from dicomdb import Folder
+from dbdicom import Folder
 
-from MDR_Library.MDR.MDR import model_driven_registration
-from MDR_Library.MDR.Tools import read_elastix_model_parameters, export_results, export_animation
+from MDR.MDR import model_driven_registration
+from MDR.Tools import read_elastix_model_parameters, export_results
 
-import MDR_Library.models_signal.two_compartment_filtration_model_DCE as DCE
-import MDR_Library.models_signal.constant as constant
-import MDR_Library.models_signal.DTI as DTI
-import MDR_Library.models_signal.DWI_monoexponential as DWI_monoexponential
-import MDR_Library.models_signal.DWI_monoexponential_simple as DWI_monoexponential_simple
-import MDR_Library.models_signal.T1 as T1
-import MDR_Library.models_signal.T1_simple as T1_simple
-import MDR_Library.models_signal.T2 as T2
-import MDR_Library.models_signal.T2_simple as T2_simple
-import MDR_Library.models_signal.T2star as T2star
-import MDR_Library.models_signal.T2star_simple as T2star_simple
+import models_signal.two_compartment_filtration_model_DCE as DCE
+import models_signal.constant as constant
+import models_signal.DTI as DTI
+import models_signal.DWI_monoexponential as DWI_monoexponential
+import models_signal.DWI_monoexponential_simple as DWI_monoexponential_simple
+import models_signal.T1 as T1
+import models_signal.T1_simple as T1_simple
+import models_signal.T2 as T2
+import models_signal.T2_simple as T2_simple
+import models_signal.T2star as T2star
+import models_signal.T2star_simple as T2star_simple
 
 # To read and write from/to other locations, change these path names
-data = os.path.join(os.path.dirname(__file__), 'mydata')
-results = os.path.join(os.path.dirname(__file__), 'myresults')
+data = os.path.join(os.path.dirname(__file__), 'data')
+results = os.path.join(os.path.dirname(__file__), 'results')
 
 
 def fit_DCE():
@@ -65,7 +64,7 @@ def fit_DCE():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -108,7 +107,7 @@ def fit_DTI():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -150,7 +149,7 @@ def fit_DWI_monoexponential_simple():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -190,7 +189,7 @@ def fit_DWI_monoexponential():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -229,7 +228,7 @@ def fit_T1_simple():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -269,7 +268,7 @@ def fit_T1():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -297,7 +296,7 @@ def fit_constant():
     signal_model = constant 
     model_name = 'constant' 
     par_name = ['mean'] 
-    series_nr = 4 
+    series_nr = 3
     slice = 2
 
     print('Reading data..')
@@ -307,7 +306,7 @@ def fit_constant():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -346,7 +345,7 @@ def fit_T2_simple():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -385,7 +384,7 @@ def fit_T2():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -424,7 +423,7 @@ def fit_T2star_simple():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
@@ -463,7 +462,7 @@ def fit_T2star():
 
     print('Performing MDR..')
     start = time.time()
-    file = os.path.join(os.getcwd(), 'MDR_Library', 'models_coreg', coreg_model + '.txt')
+    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
     MDR_output = model_driven_registration(
         np.squeeze(array[:,:,slice,:,0]),                       # images
         header[slice,0,0].PixelSpacing,                         # pixel size
