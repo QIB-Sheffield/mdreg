@@ -22,8 +22,8 @@ def main(images, dummy):
 
     shape = np.shape(images)
     avr = np.mean(images, axis=1) # fitting a constant model
-    par = np.empty((1, shape[0])) # pixels should be first for consistency
-    par[0,:] = avr
+    par = np.empty((shape[0], 1)) # pixels should be first for consistency
+    par[:,0] = avr
     fit = np.repeat(avr[:,np.newaxis], shape[1], axis=1)
     
     return fit, par
