@@ -19,6 +19,7 @@ Then just run this module as a script.
 import os, time
 import numpy as np
 import pandas as pd
+import warnings
 
 from dbdicom import Folder
 
@@ -41,7 +42,7 @@ import models_signal.T2star_simple as T2star_simple
 data = os.path.join(os.path.dirname(__file__), 'data')
 results = os.path.join(os.path.dirname(__file__), 'results')
 # Check if `data` folder has more files besides README.md
-if len([files for path, subdirs, files in os.walk(data)]) <= 1: raise ValueError("Data folder is empty")
+if len([files for path, subdirs, files in os.walk(data)]) <= 1: warnings.warn("Data folder is empty!")
 
 
 def fit_DCE():
