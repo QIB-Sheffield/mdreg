@@ -34,8 +34,8 @@ if __name__ == '__main__':
         url="https://github.com/QIB-Sheffield/MDR_Library",
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
-        packages=['MDR'],
-        install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix", "pydicom", "Pillow", "pdoc3", "scipy"],
+        packages=['MDR', 'models_signal'],
+        install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix", "matplotlib", "Pillow", "pdoc3", "scipy", "tqdm"],
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],
         # Classifiers - the purpose is to create a wheel and upload it to PYPI
