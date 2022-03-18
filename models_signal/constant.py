@@ -6,6 +6,9 @@ Fitting to a constant
 
 import numpy as np
 
+def pars():
+    return ['const']
+
 def main(images, dummy):
     """ main function that performs the T2*-map signal model-fit for input 2D image at multiple time-points (TEs).
 

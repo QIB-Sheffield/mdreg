@@ -5,9 +5,12 @@
 Pixel-by-pixel exponential decay fit 
 2022
 """
-
+import tqdm
 import numpy as np
 from scipy.optimize import curve_fit
+
+def pars():
+    return ['S0', 'R']
 
 
 def func(t, S, R):
@@ -47,21 +50,25 @@ def main(images, t,
 
     t = np.array(t)
     shape = np.shape(images)
-    par = np.empty((2, shape[0])) # pixels should be first for consistency
+    par = np.empty((shape[0], 2)) 
     fit = np.empty(shape)
 
-    for x in range(shape[0]):
+    for x in tqdm(range(shape[0]), dec='Fitting exponential decay'):
 
         signal = images[x,:]
-        par[:,x], _ = curve_fit(func, 
-            xdata = t, 
-            ydata = signal, 
-            p0 = [np.max(signal)*initial_value[0], initial_value[1]], 
-            bounds = (lower_bounds, upper_bounds), 
-            method = method, 
-            maxfev = maxfev, 
-        )
-        fit[x,:] = func(t, par[0,x], par[1,x])
+        p0 = [np.max(signal)*initial_value[0], initial_value[1]]
+        try:
+            par[x,:], _ = curve_fit(func, 
+                xdata = t, 
+                ydata = signal, 
+                p0 = p0, 
+                bounds = (lower_bounds, upper_bounds), 
+                method = method, 
+                maxfev = maxfev, 
+            )
+        except RuntimeError:
+            par[x,:] = p0
+        fit[x,:] = func(t, par[x,0], par[x,1])
   
     return fit, par
 

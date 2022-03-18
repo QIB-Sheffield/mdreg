@@ -7,7 +7,9 @@ DCE-MRI two-compartment filtration model fit
 import numpy as np
 import sys  
 from scipy import integrate
-np.set_printoptions(threshold=sys.maxsize)
+
+def pars():
+    return ['FP', 'TP', 'PS', 'TE']
 
 
 def ddint(c, t):
@@ -65,7 +67,7 @@ def main(St, p):
 
     shape = np.shape(St)
     fit = np.empty(shape)
-    par = np.empty(shape[0], 4)
+    par = np.empty((shape[0], 4))
     
     Sa = p[0]
     t = p[1]

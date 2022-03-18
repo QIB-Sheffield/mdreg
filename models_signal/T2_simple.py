@@ -8,6 +8,9 @@ T2-mapping signal model-fit
 
 from .exp_decay import main as exp_decay
 
+def pars():
+    return ['S0', 'T2']
+
 def main(images, T2_prep_times):
     """ main function that performs the T2*-map signal model-fit for input 2D image at multiple time-points (TEs).
 
@@ -27,6 +30,6 @@ def main(images, T2_prep_times):
         initial_value = [1.0, 1.0/80], 
         maxfev = 500, 
     )
-    par[1,:] = 1/par[1,:]
+    par[:,1] = 1/par[:,1]
 
     return fit, par

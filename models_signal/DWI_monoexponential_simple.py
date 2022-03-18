@@ -7,6 +7,8 @@ DWI monoexponential model fit for the MDR Library
 import numpy as np 
 from .exp_decay import main as exp_decay
 
+def pars():
+    return ['S0', 'ADC']
 
 def main(images, bvalues):
     """ main function that performs the DWI signal model-fit for input 2D image at multiple time-points. 
@@ -26,7 +28,7 @@ def main(images, bvalues):
     maxfev = 500
 
     shape = np.shape(images)
-    par = np.empty((3, 2, shape[0]))
+    par = np.empty((3, shape[0], 2))
     fit = np.empty(shape)
     nb = len(bvalues)
     

@@ -16,14 +16,12 @@ change the path names in the script below.
 Then just run this module as a script.
 """
 
-import os, time
+import os
 import numpy as np
 import pandas as pd
 
 from dbdicom import Folder
-
-from MDR.MDR import model_driven_registration
-from MDR.Tools import read_elastix_model_parameters, export_results
+from main import MDReg
 
 import models_signal.two_compartment_filtration_model_DCE as DCE
 import models_signal.constant as constant
@@ -40,461 +38,308 @@ import models_signal.T2star_simple as T2star_simple
 # To read and write from/to other locations, change these path names
 data = os.path.join(os.path.dirname(__file__), 'data')
 results = os.path.join(os.path.dirname(__file__), 'results')
+elastix_pars = os.path.join(os.path.dirname(__file__), 'models_coreg')
+
+data = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_data'
+results = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_results'
+
 
 
 def fit_DCE():
 
-    coreg_model = 'BSplines_DCE' 
-    signal_model = DCE
-    model_name = 'DCE_2CFM' 
-    par_name = ['FP', 'TP', 'PS', 'TE'] 
-    series_nr = 0 
-    slice = 4
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-
-    file = os.path.join(data, 'test_data', 'AIF.csv')
-    array = pd.read_csv(file).to_numpy()
+    array, header = folder.series(0).array(sortby, pixels_first=True)
+    file = os.path.join(data, 'AIF.csv')
+    aif = pd.read_csv(file).to_numpy()
     baseline = 15
-    Hct = 0.45
-    signal_model_parameters = [array[:,1], array[:,0], baseline, Hct]
+    hematocrit = 0.45
+    slice = 4
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,             # signal model parameters
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [aif[:,1], aif[:,0], baseline, hematocrit]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = DCE
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_DCE.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.max_iterations = 2
+    mdr.precision = 10
+    mdr.export_path = os.path.join(results, 'DCE')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_DTI():
 
-    coreg_model = 'BSplines_DTI' 
-    signal_model = DTI 
-    model_name = 'DTI' 
-    par_name = ['FA', 'ADC'] 
-    series_nr = 1
-    slice = 15
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
+    array, header = folder.series(1).array(sortby, pixels_first=True)
+    slice = 15
+    b_values = [float(hdr[(0x19, 0x100c)]) for hdr in header[slice,:,0]]
+    b_vectors = [hdr[(0x19, 0x100e)] for hdr in header[slice,:,0]]
+    orientation = [hdr.ImageOrientationPatient for hdr in header[slice,:,0]] 
+    
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [b_values, b_vectors, orientation]
+    mdr.signal_model = DTI
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_DTI.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'DTI')
+    mdr.fit()
+    mdr.export()
 
-    b_values = [hdr[(0x19, 0x100c)] for hdr in header[slice,:,0]]
-    b_Vec_original = [hdr[(0x19, 0x100e)] for hdr in header[slice,:,0]]
-    image_orientation_patient = [hdr.ImageOrientationPatient for hdr in header[slice,:,0]]
-    signal_model_parameters = [b_values, b_Vec_original, image_orientation_patient]
-
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,    
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 1024]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
-
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_DWI_monoexponential_simple():
-
-    coreg_model = 'BSplines_IVIM' 
-    signal_model = DWI_monoexponential_simple 
-    model_name = 'DWI_simple' 
-    par_name = ['S0', 'ADC'] 
-    series_nr = 2
-    slice = 15
-
+ 
     print('Reading data..')
     folder = Folder(data).open()
-    folder.print()
-
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    bvalues = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
-    signal_model_parameters = bvalues
+    array, header = folder.series(2).array(sortby, pixels_first=True)
+    slice = 15
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,    
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = DWI_monoexponential_simple
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_IVIM.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'DWI_simple')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_DWI_monoexponential():
-
-    coreg_model = 'BSplines_IVIM' 
-    signal_model = DWI_monoexponential
-    model_name = 'DWI' 
-    par_name = ['S0', 'ADC'] 
-    series_nr = 2
-    slice = 15
-
+ 
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    bvalues = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
-    signal_model_parameters = bvalues + bvalues + bvalues
+    array, header = folder.series(2).array(sortby, pixels_first=True)
+    slice = 15
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,    
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [0,10.000086, 19.99908294, 30.00085926, 50.00168544, 80.007135, 100.0008375, 199.9998135, 300.0027313, 600.0]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = DWI_monoexponential
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_IVIM.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'DWI')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T1_simple():
 
-    coreg_model = 'BSplines_T1' 
-    signal_model = T1_simple 
-    model_name = 'T1_simple' 
-    par_name = ['S0', 'inversion_efficiency', 'T1'] 
-    series_nr = 3
-    slice = 2
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'InversionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [hdr.InversionTime for hdr in header[slice,:,0]]
+    array, header = folder.series(3).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,                                # T2 prep times (ms)
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [hdr.InversionTime for hdr in header[slice,:,0]]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T1_simple
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T1.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'T1_simple')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T1():
 
-    coreg_model = 'BSplines_T1' 
-    signal_model = T1 
-    model_name = 'T1' 
-    par_name = ['T1', 'T1app', 'B', 'A'] 
-    series_nr = 3 
-    slice = 2
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'InversionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [hdr.InversionTime for hdr in header[slice,:,0]]
-   # export_animation(np.squeeze(array[:,:,slice,:,0]), results, 'T1data')
+    array, header = folder.series(3).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,                                # T2 prep times (ms)
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [hdr.InversionTime for hdr in header[slice,:,0]]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T1
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T1.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'T1')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_constant():
 
-    coreg_model = 'BSplines_MT' 
-    signal_model = constant 
-    model_name = 'constant' 
-    par_name = ['mean'] 
-    series_nr = 3
-    slice = 2
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
+    array, header = folder.series(3).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        None,                                 
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [0,30,40,50,60,70,80,90,100,110,120]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = constant
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_MT.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 10
+    mdr.export_path = os.path.join(results, 'constant')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T2_simple():
 
-    coreg_model = 'BSplines_T2' 
-    signal_model = T2_simple 
-    model_name = 'T2_simple' 
-    par_name = ['S0', 'T2'] 
-    series_nr = 4 
-    slice = 2
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [0,30,40,50,60,70,80,90,100,110,120]
+    array, header = folder.series(4).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,                                # T2 prep times (ms)
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [0,30,40,50,60,70,80,90,100,110,120]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T2_simple
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T2_simple.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'T2_simple')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T2():
 
-    coreg_model = 'BSplines_T2' 
-    signal_model = T2
-    model_name = 'T2' 
-    par_name = ['S0', 'T2'] 
-    series_nr = 4 
-    slice = 2
-
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [0,30,40,50,60,70,80,90,100,110,120]
+    array, header = folder.series(4).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,                   # T2 prep times (ms)
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [0,30,40,50,60,70,80,90,100,110,120]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T2
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T2.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'T2')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T2star_simple():
 
-    coreg_model = 'BSplines_T2star' 
-    signal_model = T2star_simple 
-    model_name = 'T2_star_simple' 
-    par_name = ['S0', 'T2star'] 
-    series_nr = 5
-    slice = 2
-
-    print('Reading data..')
+    print('Reading data..') 
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [hdr.EchoTime for hdr in header[slice,:,0]]
+    array, header = folder.series(5).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,             # signal model parameters
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [hdr.EchoTime for hdr in header[slice,:,0]]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T2star_simple
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T2star.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 10
+    mdr.export_path = os.path.join(results, 'T2star_simple')
+    mdr.fit()
+    mdr.export()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
 
 
 def fit_T2star():
 
-    coreg_model = 'BSplines_T2star' 
-    signal_model = T2star
-    model_name = 'T2_star' 
-    par_name = ['S0', 'T2star'] 
-    series_nr = 5 
+    print('Reading data..')
+    folder = Folder(data).open()
+    sortby = ['SliceLocation', 'AcquisitionTime']
+    array, header = folder.series(5).array(sortby, pixels_first=True)
     slice = 2
+
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [hdr.EchoTime for hdr in header[slice,:,0]]
+    mdr.pixel_spacing = header[slice,0,0].PixelSpacing
+    mdr.signal_model = T2star
+    mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_T2star.txt'))
+    mdr.set_elastix(MaximumNumberOfIterations = 256)
+    mdr.precision = 1
+    mdr.export_path = os.path.join(results, 'T2star')
+    mdr.fit()
+    mdr.export()
+
+    folder.close()
+
+def fit_T2star_model():
+    """Fit the data to a signal model without motion correction"""
 
     print('Reading data..')
     folder = Folder(data).open()
     sortby = ['SliceLocation', 'AcquisitionTime']
-    array, header = folder.series(series_nr).array(sortby, pixels_first=True)
-    signal_model_parameters = [hdr.EchoTime for hdr in header[slice,:,0]]
+    array, header = folder.series(5).array(sortby, pixels_first=True)
+    slice = 2
 
-    print('Performing MDR..')
-    start = time.time()
-    file = os.path.join(os.getcwd(), 'models_coreg', coreg_model + '.txt')
-    MDR_output = model_driven_registration(
-        np.squeeze(array[:,:,slice,:,0]),                       # images
-        header[slice,0,0].PixelSpacing,                         # pixel size
-        signal_model,                                           # model
-        signal_model_parameters,             # signal model parameters
-        read_elastix_model_parameters(file, ['MaximumNumberOfIterations', 256]), 
-        precision = 1, 
-    )
-    print('Calculation time (min)', (time.time()-start)/60)
+    mdr = MDReg()
+    mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
+    mdr.signal_parameters = [hdr.EchoTime for hdr in header[slice,:,0]]
+    mdr.signal_model = T2star
+    mdr.fit_signal()
+    mdr.export_path = os.path.join(results, 'T2starmodel')
+    mdr.export_data()
+    mdr.export_fit()
 
-    print('Exporting results..')
-    export_results(
-        MDR_output = MDR_output, 
-        path = results, 
-        model = model_name, 
-        pars = par_name, 
-        xy = np.shape(np.squeeze(array[:,:,slice,:,0])), 
-    )
     folder.close()
+
 
 
 if __name__ == '__main__':
 
-    # fit_DCE()
-    # fit_constant()
-    # fit_DTI()
-    # fit_DWI_monoexponential()
-    # fit_DWI_monoexponential_simple()
-    fit_T1_simple()
-    # fit_T1()
-    # fit_T2_simple()
-    # fit_T2()
-    # fit_T2star_simple()
-    # fit_T2star()
+#    fit_T2star_model()
+
+#    fit_DWI_monoexponential()
+#    fit_DWI_monoexponential_simple()
+#    fit_T1_simple()
+#    fit_T1()
+#    fit_T2_simple()
+#    fit_T2()
+#    fit_T2star_simple()
+#    fit_T2star()
+    fit_DCE()
+#    fit_DTI()
+#    fit_constant()   
     
