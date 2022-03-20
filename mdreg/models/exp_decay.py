@@ -12,6 +12,11 @@ from scipy.optimize import curve_fit
 def pars():
     return ['S0', 'R']
 
+def bounds():
+    lower = [0,0]
+    upper = [np.inf, np.inf]
+    return lower, upper
+
 
 def func(t, S, R):
     """Mono-exponential decay function.  

@@ -4,12 +4,17 @@ DCE-MRI two-compartment filtration model fit
 2021  
 """
 
-import numpy as np
-import sys  
+import numpy as np 
 from scipy import integrate
 
 def pars():
     return ['FP', 'TP', 'PS', 'TE']
+
+
+def bounds():
+    lower = [0,0,0,0]
+    upper = [0.1, 20, 0.01, 120]
+    return lower, upper
 
 
 def ddint(c, t):
@@ -19,7 +24,7 @@ def ddint(c, t):
     cii = integrate.cumtrapz(ci, t)
     cii = np.insert(cii, 0, 0)
 
-    return ci, cii
+    return cii, ci
 
 
 def DCEparameters(X):
@@ -30,10 +35,13 @@ def DCEparameters(X):
     Fp = X[3]
     
     if alpha == 0: 
-        return [Fp, 1/beta, 0, 0]
+        if beta == 0:
+            return [Fp, 0, 0, 0]
+        else:
+            return [Fp, 1/beta, 0, 0]
 
     nom = 2*alpha
-    det = np.square(beta)-4*alpha
+    det = beta**2 - 4*alpha
     if det < 0 :
         Tp = beta/nom
         Te = Tp
@@ -45,8 +53,11 @@ def DCEparameters(X):
     if Te == 0:
         PS = 0
     else:   
-        T = gamma/(alpha*Fp) 
-        PS = Fp*(T-Tp)/Te   
+        if Fp == 0:
+            PS == 0
+        else:
+            T = gamma/(alpha*Fp) 
+            PS = Fp*(T-Tp)/Te   
 
     return [Fp, Tp, PS, Te] 
 
@@ -81,12 +92,12 @@ def main(St, p):
     A = np.empty((shape[1],4))
     A[:,2], A[:,3] = ddint(ca, t)
     for x in range(shape[0]):
-        c = St[x,:] - S0[x]
-        cti, ctii = ddint(c, t)
-        A[:,0] = -cti
-        A[:,1] = -ctii
+        c = np.squeeze(St[x,:]) - S0[x]
+        ctii, cti = ddint(c, t)
+        A[:,0] = -ctii
+        A[:,1] = -cti
         P = np.linalg.lstsq(A, c, rcond=None)[0] 
-        fit[x,:] = S0[x] + P[0]*A[:,0] + P[1]*A[:,1] + P[2]*A[:,2] + P[3]*A[:,3] 
+        fit[x,:] = S0[x] + P[0]*A[:,0] + P[1]*A[:,1] + P[2]*A[:,2] + P[3]*A[:,3]
         par[x,:] = DCEparameters(P)
 
     return fit, par

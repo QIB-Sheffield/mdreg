@@ -13,6 +13,11 @@ import multiprocessing
 
 def pars():
     return ['S0', 'T2star']
+
+def bounds():
+    lower = [0,0]
+    upper = [np.inf, 100]
+    return lower, upper
     
 def func(TE,S0,T2star):
     """ mono-exponential decay function to perform T2*-fitting.  

@@ -10,6 +10,11 @@ from .exp_decay import main as exp_decay
 def pars():
     return ['S0', 'ADC']
 
+def bounds():
+    lower = [0,0]
+    upper = [np.inf, 1.0]
+    return lower, upper
+
 def main(images, bvalues):
     """ main function that performs the DWI signal model-fit for input 2D image at multiple time-points. 
  

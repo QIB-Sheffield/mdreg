@@ -9,6 +9,11 @@ import numpy as np
 def pars():
     return ['FA', 'ADC']
 
+def bounds():
+    lower = [0,0]
+    upper = [1.0, 10]
+    return lower, upper
+
 
 def DTI_fitting(im, b, thresh_val, method='linear'):
     """ DTI fit function.  

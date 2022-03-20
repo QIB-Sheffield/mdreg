@@ -11,7 +11,7 @@ import matplotlib.animation as animation
 import itk
 import SimpleITK as sitk
 
-import models_signal.constant as constant
+from .models import constant
 
 default_path = os.path.dirname(__file__)
 
@@ -25,6 +25,7 @@ class MDReg:
         self.pixel_spacing = 1.0
         self.signal_model = constant
         self.elastix = itk.ParameterObject.New()
+        self.elastix.AddParameterFile(os.path.join(default_path, 'BSplines.txt'))
 
         # mdr optimization
         self.max_iterations = 5
@@ -40,7 +41,7 @@ class MDReg:
         self.export_unregistered = True
 
     @property
-    def npdt(self): 
+    def _npdt(self): 
         """
         (nr of pixels, nr of dimensions, nr of time points)
         """
@@ -50,7 +51,7 @@ class MDReg:
     def set_array(self, array):
         self.array = array
         self.coreg = array
-        n = self.npdt
+        n = self._npdt
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
 
     def read_elastix(self, file):
@@ -62,7 +63,7 @@ class MDReg:
 
     def fit(self):
 
-        n = self.npdt
+        n = self._npdt
         self.coreg = copy.deepcopy(self.array)
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
         self.deformation = np.zeros(n)
@@ -77,7 +78,7 @@ class MDReg:
             if self.export_unregistered:
                 if it == 1: self.export_fit(name='_unregistered')
             deformation = self.fit_deformation()
-            improvement.append(maxnorm(self.deformation-deformation))
+            improvement.append(_maxnorm(self.deformation-deformation))
             self.deformation = deformation
             converged = improvement[-1] <= self.precision 
             if it == self.max_iterations: converged=True
@@ -108,9 +109,9 @@ class MDReg:
 
         start = time.time()
         print('Performing coregistration..')
-        nt = self.npdt[-1]
-        deformation = np.empty(self.npdt)
-        dict_param = elastix2dict(self.elastix) # Hack necessary for parallelization
+        nt = self._npdt[-1]
+        deformation = np.empty(self._npdt)
+        dict_param = _elastix2dict(self.elastix) # Hack necessary for parallelization
         # If mask isn't same shape as images, then don't use it
         if isinstance(mask, np.ndarray):
             if np.shape(mask) != self.array.shape: mask = None  
@@ -121,14 +122,14 @@ class MDReg:
                 else: 
                     mask_t = None
                 args = (self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask_t)
-                self.coreg[:,t], deformation[:,:,t] = coregister(args)
+                self.coreg[:,t], deformation[:,:,t] = _coregister(args)
         else:
             pool = multiprocessing.Pool(processes=os.cpu_count()-1)
             if mask is None:
                 args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask) for t in range(nt)] #dynamics
             else:
                 args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask[...,t]) for t in range(nt)] #dynamics
-            results = list(tqdm(pool.imap(coregister, args), total=nt, desc='Coregistration progress'))
+            results = list(tqdm(pool.imap(_coregister, args), total=nt, desc='Coregistration progress'))
             for t in range(nt):
                 self.coreg[:,t] = results[t][0]
                 deformation[:,:,t] = results[t][1]
@@ -146,7 +147,7 @@ class MDReg:
         print('Exporting data..')
         path = self.export_path 
         if not os.path.exists(path): os.mkdir(path)
-        export_animation(self.array, path, 'images')
+        _export_animation(self.array, path, 'images')
 
     def export_fit(self, name=''):
 
@@ -154,9 +155,10 @@ class MDReg:
         path = self.export_path 
         pars = self.signal_model.pars()
         if not os.path.exists(path): os.mkdir(path)
+        lower, upper = self.signal_model.bounds()
         for i in range(len(pars)):
-            export_imgs(self.pars[...,i], path, pars[i] + name)
-        export_animation(self.model_fit, path, 'modelfit' + name)
+            _export_imgs(self.pars[...,i], path, pars[i] + name, bounds=[lower[i],upper[i]])
+        _export_animation(self.model_fit, path, 'modelfit' + name)
 
     def export_registered(self):
 
@@ -165,16 +167,17 @@ class MDReg:
         if not os.path.exists(path): os.mkdir(path)
         defx = np.squeeze(self.deformation[:,:,0,:])
         defy = np.squeeze(self.deformation[:,:,1,:])
-        export_animation(self.coreg, path, 'coregistered')
-        export_animation(defx, path, 'deformation_field_x')
-        export_animation(defy, path, 'deformation_field_y')
-        export_animation(np.sqrt(defx**2 + defy**2), path, 'deformation_field')
+        _export_animation(self.coreg, path, 'coregistered')
+        _export_animation(defx, path, 'deformation_field_x')
+        _export_animation(defy, path, 'deformation_field_y')
+        _export_animation(np.sqrt(defx**2 + defy**2), path, 'deformation_field')
         self.iter.to_csv(os.path.join(path, 'largest_deformations.csv'))
 
 
-def export_animation(array, path, filename):
+def _export_animation(array, path, filename):
 
     file = os.path.join(path, filename + '.gif')
+    array[np.isnan(array)] = 0
     fig = plt.figure()
     im = plt.imshow(np.squeeze(array[:,:,0]).T, animated=True)
     def updatefig(i):
@@ -183,11 +186,12 @@ def export_animation(array, path, filename):
     anim.save(file)
     #plt.show()
 
-def export_imgs(array, path, filename):
+def _export_imgs(array, path, filename, bounds=[-np.inf, np.inf]):
 
     file = os.path.join(path, filename + '.png')
     array[np.isnan(array)] = 0
     array[np.isinf(array)] = 0
+    array = np.clip(array, bounds[0], bounds[1])
     plt.imshow(array.T)
     plt.clim(np.amin(array), np.amax(array))
     cBar = plt.colorbar()
@@ -195,7 +199,7 @@ def export_imgs(array, path, filename):
     plt.savefig(fname=file)
     plt.close()
 
-def maxnorm(d):
+def _maxnorm(d):
     """This function calculates diagnostics from the registration process.
 
     It takes as input the original deformation field and the new deformation field
@@ -206,10 +210,9 @@ def maxnorm(d):
     d = d[:,0,:]**2 + d[:,1,:]**2
     return np.nanmax(np.sqrt(d))
 
-def elastix2dict(elastix_model_parameters):
+def _elastix2dict(elastix_model_parameters):
     """
-        This function converts the non-pickable object elastix_model_parameters and converts it into a list of dictionaries.
-        This is only called when parallel=True and the purpose is to make the multiprocessing possible and successful.
+    Hack to allow parallel processing
     """
     list_dictionaries_parameters = []
     for index in range(elastix_model_parameters.GetNumberOfParameterMaps()):
@@ -221,10 +224,9 @@ def elastix2dict(elastix_model_parameters):
     return list_dictionaries_parameters
 
 
-def dict2elastix(list_dictionaries_parameters):
+def _dict2elastix(list_dictionaries_parameters):
     """
-        This function converts the list of dictionaries to the non-pickable object elastix_model_parameters during the itkElastix_MDR_coregistration processing.
-        This is only called when parallel=True and the purpose is to make the multiprocessing possible and successful.
+    Hack to allow parallel processing
     """
     elastix_model_parameters = itk.ParameterObject.New()
     for one_map in list_dictionaries_parameters:
@@ -232,11 +234,10 @@ def dict2elastix(list_dictionaries_parameters):
     return elastix_model_parameters
 
 
-# deformable registration for MDR
-def coregister(args):
+
+def _coregister(args):
     """
-        This function takes pair-wise unregistered source image and target image (per time-series point) as input 
-        and returns ffd based co-registered target image and its corresponding deformation field. 
+    Coregister two arrays and return coregistered + deformation field 
     """
     target, source, elastix_model_parameters, spacing, log, mask = args
     shape_source = np.shape(source)
@@ -266,7 +267,7 @@ def coregister(args):
         elastixImageFilter.SetMovingMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
 
     ## call the parameter map file specifying the registration parameters
-    elastix_model_parameters = dict2elastix(elastix_model_parameters) # Hack
+    elastix_model_parameters = _dict2elastix(elastix_model_parameters) # Hack
     elastixImageFilter.SetParameterObject(elastix_model_parameters)
 
     ## set additional options

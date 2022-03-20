@@ -5,11 +5,16 @@
 T2-mapping signal model-fit  
 2022 
 """
-
+import numpy as np
 from .exp_decay import main as exp_decay
 
 def pars():
     return ['S0', 'T2']
+
+def bounds():
+    lower = [0,0]
+    upper = [np.inf, 250]
+    return lower, upper
 
 def main(images, T2_prep_times):
     """ main function that performs the T2*-map signal model-fit for input 2D image at multiple time-points (TEs).

@@ -9,6 +9,11 @@ import numpy as np
 def pars():
     return ['const']
 
+def bounds():
+    lower = [-np.inf]
+    upper = [np.ing]
+    return lower, upper
+
 def main(images, dummy):
     """ main function that performs the T2*-map signal model-fit for input 2D image at multiple time-points (TEs).
 

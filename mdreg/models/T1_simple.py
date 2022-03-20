@@ -2,6 +2,9 @@
 @author: Steven Sourbron 
 T1-MOLLI model fit  
 2022  
+Messroghli DR, Radjenovic A, Kozerke S, Higgins DM, Sivananthan MU, Ridgway JP. 
+Modified Look-Locker inversion recovery (MOLLI) for high-resolution T1 mapping of the heart. 
+Magn Reson Med. 2004 Jul;52(1):141-6. doi: 10.1002/mrm.20110. PMID: 15236377. 
 """
 
 import numpy as np
@@ -9,6 +12,11 @@ from scipy.optimize import curve_fit
 
 def pars():
     return ['S0', 'alpha', 'T1']
+
+def bounds():
+    lower = [0, 1, 1.0] 
+    upper = [np.inf, 2.0, 3000.0]
+    return lower, upper
 
 
 def func(TI, S0, alpha, T1):

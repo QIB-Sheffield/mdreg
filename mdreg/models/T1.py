@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 @author: Kanishka Sharma  
-T2*-mapping signal model-fit  
+T1-mapping signal model-fit  
 2021  
+Messroghli DR, Radjenovic A, Kozerke S, Higgins DM, Sivananthan MU, Ridgway JP. 
+Modified Look-Locker inversion recovery (MOLLI) for high-resolution T1 mapping of the heart. 
+Magn Reson Med. 2004 Jul;52(1):141-6. doi: 10.1002/mrm.20110. PMID: 15236377. 
 """
 
 import os
@@ -13,6 +16,11 @@ import multiprocessing
 
 def pars():
     return ['A', 'B', 'T1app']
+
+def bounds():
+    lower = [0,0,0]
+    upper = [np.inf, np.inf, 3000]
+    return lower, upper
 
 def func(x, a, b, T1):
     """ exponential function for T1-fitting.

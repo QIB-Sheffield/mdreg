@@ -15,6 +15,11 @@ np.set_printoptions(threshold=sys.maxsize)
 def pars():
     return ['S0', 'ADC']
 
+def bounds():
+    lower = [0,0]
+    upper = [np.inf, 1.0]
+    return lower, upper
+
 
 def func(b, S0, ADC):
     """ mono-exponential decay function used to perform DWI-fitting.  
