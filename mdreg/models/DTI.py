@@ -6,6 +6,14 @@ iBEAt study DTI model fit for the MDR Library
 
 import numpy as np
 
+def pars():
+    return ['FA', 'ADC']
+
+def bounds():
+    lower = [0,0]
+    upper = [1.0, 10]
+    return lower, upper
+
 
 def DTI_fitting(im, b, thresh_val, method='linear'):
     """ DTI fit function.  
@@ -38,7 +46,7 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     I = im_matrix[mask]
     
     if not np.all(np.isreal(I)):
-        print('Some voxels are complex. Taking magnitude.')
+        # Some voxels are complex. Taking magnitude.'
         I = np.abs(I)
         
     # take the log of the image to linearise the equation
@@ -70,10 +78,11 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     M[np.isinf(M)]=0
     
     ### Initialize Variables
-    FA_mask = np.empty(sz[0]) 
-    ADC_mask = np.empty(sz[0]) 
+    npixels = np.shape(M)[0]
+    FA_mask = np.empty(npixels) 
+    ADC_mask = np.empty(npixels) 
 
-    for i in range(np.shape(M)[0]):
+    for i in range(npixels):
         
         # The DiffusionTensor (Remember it is a symetric matrix,
         # thus for instance Dxy == Dyx)
@@ -105,7 +114,7 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
         # FA definition:
         denominator = np.sqrt(EigenValues[0]**2+EigenValues[1]**2+EigenValues[2]**2)
         if denominator == 0:
-            FA_mask[i] = np.nan
+            FA_mask[i] = 0
         else:    
             FA_mask[i]=np.sqrt(1.5)*(np.sqrt((EigenValues[0]-ADCv)**2+(EigenValues[1]-ADCv)**2+(EigenValues[2]-ADCv)**2)/denominator)
         ADC_mask[i]=ADCv
@@ -113,8 +122,11 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     Bv_new_times_M_new = np.moveaxis(np.dot(Bv_new, M.T),0,-1).reshape(sz) 
     fit = np.exp(-Bv_new_times_M_new)
     
-    return fit, M, Bv_new, FA_mask, ADC_mask
-
+    par = np.empty((npixels, 2))
+    par[:,0] = FA_mask
+    par[:,1] = ADC_mask
+    
+    return fit, par
 
 
 def main(images_to_be_fitted, signal_model_parameters):
@@ -150,20 +162,10 @@ def main(images_to_be_fitted, signal_model_parameters):
     
     mask = np.ones(sz_mask)
 
-    ### Fitting
-    B = np.zeros((3, 3, len(b_values)))
+    ### b matrix
+    b = np.zeros((3, 3, len(b_values)))
     for idx_b in range(len(b_values)):
-        B[:, :, idx_b] = np.outer(np.outer(b_values[idx_b], bVec[idx_b,:].T), bVec[idx_b,:])
-
-    results = DTI_fitting(images_to_be_fitted, B, mask, 'linear')
-    fit = results[0]
-    M_new = results[1]
-    Bv_new = results[2]
-    fa = results[3]
-    adc = results[4]
-
-    fitted_parameters_tuple = (fa, adc) 
-    fitted_parameters = np.vstack(fitted_parameters_tuple)
+        b[:, :, idx_b] = np.outer(np.outer(b_values[idx_b], bVec[idx_b,:].T), bVec[idx_b,:])
   
-    return fit, fitted_parameters
+    return DTI_fitting(images_to_be_fitted, b, mask, 'linear')
 
