@@ -1,9 +1,0 @@
-itk-elastix
-matplotlib
-numpy
-pandas
-pdoc3
-Pillow
-scipy
-SimpleITK
-tqdm
