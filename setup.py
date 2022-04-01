@@ -16,14 +16,14 @@ with open('requirements.txt', encoding='utf-8') as f:
 
 # Get latest version published online in PYPI (https://pypi.org/project/mdreg/) 
 # and increment 0.0.1 (or other) so that it's uploaded correctly during Github Action
-#contents = urllib.request.urlopen('https://pypi.org/pypi/mdreg/json').read()
-#data = json.loads(contents)
-#LATEST_VERSION = data['info']['version']
-#latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
+contents = urllib.request.urlopen('https://pypi.org/pypi/mdreg/json').read()
+data = json.loads(contents)
+LATEST_VERSION = data['info']['version']
+latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
 new_major = "0"
-new_minor = "0"
-#new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
-new_patch = "1"
+new_minor = "2"
+new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
+
 NEW_VERSION = new_major + "." + new_minor + "." + new_patch
 
 if __name__ == '__main__':
