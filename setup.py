@@ -10,32 +10,36 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
     print(long_description)
 
-# Get latest version published online in PYPI (https://pypi.org/project/mdr-library/) 
+with open('requirements.txt', encoding='utf-8') as f:
+    required = f.read().splitlines()
+
+
+# Get latest version published online in PYPI (https://pypi.org/project/mdreg/) 
 # and increment 0.0.1 (or other) so that it's uploaded correctly during Github Action
-contents = urllib.request.urlopen('https://pypi.org/pypi/mdr-library/json').read()
-data = json.loads(contents)
-LATEST_VERSION = data['info']['version']
-latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
+#contents = urllib.request.urlopen('https://pypi.org/pypi/mdreg/json').read()
+#data = json.loads(contents)
+#LATEST_VERSION = data['info']['version']
+#latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
 new_major = "0"
-new_minor = "1"
+new_minor = "0"
 #new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
-new_patch = "10"
+new_patch = "1"
 NEW_VERSION = new_major + "." + new_minor + "." + new_patch
 
 if __name__ == '__main__':
     setup(
-        name="mdr-library",
+        name="mdreg",
         version=NEW_VERSION,
         author="Kanishka Sharma, Joao Almeida e Sousa and Steven Sourbron",
         author_email="kanishka.sharma@sheffield.ac.uk, j.g.sousa@sheffield.ac.uk, s.sourbron@sheffield.ac.uk",
         description="Open-source, platform independent library for Model Driven Registration (MDR) in quantitative renal MRI",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        url="https://github.com/QIB-Sheffield/MDR_Library",
+        url="https://github.com/QIB-Sheffield/mdreg",
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
-        packages=['MDR', 'models_signal'],
-        install_requires=["numpy", "pandas", "SimpleITK", "itk-elastix", "matplotlib", "Pillow", "pdoc3", "scipy", "tqdm"],
+        packages=['mdreg'],
+        install_requires=required,
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],
         # Classifiers - the purpose is to create a wheel and upload it to PYPI
@@ -44,7 +48,7 @@ if __name__ == '__main__':
             #   3 - Alpha
             #   4 - Beta
             #   5 - Production/Stable
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
 
             # Indicate who your project is intended for
             'Intended Audience :: Developers',

@@ -1,7 +1,7 @@
 
 """
 @author: Kanishka Sharma  
-iBEAt study DWI monoexponential model fit for the MDR Library  
+iBEAt study DWI monoexponential model fit for mdreg  
 2021  
 """
 

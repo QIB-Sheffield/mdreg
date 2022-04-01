@@ -1,6 +1,3 @@
-__all__ = ['MDReg']
-
-
 import time, os, copy
 import multiprocessing
 from tqdm import tqdm
