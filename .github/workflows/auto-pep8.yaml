@@ -1,5 +1,7 @@
 name: Format Python code of `mdreg` to PEP8 standards
-on: workflow_dispatch:
+
+on: workflow_dispatch
+
 jobs:
   autopep8:
     runs-on: ubuntu-latest
