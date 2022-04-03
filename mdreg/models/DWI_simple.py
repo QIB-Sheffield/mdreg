@@ -1,6 +1,6 @@
 """
 @author: Steven Sourbron 
-DWI monoexponential model fit for the MDR Library  
+DWI monoexponential model fit for mdreg  
 2022 
 """
 

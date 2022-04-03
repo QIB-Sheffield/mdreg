@@ -23,8 +23,8 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Publish package to PyPI
-        if: github.repository == 'QIB-Sheffield/MDR_Library' && github.event_name == 'workflow_dispatch'
+        if: github.repository == 'QIB-Sheffield/mdreg' && github.event_name == 'workflow_dispatch'
         uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+          password: ${{ secrets.PYPI_MDREG_PASSWORD }}

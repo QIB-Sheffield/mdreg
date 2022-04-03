@@ -1,6 +1,6 @@
 """
-@author: Kanishka Sharma - modified for MDR-Library from implementation of @Fotios Tagkalakis   
-iBEAt study DTI model fit for the MDR Library   
+@author: Kanishka Sharma - modified for mdreg from implementation of @Fotios Tagkalakis   
+iBEAt study DTI model fit for mdreg   
 2021 
 """
 

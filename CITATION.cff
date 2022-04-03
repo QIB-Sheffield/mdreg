@@ -10,8 +10,8 @@ authors:
 - family-names: "Sourbron"
   given-names: "Steven"
   orcid: "https://orcid.org/0000-0002-3374-3973"
-title: "MDR-Library"
-version: 0.1.0
+title: "mdreg"
+version: 0.2.0
 doi: 10.5281/zenodo.5849438
-date-released: 2022-01-14
+date-released: 2022-04-01
 url: "https://doi.org/10.5281/zenodo.5849438"

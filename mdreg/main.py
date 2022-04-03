@@ -1,6 +1,3 @@
-__all__ = ['MDReg']
-
-
 import time, os, copy
 import multiprocessing
 from tqdm import tqdm
@@ -24,8 +21,7 @@ class MDReg:
         self.signal_parameters = None
         self.pixel_spacing = 1.0
         self.signal_model = constant
-        self.elastix = itk.ParameterObject.New()
-        self.elastix.AddParameterFile(os.path.join(default_path, 'BSplines.txt'))
+        self.elastix = _default_bspline()
 
         # mdr optimization
         self.max_iterations = 5
@@ -174,6 +170,51 @@ class MDReg:
         self.iter.to_csv(os.path.join(path, 'largest_deformations.csv'))
 
 
+def _default_bspline(*argv):
+    param_obj = itk.ParameterObject.New()
+    parameter_map_bspline = param_obj.GetDefaultParameterMap('bspline')
+    param_obj.AddParameterMap(parameter_map_bspline)
+    param_obj.SetParameter("FixedInternalImagePixelType", "float")
+    param_obj.SetParameter("MovingInternalImagePixelType", "float")
+    param_obj.SetParameter("FixedImageDimension", "2")
+    param_obj.SetParameter("MovingImageDimension", "2")
+    param_obj.SetParameter("UseDirectionCosines", "true")
+    param_obj.SetParameter("Registration", "MultiResolutionRegistration")
+    param_obj.SetParameter("ImageSampler", "RandomCoordinate")
+    param_obj.SetParameter("Interpolator", "BSplineInterpolator")
+    param_obj.SetParameter("ResampleInterpolator", "FinalBSplineInterpolator")
+    param_obj.SetParameter("Resampler", "DefaultResampler")
+    param_obj.SetParameter("BSplineInterpolationOrder", "1")
+    param_obj.SetParameter("FinalBSplineInterpolationOrder", "1")
+    param_obj.SetParameter("FixedImagePyramid", "FixedSmoothingImagePyramid")
+    param_obj.SetParameter("MovingImagePyramid", "MovingSmoothingImagePyramid")
+    param_obj.SetParameter("Optimizer", "AdaptiveStochasticGradientDescent")
+    param_obj.SetParameter("HowToCombineTransforms", "Compose")
+    param_obj.SetParameter("Transform", "BSplineTransform")
+    param_obj.SetParameter("Metric", "AdvancedMeanSquares")
+    param_obj.SetParameter("NumberOfHistogramBins", "32")
+    param_obj.SetParameter("FinalGridSpacingInPhysicalUnits", ["50.0", "50.0"])
+    param_obj.SetParameter("NumberOfResolutions", "4")
+    param_obj.SetParameter("AutomaticParameterEstimation", "true")
+    param_obj.SetParameter("ASGDParameterEstimationMethod", "Original")
+    param_obj.SetParameter("MaximumNumberOfIterations", "500")
+    param_obj.SetParameter("MaximumStepLength", "0.1")
+    param_obj.SetParameter("NumberOfSpatialSamples", "2048")
+    param_obj.SetParameter("NewSamplesEveryIteration", "true")
+    param_obj.SetParameter("CheckNumberOfSamples", "true")
+    param_obj.SetParameter("ErodeMask", "false")
+    param_obj.SetParameter("ErodeFixedMask", "false")
+    param_obj.SetParameter("DefaultPixelValue", "0")
+    param_obj.SetParameter("WriteResultImage", "true")
+    param_obj.SetParameter("ResultImagePixelType", "float")
+    param_obj.SetParameter("ResultImageFormat", "mhd")
+    for list_arguments in argv:
+        parameter = str(list_arguments[0])
+        value = str(list_arguments[1])
+        param_obj.SetParameter(parameter, value)
+    return param_obj
+
+
 def _export_animation(array, path, filename):
 
     file = os.path.join(path, filename + '.gif')
@@ -185,6 +226,7 @@ def _export_animation(array, path, filename):
     anim = animation.FuncAnimation(fig, updatefig, interval=50, frames=array.shape[2])
     anim.save(file)
     #plt.show()
+
 
 def _export_imgs(array, path, filename, bounds=[-np.inf, np.inf]):
 
@@ -199,6 +241,7 @@ def _export_imgs(array, path, filename, bounds=[-np.inf, np.inf]):
     plt.savefig(fname=file)
     plt.close()
 
+
 def _maxnorm(d):
     """This function calculates diagnostics from the registration process.
 
@@ -209,6 +252,7 @@ def _maxnorm(d):
     """
     d = d[:,0,:]**2 + d[:,1,:]**2
     return np.nanmax(np.sqrt(d))
+
 
 def _elastix2dict(elastix_model_parameters):
     """
@@ -232,7 +276,6 @@ def _dict2elastix(list_dictionaries_parameters):
     for one_map in list_dictionaries_parameters:
         elastix_model_parameters.AddParameterMap(one_map)
     return elastix_model_parameters
-
 
 
 def _coregister(args):

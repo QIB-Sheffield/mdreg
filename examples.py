@@ -29,8 +29,8 @@ results = os.path.join(os.path.dirname(__file__), 'results')
 elastix_pars = os.path.join(os.path.dirname(__file__), 'elastix')
 
 # To read and write from/to other locations, set these path names
-data = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_data'
-results = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_results'
+#data = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_data'
+#results = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_results'
 
 
 
