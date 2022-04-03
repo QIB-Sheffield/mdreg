@@ -10,6 +10,7 @@ from PyQt5 import QtGui
 
 from .instance import Instance
 
+
 class Image(Instance):
     """Specific methods for the SOPClass MR Image Storage"""
 
@@ -17,32 +18,37 @@ class Image(Instance):
         """Initialize the attributes relevant for the Images"""
 
         super()._initialize(ref_ds)
-        
+
         self.ImageType.insert(0, "DERIVED")
 
     def array(self):
         """Read the pixel array from an image"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
-        if self.ds is None: return
+        if on_disk:
+            self.read()
+        if self.ds is None:
+            return
         array = self.ds.pixel_array.astype(np.float32)
-        slope = float(getattr(self.ds, 'RescaleSlope', 1)) 
-        intercept = float(getattr(self.ds, 'RescaleIntercept', 0)) 
+        slope = float(getattr(self.ds, 'RescaleSlope', 1))
+        intercept = float(getattr(self.ds, 'RescaleIntercept', 0))
         array = array * slope + intercept
         array = np.transpose(array)
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
         return array
 
     def set_array(self, array, value_range=None):
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
-        
-        if array.ndim >= 3: # remove spurious dimensions of 1
-            array = np.squeeze(array) 
+        if on_disk:
+            self.read()
+
+        if array.ndim >= 3:  # remove spurious dimensions of 1
+            array = np.squeeze(array)
         array = self.clip(array, value_range=value_range)
-        array, slope, intercept = self.scale_to_range(array, self.ds.BitsAllocated)
+        array, slope, intercept = self.scale_to_range(
+            array, self.ds.BitsAllocated)
         array = np.transpose(array)
 
         maximum = np.amax(array)
@@ -59,7 +65,7 @@ class Image(Instance):
         self.ds.Rows = shape[0]
         self.ds.Columns = shape[1]
         self.ds.PixelData = array.tobytes()
-        if on_disk: 
+        if on_disk:
             self.write()
             self.clear()
 
@@ -68,7 +74,7 @@ class Image(Instance):
 #        self.set_array(pixelArray, value_range=value_range)
 #        self.write()
 
-    def clip(self, array, value_range = None):
+    def clip(self, array, value_range=None):
 
         array[np.isnan(array)] = 0
         if value_range is None:
@@ -77,8 +83,8 @@ class Image(Instance):
         return np.clip(array, value_range[0], value_range[1])
 
     def scale_to_range(self, array, bits_allocated):
-            
-    #    target = np.power(2, bits_allocated) - 1
+
+        #    target = np.power(2, bits_allocated) - 1
         target = 2.0**bits_allocated - 1
         maximum = np.amax(array)
         minimum = np.amin(array)
@@ -110,12 +116,12 @@ class Image(Instance):
 
     def map_onto(self, target):
         """Map non-zero image pixels onto a target image.
-        
+
         Overwrite pixel values in the target"""
 
         # Create a coordinate array of non-zero pixels
-        coords = np.transpose(np.where(self.array() != 0)) 
-        coords = [[coord[0], coord[1], 0] for coord in coords] 
+        coords = np.transpose(np.where(self.array() != 0))
+        coords = [[coord[0], coord[1], 0] for coord in coords]
         coords = np.array(coords)
 
         # Determine coordinate transformation matrix
@@ -133,11 +139,12 @@ class Image(Instance):
         # Note - replace by actual values rather than 1 & 0.
         result = target.zeros()
         in_memory = self.in_memory()
-        if in_memory: result.read()
+        if in_memory:
+            result.read()
         pixelArray = result.array()
         pixelArray[(x, y)] = 1.0
         result.set_array(pixelArray)
-        if not in_memory: 
+        if not in_memory:
             result.write()
             result.clear()
 
@@ -147,12 +154,13 @@ class Image(Instance):
         """Affine transformation matrix for a DICOM image"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
 
         image_orientation = self.ds.ImageOrientationPatient
         image_position = self.ds.ImagePositionPatient
         pixel_spacing = self.ds.PixelSpacing
-        slice_spacing = self.ds.SliceThickness            
+        slice_spacing = self.ds.SliceThickness
 
         row_spacing = pixel_spacing[0]
         column_spacing = pixel_spacing[1]
@@ -167,7 +175,8 @@ class Image(Instance):
         affine[:3, 2] = slice_cosine * slice_spacing
         affine[:3, 3] = image_position
 
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
 
         return affine
 
@@ -175,7 +184,8 @@ class Image(Instance):
         """Returns the colormap if there is any."""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         ds = self.ds
 
         lut = None
@@ -184,104 +194,137 @@ class Image(Instance):
                 colormap = ds.ContentLabel
             elif 'MONOCHROME' in ds.PhotometricInterpretation:
                 colormap = 'gray'
-        elif len(ds.dir("PaletteColor"))>=3 and ds.PhotometricInterpretation == 'PALETTE COLOR':
+        elif len(ds.dir("PaletteColor")) >= 3 and ds.PhotometricInterpretation == 'PALETTE COLOR':
             colormap = 'custom'
             lut = self.get_lut()
         else:
-            colormap = 'gray' # default
+            colormap = 'gray'  # default
 
-        if on_disk: self.clear()
-        return colormap, lut  
+        if on_disk:
+            self.clear()
+        return colormap, lut
 
     def get_lut(self):
-        
+
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         ds = self.ds
 
         redColour = list(ds.RedPaletteColorLookupTableData)
         greenColour = list(ds.GreenPaletteColorLookupTableData)
         blueColour = list(ds.BluePaletteColorLookupTableData)
-        redLut = list(struct.unpack('<' + ('H' * ds.RedPaletteColorLookupTableDescriptor[0]), bytearray(redColour)))
-        greenLut = list(struct.unpack('<' + ('H' * ds.GreenPaletteColorLookupTableDescriptor[0]), bytearray(greenColour)))
-        blueLut = list(struct.unpack('<' + ('H' * ds.BluePaletteColorLookupTableDescriptor[0]), bytearray(blueColour)))
+        redLut = list(struct.unpack(
+            '<' + ('H' * ds.RedPaletteColorLookupTableDescriptor[0]), bytearray(redColour)))
+        greenLut = list(struct.unpack(
+            '<' + ('H' * ds.GreenPaletteColorLookupTableDescriptor[0]), bytearray(greenColour)))
+        blueLut = list(struct.unpack(
+            '<' + ('H' * ds.BluePaletteColorLookupTableDescriptor[0]), bytearray(blueColour)))
         colours = np.transpose([redLut, greenLut, blueLut])
-        normaliseFactor = int(np.power(2, ds.RedPaletteColorLookupTableDescriptor[2]))
+        normaliseFactor = int(
+            np.power(
+                2, ds.RedPaletteColorLookupTableDescriptor[2]))
         # Fast ColourTable loading
-        colourTable = np.around(colours/normaliseFactor, decimals = 2)
+        colourTable = np.around(colours / normaliseFactor, decimals=2)
         indexes = np.unique(colourTable, axis=0, return_index=True)[1]
         lut = [colourTable[index].tolist() for index in sorted(indexes)]
         # Full / Complete Colourmap - takes 20 seconds to load each image
-        # lut = (colours/normaliseFactor).tolist()   
-        if on_disk: self.clear()
-        return lut      
+        # lut = (colours/normaliseFactor).tolist()
+        if on_disk:
+            self.clear()
+        return lut
 
     def set_colormap(self, colormap=None, levels=None):
         """Set the colour table of the image."""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         ds = self.ds
 
-        #and (colormap != 'gray') removed from If statement below, so as to save gray colour tables
+        # and (colormap != 'gray') removed from If statement below, so as to
+        # save gray colour tables
         if (colormap == 'gray'):
             ds.PhotometricInterpretation = 'MONOCHROME2'
             ds.ContentLabel = ''
             if hasattr(ds, 'RedPaletteColorLookupTableData'):
-                del (ds.RGBLUTTransferFunction, ds.RedPaletteColorLookupTableData,
-                    ds.GreenPaletteColorLookupTableData, ds.BluePaletteColorLookupTableData,
-                    ds.RedPaletteColorLookupTableDescriptor, ds.GreenPaletteColorLookupTableDescriptor,
+                del (
+                    ds.RGBLUTTransferFunction,
+                    ds.RedPaletteColorLookupTableData,
+                    ds.GreenPaletteColorLookupTableData,
+                    ds.BluePaletteColorLookupTableData,
+                    ds.RedPaletteColorLookupTableDescriptor,
+                    ds.GreenPaletteColorLookupTableDescriptor,
                     ds.BluePaletteColorLookupTableDescriptor)
-        if ((colormap is not None)  and (colormap != 'custom') and (colormap != 'gray') 
-            and (colormap != 'default') and isinstance(colormap, str)):
+        if ((colormap is not None) and (colormap != 'custom') and (colormap != 'gray')
+                and (colormap != 'default') and isinstance(colormap, str)):
             ds.PhotometricInterpretation = 'PALETTE COLOR'
             ds.RGBLUTTransferFunction = 'TABLE'
             ds.ContentLabel = colormap
-            stringType = 'US' # ('SS' if minValue < 0 else 'US')
-            ds.PixelRepresentation = 0 # (1 if minValue < 0 else 0)
+            stringType = 'US'  # ('SS' if minValue < 0 else 'US')
+            ds.PixelRepresentation = 0  # (1 if minValue < 0 else 0)
             pixelArray = ds.pixel_array
             minValue = int(np.amin(pixelArray))
             maxValue = int(np.amax(pixelArray))
             numberOfValues = int(maxValue - minValue)
             arrayForRGB = np.arange(0, numberOfValues)
-            colorsList = cm.ScalarMappable(cmap=colormap).to_rgba(np.array(arrayForRGB), bytes=False)
+            colorsList = cm.ScalarMappable(
+                cmap=colormap).to_rgba(
+                np.array(arrayForRGB), bytes=False)
             totalBytes = ds.BitsAllocated
-            ds.add_new('0x00281101', stringType, [numberOfValues, minValue, totalBytes])
-            ds.add_new('0x00281102', stringType, [numberOfValues, minValue, totalBytes])
-            ds.add_new('0x00281103', stringType, [numberOfValues, minValue, totalBytes])
+            ds.add_new(
+                '0x00281101', stringType, [
+                    numberOfValues, minValue, totalBytes])
+            ds.add_new(
+                '0x00281102', stringType, [
+                    numberOfValues, minValue, totalBytes])
+            ds.add_new(
+                '0x00281103', stringType, [
+                    numberOfValues, minValue, totalBytes])
             ds.RedPaletteColorLookupTableData = bytes(np.array([int((np.power(
-                2, totalBytes) - 1) * value) for value in colorsList[:, 0].flatten()]).astype('uint'+str(totalBytes)))
+                2, totalBytes) - 1) * value) for value in colorsList[:, 0].flatten()]).astype('uint' + str(totalBytes)))
             ds.GreenPaletteColorLookupTableData = bytes(np.array([int((np.power(
-                2, totalBytes) - 1) * value) for value in colorsList[:, 1].flatten()]).astype('uint'+str(totalBytes)))
+                2, totalBytes) - 1) * value) for value in colorsList[:, 1].flatten()]).astype('uint' + str(totalBytes)))
             ds.BluePaletteColorLookupTableData = bytes(np.array([int((np.power(
-                2, totalBytes) - 1) * value) for value in colorsList[:, 2].flatten()]).astype('uint'+str(totalBytes)))
+                2, totalBytes) - 1) * value) for value in colorsList[:, 2].flatten()]).astype('uint' + str(totalBytes)))
         if levels is not None:
             ds.WindowCenter = levels[0]
             ds.WindowWidth = levels[1]
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
 
     def export_as_nifti(self, directory=None, filename=None):
         """Export 2D pixel Array in nifty format"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         ds = self.ds
-        if directory is None: 
-            directory = self.directory(message='Please select a folder for the nifty data')
+        if directory is None:
+            directory = self.directory(
+                message='Please select a folder for the nifty data')
         if filename is None:
             filename = self.SeriesDescription
         dicomHeader = nib.nifti1.Nifti1DicomExtension(2, ds)
-        niftiObj = nib.Nifti1Instance(np.flipud(np.rot90(np.transpose(self.array()))), affine=self.affine)
-        # The transpose is necessary in this case to be in line with the rest of WEASEL.
+        niftiObj = nib.Nifti1Instance(
+            np.flipud(
+                np.rot90(
+                    np.transpose(
+                        self.array()))),
+            affine=self.affine)
+        # The transpose is necessary in this case to be in line with the rest
+        # of WEASEL.
         niftiObj.header.extensions.append(dicomHeader)
         nib.save(niftiObj, directory + '/' + filename + '.nii.gz')
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
 
     def export_as_csv(self, directory=None, filename=None, columnHeaders=None):
         """Export 2D pixel Array in csv format"""
 
-        if directory is None: 
-            directory = self.directory(message='Please select a folder for the csv data')
+        if directory is None:
+            directory = self.directory(
+                message='Please select a folder for the csv data')
         if filename is None:
             filename = self.SeriesDescription
         filename = os.path.join(directory, filename + '.csv')
@@ -293,7 +336,7 @@ class Image(Instance):
                 counter += 1
                 columnHeaders.append("Column" + str(counter))
         df = pd.DataFrame(np.transpose(table), columns=columnHeaders)
-        df.to_csv(filename, index=False) 
+        df.to_csv(filename, index=False)
 
     def export_as_png(self, fileName):
         """Export image in png format."""
@@ -301,8 +344,8 @@ class Image(Instance):
         colourTable, _ = self.get_colormap()
         pixelArray = np.transpose(self.array())
         centre, width = self.window()
-        minValue = centre - width/2
-        maxValue = centre + width/2
+        minValue = centre - width / 2
+        maxValue = centre + width / 2
         cmap = plt.get_cmap(colourTable)
         plt.imshow(pixelArray, cmap=cmap)
         plt.clim(int(minValue), int(maxValue))
@@ -315,17 +358,21 @@ class Image(Instance):
         """Centre and width of the pixel data after applying rescale slope and intercept"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
-        if 'WindowCenter' in self.ds: centre = self.ds.WindowCenter
-        if 'WindowWidth' in self.ds: width = self.ds.WindowWidth
+        if on_disk:
+            self.read()
+        if 'WindowCenter' in self.ds:
+            centre = self.ds.WindowCenter
+        if 'WindowWidth' in self.ds:
+            width = self.ds.WindowWidth
         if centre is None or width is None:
             array = self.array()
-        if centre is None: 
+        if centre is None:
             centre = np.median(array)
-        if width is None: 
+        if width is None:
             p = np.percentile(array, [25, 75])
             width = p[1] - p[0]
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
         return centre, width
 
     def QImage(self):
@@ -333,8 +380,8 @@ class Image(Instance):
         width = self.WindowWidth
         center = self.WindowCenter
         imgData, alpha = _makeARGB(
-            data = self.array(), 
-            levels = [center-width/2, center+width/2],
+            data=self.array(),
+            levels=[center - width / 2, center + width / 2],
         )
         return _makeQImage(imgData, alpha)
 
@@ -342,42 +389,42 @@ class Image(Instance):
 # HELPER FUNCTIONS ADAPTED FROM ???
 
 
-def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False): 
-    """ 
+def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
+    """
     Convert an array of values into an ARGB array suitable for building QImages
-    
+
     Returns the ARGB array (unsigned byte) and a boolean indicating whether
     there is alpha channel data. This is a two stage process:
-    
+
         1) Rescale the data based on the values in the *levels* argument (min, max).
         2) Determine the final output by passing the rescaled values through a
            lookup table.
-   
+
     Both stages are optional.
-    
+
     ============== ==================================================================================
     **Arguments:**
-    data           numpy array of int/float types. If 
+    data           numpy array of int/float types. If
     levels         List [min, max]; optionally rescale data before converting through the
                    lookup table. The data is rescaled such that min->0 and max->*scale*::
-                   
+
                       rescaled = (clip(data, min, max) - min) * (*scale* / (max - min))
-                   
+
                    It is also possible to use a 2D (N,2) array of values for levels. In this case,
-                   it is assumed that each pair of min,max values in the levels array should be 
-                   applied to a different subset of the input data (for example, the input data may 
-                   already have RGB values and the levels are used to independently scale each 
+                   it is assumed that each pair of min,max values in the levels array should be
+                   applied to a different subset of the input data (for example, the input data may
+                   already have RGB values and the levels are used to independently scale each
                    channel). The use of this feature requires that levels.shape[0] == data.shape[-1].
-    scale          The maximum value to which data will be rescaled before being passed through the 
+    scale          The maximum value to which data will be rescaled before being passed through the
                    lookup table (or returned if there is no lookup table). By default this will
                    be set to the length of the lookup table, or 255 if no lookup table is provided.
     lut            Optional lookup table (array with dtype=ubyte).
                    Values in data will be converted to color by indexing directly from lut.
                    The output data shape will be input.shape + lut.shape[1:].
                    Lookup tables can be built using ColorMap or GradientWidget.
-    useRGBA        If True, the data is returned in RGBA order (useful for building OpenGL textures). 
-                   The default is False, which returns in ARGB order for use with QImage 
-                   (Note that 'ARGB' is a term used by the Qt documentation; the *actual* order 
+    useRGBA        If True, the data is returned in RGBA order (useful for building OpenGL textures).
+                   The default is False, which returns in ARGB order for use with QImage
+                   (Note that 'ARGB' is a term used by the Qt documentation; the *actual* order
                    is BGRA).
     ============== ==================================================================================
     """
@@ -386,21 +433,22 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
         raise TypeError("data must be 2D or 3D")
     if data.ndim == 3 and data.shape[2] > 4:
         raise TypeError("data.shape[2] must be <= 4")
-    
+
     if lut is not None and not isinstance(lut, np.ndarray):
         lut = np.array(lut)
-    
+
     if levels is None:
         # automatically decide levels based on data dtype
         if data.dtype.kind == 'u':
-            levels = np.array([0, 2**(data.itemsize*8)-1])
+            levels = np.array([0, 2**(data.itemsize * 8) - 1])
         elif data.dtype.kind == 'i':
-            s = 2**(data.itemsize*8 - 1)
-            levels = np.array([-s, s-1])
+            s = 2**(data.itemsize * 8 - 1)
+            levels = np.array([-s, s - 1])
         elif data.dtype.kind == 'b':
-            levels = np.array([0,1])
+            levels = np.array([0, 1])
         else:
-            raise Exception('levels argument is required for float input types')
+            raise Exception(
+                'levels argument is required for float input types')
     if not isinstance(levels, np.ndarray):
         levels = np.array(levels)
     if levels.ndim == 1:
@@ -408,11 +456,15 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
             raise Exception('levels argument must have length 2')
     elif levels.ndim == 2:
         if lut is not None and lut.ndim > 1:
-            raise Exception('Cannot make ARGB data when both levels and lut have ndim > 2')
+            raise Exception(
+                'Cannot make ARGB data when both levels and lut have ndim > 2')
         if levels.shape != (data.shape[-1], 2):
             raise Exception('levels must have shape (data.shape[-1], 2)')
     else:
-        raise Exception("levels argument must be 1D or 2D (got shape=%s)." % repr(levels.shape))
+        raise Exception(
+            "levels argument must be 1D or 2D (got shape=%s)." %
+            repr(
+                levels.shape))
 
     # Decide on maximum scaled value
     if scale is None:
@@ -425,20 +477,22 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
     if lut is None:
         dtype = np.ubyte
     else:
-        dtype = np.min_scalar_type(lut.shape[0]-1)
-            
+        dtype = np.min_scalar_type(lut.shape[0] - 1)
+
     # Apply levels if given
     if levels is not None:
         if isinstance(levels, np.ndarray) and levels.ndim == 2:
             # we are going to rescale each channel independently
             if levels.shape[0] != data.shape[-1]:
-                raise Exception("When rescaling multi-channel data, there must be the same number of levels as channels (data.shape[-1] == levels.shape[0])")
+                raise Exception(
+                    "When rescaling multi-channel data, there must be the same number of levels as channels (data.shape[-1] == levels.shape[0])")
             newData = np.empty(data.shape, dtype=int)
             for i in range(data.shape[-1]):
                 minVal, maxVal = levels[i]
                 if minVal == maxVal:
                     maxVal += 1e-16
-                newData[...,i] = _rescaleData(data[...,i], scale/(maxVal-minVal), minVal, dtype=dtype)
+                newData[..., i] = _rescaleData(
+                    data[..., i], scale / (maxVal - minVal), minVal, dtype=dtype)
             data = newData
         else:
             # Apply level scaling unless it would have no effect on the data
@@ -446,8 +500,9 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
             if minVal != 0 or maxVal != scale:
                 if minVal == maxVal:
                     maxVal += 1e-16
-                data = _rescaleData(data, scale/(maxVal-minVal), minVal, dtype=dtype)
-            
+                data = _rescaleData(
+                    data, scale / (maxVal - minVal), minVal, dtype=dtype)
+
     # apply LUT if given
     if lut is not None:
         data = _applyLookupTable(data, lut)
@@ -456,14 +511,15 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
             data = np.clip(data, 0, 255).astype(np.ubyte)
 
     # this will be the final image array
-    imgData = np.empty(data.shape[:2]+(4,), dtype=np.ubyte)
+    imgData = np.empty(data.shape[:2] + (4,), dtype=np.ubyte)
 
     # decide channel order
     if useRGBA:
-        order = [0,1,2,3] # array comes out RGBA
+        order = [0, 1, 2, 3]  # array comes out RGBA
     else:
-        order = [2,1,0,3] # for some reason, the colors line up as BGR in the final image.
-        
+        # for some reason, the colors line up as BGR in the final image.
+        order = [2, 1, 0, 3]
+
     # copy data into image array
     if data.ndim == 2:
         # This is tempting:
@@ -476,8 +532,8 @@ def _makeARGB(data, lut=None, levels=None, scale=None, useRGBA=False):
             imgData[..., i] = data[..., 0]
     else:
         for i in range(0, data.shape[2]):
-            imgData[..., i] = data[..., order[i]] 
-    
+            imgData[..., i] = data[..., order[i]]
+
     # add opaque alpha channel if needed
     if data.ndim == 2 or data.shape[2] == 3:
         alpha = False
@@ -495,11 +551,11 @@ def _makeQImage(imgData, alpha=None, copy=True, transpose=True):
     be reflected in the image. The image will be given aata' attribute
     pointing to the array which shares its data to prevent python
     freeing that memory while the image is in use.
-    
+
     ============== ===================================================================
     **Arguments:**
-    imgData        Array of data to convert. Must have shape (width, height, 3 or 4) 
-                   and dtype=ubyte. The order of values in the 3rd axis must be 
+    imgData        Array of data to convert. Must have shape (width, height, 3 or 4)
+                   and dtype=ubyte. The order of values in the 3rd axis must be
                    (b, g, r, a).
     alpha          If True, the QImage returned will have format ARGB32. If False,
                    the format will be RGB32. By default, _alpha_ is True if
@@ -508,55 +564,68 @@ def _makeQImage(imgData, alpha=None, copy=True, transpose=True):
                    If False, the new QImage points directly to the data in the array.
                    Note that the array must be contiguous for this to work
                    (see numpy.ascontiguousarray).
-    transpose      If True (the default), the array x/y axes are transposed before 
-                   creating the image. Note that Qt expects the axes to be in 
-                   (height, width) order whereas pyqtgraph usually prefers the 
+    transpose      If True (the default), the array x/y axes are transposed before
+                   creating the image. Note that Qt expects the axes to be in
+                   (height, width) order whereas pyqtgraph usually prefers the
                    opposite.
-    ============== ===================================================================    
+    ============== ===================================================================
     """
-    ## create QImage from buffer
-    
-    ## If we didn't explicitly specify alpha, check the array shape.
+    # create QImage from buffer
+
+    # If we didn't explicitly specify alpha, check the array shape.
     if alpha is None:
         alpha = (imgData.shape[2] == 4)
-        
+
     copied = False
-    if imgData.shape[2] == 3:  ## need to make alpha channel (even if alpha==False; QImage requires 32 bpp)
+    # need to make alpha channel (even if alpha==False; QImage requires 32 bpp)
+    if imgData.shape[2] == 3:
         if copy is True:
             d2 = np.empty(imgData.shape[:2] + (4,), dtype=imgData.dtype)
-            d2[:,:,:3] = imgData
-            d2[:,:,3] = 255
+            d2[:, :, :3] = imgData
+            d2[:, :, 3] = 255
             imgData = d2
             copied = True
         else:
-            raise Exception('Array has only 3 channels; cannot make QImage without copying.')
-    
+            raise Exception(
+                'Array has only 3 channels; cannot make QImage without copying.')
+
     if alpha:
         imgFormat = QtGui.QImage.Format_ARGB32
     else:
         imgFormat = QtGui.QImage.Format_RGB32
-        
+
     if transpose:
-        imgData = imgData.transpose((1, 0, 2))  ## QImage expects the row/column order to be opposite
+        # QImage expects the row/column order to be opposite
+        imgData = imgData.transpose((1, 0, 2))
 
     if not imgData.flags['C_CONTIGUOUS']:
         if copy is False:
             extra = ' (try setting transpose=False)' if transpose else ''
-            raise Exception('Array is not contiguous; cannot make QImage without copying.'+extra)
+            raise Exception(
+                'Array is not contiguous; cannot make QImage without copying.' + extra)
         imgData = np.ascontiguousarray(imgData)
         copied = True
-        
+
     if copy is True and copied is False:
-        imgData = imgData.copy()       
+        imgData = imgData.copy()
     try:
-        img = QtGui.QImage(imgData.ctypes.data, imgData.shape[1], imgData.shape[0], imgFormat)
-    except:
-        img = QtGui.QImage(memoryview(imgData), imgData.shape[1], imgData.shape[0], imgFormat)
-                
+        img = QtGui.QImage(
+            imgData.ctypes.data,
+            imgData.shape[1],
+            imgData.shape[0],
+            imgFormat)
+    except BaseException:
+        img = QtGui.QImage(
+            memoryview(imgData),
+            imgData.shape[1],
+            imgData.shape[0],
+            imgFormat)
+
     img.data = imgData
-    
+
     return img
-    
+
+
 def _applyLookupTable(data, lut):
     """
     Uses values in *data* as indexes to select values from *lut*.
@@ -564,33 +633,33 @@ def _applyLookupTable(data, lut):
     """
     if data.dtype.kind not in ('i', 'u'):
         data = data.astype(int)
-    
-    return np.take(lut, data, axis=0, mode='clip')  
+
+    return np.take(lut, data, axis=0, mode='clip')
 
 
 def _rescaleData(data, scale, offset, dtype=None, clip=None):
     """Return data rescaled and optionally cast to a new dtype::
-    
+
         data => (data-offset) * scale
-        
+
     """
     if dtype is None:
         dtype = data.dtype
     else:
         dtype = np.dtype(dtype)
-    
+
     try:
         newData = np.empty((data.size,), dtype=dtype)
         flat = np.ascontiguousarray(data).reshape(data.size)
-        newData = (flat - offset)*scale 
-        if dtype != dtype: 
+        newData = (flat - offset) * scale
+        if dtype != dtype:
             newData = newData.astype(dtype)
         data = newData.reshape(data.shape)
-    except:
-        
+    except BaseException:
+
         d2 = data - float(offset)
         d2 *= scale
-        
+
         # Clip before converting dtype to avoid overflow
         if dtype.kind in 'ui':
             lim = np.iinfo(dtype)

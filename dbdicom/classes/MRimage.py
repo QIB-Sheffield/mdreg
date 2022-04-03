@@ -2,6 +2,7 @@ import struct
 import numpy as np
 from .image import Image
 
+
 class MRImage(Image):
     """Specific methods for the SOPClass MR Image Storage"""
 
@@ -9,8 +10,9 @@ class MRImage(Image):
         """Read the pixel array from an MR image"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
-        if [0x2005, 0x100E] in self.ds: # 'Philips Rescale Slope'
+        if on_disk:
+            self.read()
+        if [0x2005, 0x100E] in self.ds:  # 'Philips Rescale Slope'
             pixelArray = self.ds.pixel_array.astype(np.float32)
             slope = self.ds[(0x2005, 0x100E)].value
             intercept = self.ds[(0x2005, 0x100D)].value
@@ -19,18 +21,22 @@ class MRImage(Image):
             array = pixelArray
         else:
             array = super().array()
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
         return array
-        
+
     def set_array(self, pixelArray, value_range=None):
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
-        if (0x2005, 0x100E) in self.ds: del self.ds[0x2005, 0x100E]  # Delete 'Philips Rescale Slope'
-        if (0x2005, 0x100D) in self.ds: del self.ds[0x2005, 0x100D]
+        if on_disk:
+            self.read()
+        if (0x2005, 0x100E) in self.ds:
+            del self.ds[0x2005, 0x100E]  # Delete 'Philips Rescale Slope'
+        if (0x2005, 0x100D) in self.ds:
+            del self.ds[0x2005, 0x100D]
         super().set_array(pixelArray, value_range=value_range)
         self.write()
-        if on_disk: 
+        if on_disk:
             self.write()
             self.clear()
 
@@ -38,15 +44,22 @@ class MRImage(Image):
         """Determine if an image is Magnitude, Phase, Real or Imaginary image or None"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         if (0x0043, 0x102f) in self.ds:
             private_ge = self.ds[0x0043, 0x102f]
-            try: value = struct.unpack('h', private_ge.value)[0]
-            except: value = private_ge.value
-            if value == 0: return 'MAGNITUDE'
-            if value == 1: return 'PHASE'
-            if value == 2: return 'REAL'
-            if value == 3: return 'IMAGINARY'
+            try:
+                value = struct.unpack('h', private_ge.value)[0]
+            except BaseException:
+                value = private_ge.value
+            if value == 0:
+                return 'MAGNITUDE'
+            if value == 1:
+                return 'PHASE'
+            if value == 2:
+                return 'REAL'
+            if value == 3:
+                return 'IMAGINARY'
         if 'ImageType' in self.ds:
             type = set(self.ds.ImageType)
             if set(['M', 'MAGNITUDE']).intersection(type):
@@ -59,13 +72,15 @@ class MRImage(Image):
                 return 'IMAGINARY'
         if 'ComplexImageComponent' in self.ds:
             return self.ds.ComplexImageComponent
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
 
     def signal_type(self):
         """Determine if an image is Water, Fat, In-Phase, Out-phase image or None"""
 
         on_disk = self.on_disk()
-        if on_disk: self.read()
+        if on_disk:
+            self.read()
         flagWater = False
         flagFat = False
         flagInPhase = False
@@ -74,13 +89,14 @@ class MRImage(Image):
             type = set(self.ds.ImageType)
             if set(['W', 'WATER']).intersection(type):
                 flagWater = True
-            elif set(['F', 'FAT']).intersection(type):# or ('B0' in dataset.ImageType) or ('FIELD_MAP' in dataset.ImageType):
+            # or ('B0' in dataset.ImageType) or ('FIELD_MAP' in
+            # dataset.ImageType):
+            elif set(['F', 'FAT']).intersection(type):
                 flagFat = True
             elif set(['IP', 'IN_PHASE']).intersection(type):
                 flagInPhase = True
             elif set(['OP', 'OUT_PHASE']).intersection(type):
                 flagOutPhase = True
-        if on_disk: self.clear()
+        if on_disk:
+            self.clear()
         return flagWater, flagFat, flagInPhase, flagOutPhase
-
-

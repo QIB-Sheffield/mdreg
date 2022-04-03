@@ -7,6 +7,7 @@ import pydicom
 import pandas as pd
 import numpy as np
 
+
 def dataframe(files, tags, status=None):
     """Reads a list of tags in a list of files.
 
@@ -14,7 +15,7 @@ def dataframe(files, tags, status=None):
     ---------
     files : str or list
         A filepath or a list of filepaths
-    tags : str or list 
+    tags : str or list
         A DICOM tag or a list of DICOM tags
     status : StatusBar
 
@@ -22,7 +23,7 @@ def dataframe(files, tags, status=None):
     -------
     dataframe : pandas.DataFrame
         A Pandas dataframe with one row per file
-        The index is the file path 
+        The index is the file path
         Each column corresponds to a Tag in the list of Tags
         The returned dataframe is sorted by the given tags.
     """
@@ -32,7 +33,8 @@ def dataframe(files, tags, status=None):
         tags = [tags]
     array = []
     dicom_files = []
-    if status is not None: status.message('Reading DICOM folder..')
+    if status is not None:
+        status.message('Reading DICOM folder..')
     for i, file in enumerate(files):
         ds = pydicom.dcmread(file, force=True)
         if isinstance(ds, pydicom.dataset.FileDataset):
@@ -40,35 +42,39 @@ def dataframe(files, tags, status=None):
                 row = _read_tags(ds, tags)
                 array.append(row)
                 dicom_files.append(file)
-        if status is not None: status.progress(i, len(files))
-    if status is not None: status.hide()
-    return pd.DataFrame(array, index = dicom_files, columns = tags)
+        if status is not None:
+            status.progress(i, len(files))
+    if status is not None:
+        status.hide()
+    return pd.DataFrame(array, index=dicom_files, columns=tags)
+
 
 def _read_tags(ds, tags):
     """Helper function return a list of values"""
 
     # https://pydicom.github.io/pydicom/stable/guides/element_value_types.html
-    if not isinstance(tags, list): 
+    if not isinstance(tags, list):
         if tags not in ds:
             return None
         else:
-        #    return ds[tags].value
+            #    return ds[tags].value
             return _convert_attribute_type(ds[tags].value)
-            
-    row = []  
+
+    row = []
     for tag in tags:
         if tag not in ds:
             value = None
         else:
-        #    value = ds[tag].value
+            #    value = ds[tag].value
             value = _convert_attribute_type(ds[tag].value)
         row.append(value)
     return row
 
+
 def _convert_attribute_type(value):
     """Convert pyidcom datatypes to the python datatypes used to set the parameter.
-    
-    While this removes some functionality, this aligns with the principle 
+
+    While this removes some functionality, this aligns with the principle
     of `dbdicom` to remove DICOM-native langauge from the API.
     """
 
@@ -76,27 +82,28 @@ def _convert_attribute_type(value):
         return str(value)
     if value.__class__.__name__ == 'Sequence':
         return [ds for ds in value]
-    if value.__class__.__name__ == 'TM': # This can probably do with some formatting
-        return str(value) 
-    if value.__class__.__name__ == 'UID': 
-        return str(value) 
-    if value.__class__.__name__ == 'IS': 
+    if value.__class__.__name__ == 'TM':  # This can probably do with some formatting
         return str(value)
-    if value.__class__.__name__ == 'DT': 
+    if value.__class__.__name__ == 'UID':
         return str(value)
-    if value.__class__.__name__ == 'DA': 
+    if value.__class__.__name__ == 'IS':
         return str(value)
-    if value.__class__.__name__ == 'DSfloat': 
+    if value.__class__.__name__ == 'DT':
+        return str(value)
+    if value.__class__.__name__ == 'DA':
+        return str(value)
+    if value.__class__.__name__ == 'DSfloat':
         return float(value)
-    if value.__class__.__name__ == 'DSdecimal': 
+    if value.__class__.__name__ == 'DSdecimal':
         return int(value)
     else:
         return value
 
+
 def _set_tags(ds, tags, values):
     """Sets DICOM tags in the dataset in memory"""
 
-    if not isinstance(tags, list): 
+    if not isinstance(tags, list):
         tags = [tags]
         values = [values]
     for i, tag in enumerate(tags):
@@ -105,16 +112,17 @@ def _set_tags(ds, tags, values):
         else:
             if not isinstance(tag, pydicom.tag.BaseTag):
                 tag = pydicom.tag.Tag(tag)
-            if not tag.is_private: # Add a new data element
+            if not tag.is_private:  # Add a new data element
                 VR = pydicom.datadict.dictionary_VR(tag)
                 ds.add_new(tag, VR, values[i])
             else:
-                pass # for now
+                pass  # for now
+
 
 def _filter(objects, **kwargs):
     """
     Filters a list of DICOM classes by DICOM tags and values.
-    
+
     Example
     -------
     instances = _filter(instances, PatientName="Harry")
@@ -127,9 +135,10 @@ def _filter(objects, **kwargs):
             if getattr(obj, tag) != value:
                 select = False
                 break
-        if select: 
+        if select:
             filtered.append(obj)
     return filtered
+
 
 def split_multiframe(filepath, description):
     """Splits a multi-frame instance into single frames"""
@@ -137,13 +146,25 @@ def split_multiframe(filepath, description):
     multiframeDir = os.path.dirname(filepath)
     fileBase = "SingleFrame_"
     fileBaseFlag = fileBase + "000000_" + description.replace('.', '_')
-    command = [program('emf2sf'), "--inst-no", "'%s'", "--not-chseries", "--out-dir", multiframeDir, "--out-file", fileBaseFlag, filepath]
+    command = [
+        program('emf2sf'),
+        "--inst-no",
+        "'%s'",
+        "--not-chseries",
+        "--out-dir",
+        multiframeDir,
+        "--out-file",
+        fileBaseFlag,
+        filepath]
     try:
         fail = subprocess.call(command, stdout=subprocess.PIPE)
     except Exception as e:
         fail = 1
-        print('Error in dcm4che: Could not split the detected Multi-frame DICOM file.\n'\
-                'The DICOM file ' + filepath + ' was not deleted.')
+        print(
+            'Error in dcm4che: Could not split the detected Multi-frame DICOM file.\n'
+            'The DICOM file ' +
+            filepath +
+            ' was not deleted.')
 
     # Return a list of newly created files
     multiframe_files_list = []
@@ -151,17 +172,18 @@ def split_multiframe(filepath, description):
         for new_file in os.listdir(multiframeDir):
             if new_file.startswith(fileBase):
                 new_file_path = os.path.join(multiframeDir, new_file)
-                multiframe_files_list.append(new_file_path)     
-                # Slice Locations need to be copied from a private field 
+                multiframe_files_list.append(new_file_path)
+                # Slice Locations need to be copied from a private field
                 ds = pydicom.dcmread(new_file_path, force=True)
-                ds.SliceLocation = ds[0x2001,0x100a].value
+                ds.SliceLocation = ds[0x2001, 0x100a].value
                 ds.save_as(new_file_path)
     return multiframe_files_list
+
 
 def program(script):
     """Helper function: Find the program for a script"""
 
-    if os.name =='nt': 
+    if os.name == 'nt':
         script += '.bat'
     program = script
     # If running Weasel as executable
@@ -177,6 +199,7 @@ def program(script):
                 program = os.path.join(dirpath, filename)
     return program
 
+
 def scan_tree(directory):
     """Helper function: yield DirEntry objects for the directory."""
 
@@ -186,9 +209,10 @@ def scan_tree(directory):
         else:
             yield entry
 
+
 def _stack_arrays(arrays, align_left=False):
     """Stack a list of arrays of different shapes but same number of dimensions.
-    
+
     The stack has the size of the largest array.
     If an array is smaller it is zero-padded and centred on the middle.
     """
@@ -208,10 +232,10 @@ def _stack_arrays(arrays, align_left=False):
         for i, d in enumerate(dim):
             if align_left:
                 i0 = 0
-            else: # align center and zero-pad missing values
-                i0 = math.floor((d-array.shape[i])/2)
+            else:  # align center and zero-pad missing values
+                i0 = math.floor((d - array.shape[i]) / 2)
             i1 = i0 + array.shape[i]
-            index.append(slice(i0,i1))
+            index.append(slice(i0, i1))
         stack[tuple(index)] = array
 
     return stack

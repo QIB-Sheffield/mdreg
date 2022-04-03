@@ -10,6 +10,7 @@ from pydicom.sequence import Sequence
 from .record import Record
 from .. import utilities
 
+
 class Instance(Record):
 
     def __init__(self, folder, UID=[]):
@@ -19,7 +20,8 @@ class Instance(Record):
 
         if row is None:
             data = self.data()
-            if data.empty: return "New Instance"
+            if data.empty:
+                return "New Instance"
             file = data.index[0]
             nr = data.at[file, 'InstanceNumber']
         else:
@@ -30,14 +32,14 @@ class Instance(Record):
     @property
     def file(self):
         """Returns the filepath to the instance."""
- 
+
         files = self.files
-        if len(files) != 0:  
+        if len(files) != 0:
             return files[0]
 
     def __getitem__(self, tags):
         """Gets the value of the data elements with specified tags.
-        
+
         Arguments
         ---------
         tags : a string, hexadecimal tuple, or a list of strings and hexadecimal tuples
@@ -47,10 +49,10 @@ class Instance(Record):
         A value or a list of values
         """
         in_memory = self.in_memory()
-        if not in_memory: 
+        if not in_memory:
             self.read()
-        values = utilities._read_tags(self.ds, tags)   
-        if not in_memory: 
+        values = utilities._read_tags(self.ds, tags)
+        if not in_memory:
             self.clear()
         return values
 
@@ -59,7 +61,7 @@ class Instance(Record):
         Sets the value of the data element with given tag.
         """
         on_disk = self.on_disk()
-        if on_disk: 
+        if on_disk:
             self.read()
         utilities._set_tags(self.ds, tags, values)
         if on_disk:
@@ -69,27 +71,28 @@ class Instance(Record):
     def write(self):
         """Writes the dataset to disk"""
 
-        if self.on_disk(): return
+        if self.on_disk():
+            return
         ds = self.ds
 
         # Ensure DICOM hierarchy is respected
-        if not 'PatientID' in ds:
+        if 'PatientID' not in ds:
             ds.PatientID = pydicom.uid.generate_uid()
-        if not 'StudyInstanceUID' in ds:
+        if 'StudyInstanceUID' not in ds:
             ds.StudyInstanceUID = pydicom.uid.generate_uid()
-        if not 'SeriesInstanceUID' in ds:
-            ds.SeriesInstanceUID = pydicom.uid.generate_uid()    
-        if not 'SOPInstanceUID' in ds:
-            ds.SOPInstanceUID = pydicom.uid.generate_uid()    
+        if 'SeriesInstanceUID' not in ds:
+            ds.SeriesInstanceUID = pydicom.uid.generate_uid()
+        if 'SOPInstanceUID' not in ds:
+            ds.SOPInstanceUID = pydicom.uid.generate_uid()
 
         df = self.data()
-        if df.empty: # Data exist in memory only
+        if df.empty:  # Data exist in memory only
             self.folder._append(ds, checked=True)
-        else: 
-            file = df.index[0] 
-            if not df.loc[file,'created']:  # This is the first change 
-                self.folder.dataframe.loc[file,'removed'] = True
-                self.folder._append(ds, checked=df.loc[file,'checked'])
+        else:
+            file = df.index[0]
+            if not df.loc[file, 'created']:  # This is the first change
+                self.folder.dataframe.loc[file, 'removed'] = True
+                self.folder._append(ds, checked=df.loc[file, 'checked'])
             else:   # Update values in dataframe row
                 self.folder._update(file, ds)
 
@@ -97,11 +100,11 @@ class Instance(Record):
 
     def _save_ds(self, file=None):
 
-        if file is None: 
+        if file is None:
             file = self.file
         try:
-            self.ds.save_as(file) 
-        except:
+            self.ds.save_as(file)
+        except BaseException:
             message = "Failed to write to " + file
             message += "\n The file is open in another application, or is being synchronised by a cloud service."
             message += "\n Please close the file or pause the synchronisation and try again."
@@ -110,38 +113,38 @@ class Instance(Record):
     def clear(self):
         """Clears the dataset in memory"""
 
-        self.__dict__['ds'] = None 
+        self.__dict__['ds'] = None
 
     def read(self):
         """Reads the dataset into memory."""
 
         file = self.file
-        if file is None: 
+        if file is None:
             return
         try:
             self.ds = pydicom.dcmread(file)
-        except:
+        except BaseException:
             message = "Failed to read " + file
             message += "\n Please read the DICOM folder again via File->Read."
-            self.dialog.information(message)            
-        return self.ds # return self instead so read can be piped: series.read().copy_to(parent)
+            self.dialog.information(message)
+        return self.ds  # return self instead so read can be piped: series.read().copy_to(parent)
 
     def copy_to(self, ancestor):
         """copy instance to a new ancestor.
-        
+
         dicom_object: Root, Patient, Study, or Series
-            If the object is not a series, the missing 
+            If the object is not a series, the missing
             intermediate generations are automatically created.
         """
         # Generate new instance
         copy = self.__class__(self.folder, UID=ancestor.UID)
 
-        if self.in_memory(): # Create the copy in memory
+        if self.in_memory():  # Create the copy in memory
             copy.__dict__['ds'] = deepcopy(self.ds)
             copy._initialize(self.ds)
             if ancestor.in_memory():
                 ancestor.ds.append(copy)
-        else: # Create copy on disk
+        else:  # Create copy on disk
             self.read()
             copy.__dict__['ds'] = self.ds
             copy._initialize(self.ds)
@@ -149,26 +152,26 @@ class Instance(Record):
             copy._save_ds()
             self.clear()
             if ancestor.in_memory():
-                ancestor.ds.append(copy) 
-            else:       
+                ancestor.ds.append(copy)
+            else:
                 copy.clear()
-            
+
         return copy
 
     def save(self):
         """
         Saves all changes made in the instance
         """
-        self.write() 
+        self.write()
         rows = self.folder.dataframe.SOPInstanceUID == self.UID[-1]
-        data = self.folder.dataframe[rows] 
+        data = self.folder.dataframe[rows]
         created = data.created[data.created]
         removed = data.removed[data.removed]
 
-        if data.shape[0] == 2: # instance has been modified
+        if data.shape[0] == 2:  # instance has been modified
             created = created.index
             removed = removed.index
-            if created.empty or removed.empty: 
+            if created.empty or removed.empty:
                 message = 'DICOM dataset ' + self.file
                 message += "\n Source data have been corrupted."
                 message += "\n In your DICOM folder, remove the folder Weasel"
@@ -176,9 +179,9 @@ class Instance(Record):
                 message += "\n Then read the DICOM folder again."
                 self.dialog.error(message)
                 return
-            try: # save changes in original file
+            try:  # save changes in original file
                 shutil.copyfile(created[0], removed[0])
-            except:
+            except BaseException:
                 message = "DICOM files have been removed or are open in another application."
                 message += '\n Close the files and try again.'
                 self.dialog.error(message)
@@ -187,12 +190,12 @@ class Instance(Record):
             self.folder.dataframe.drop(created, inplace=True)
             self.folder.dataframe.loc[removed, 'removed'] = False
 
-        elif not removed.empty: # instance has been deleted
+        elif not removed.empty:  # instance has been deleted
             index = removed.index
             os.remove(index[0])
             self.folder.dataframe.drop(index, inplace=True)
-            
-        elif not created.empty: # instance has been newly created
+
+        elif not created.empty:  # instance has been newly created
             self.folder.dataframe.loc[created.index, 'created'] = False
 
     def restore(self):
@@ -200,20 +203,22 @@ class Instance(Record):
         Reverses all changes made since the last save.
         """
         in_memory = self.in_memory()
-        self.clear() 
+        self.clear()
         rows = self.folder.dataframe[self.key[-1]] == self.UID[-1]
-        data = self.folder.dataframe[rows] 
+        data = self.folder.dataframe[rows]
         created = data.created[data.created]
         removed = data.removed[data.removed]
-        if not removed.empty: # restore deleted files
+        if not removed.empty:  # restore deleted files
             index = removed.index
             self.folder.dataframe.loc[index, 'removed'] = False
-        if not created.empty: # delete new files
+        if not created.empty:  # delete new files
             index = created.index
             file = index[0]
-            self.folder.dataframe.drop(index, inplace = True)
-            if os.path.exists(file): os.remove(file)
-        if in_memory: self.read()
+            self.folder.dataframe.drop(index, inplace=True)
+            if os.path.exists(file):
+                os.remove(file)
+        if in_memory:
+            self.read()
 
     def export(self, path):
         """Export instances to an external folder.
@@ -221,18 +226,20 @@ class Instance(Record):
         This will create another copy of the same instance.
         The instance itself will not be removed from the DICOM folder.
         Instead a copy of the file will be copied to the external folder.
-        
+
         Arguments
         ---------
         path : str
             path to an external folder.
         """
         in_memory = self.in_memory()
-        if not in_memory: self.read()
+        if not in_memory:
+            self.read()
         filename = os.path.basename(self.file)
         destination = os.path.join(path, filename)
         self._save_ds(destination)
-        if not in_memory: self.clear()
+        if not in_memory:
+            self.clear()
 
     def _initialize(self, ref_ds=None):
         """Initialize the attributes relevant for the Images"""
@@ -256,7 +263,8 @@ class Instance(Record):
         self.ds.InstanceCreationDate = dt.strftime('%Y%m%d')
         self.ds.InstanceCreationTime = timeStr
 
-        if ref_ds is None: return
+        if ref_ds is None:
+            return
 
         # Series, Instance and Class for Reference
         refd_instance = Dataset()

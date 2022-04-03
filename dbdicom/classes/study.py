@@ -1,16 +1,18 @@
 from .record import Record
 
+
 class Study(Record):
 
     def __init__(self, folder, UID=[]):
-        
+
         super().__init__(folder, UID, generation=2)
 
     def label(self, row=None):
 
         if row is None:
             data = self.data()
-            if data.empty: return "New Study"
+            if data.empty:
+                return "New Study"
             file = data.index[0]
             descr = data.at[file, 'StudyDescription']
             date = data.at[file, 'StudyDate']

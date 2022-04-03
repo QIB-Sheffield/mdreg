@@ -6,8 +6,3 @@ class SecondaryCaptureImage(Image):
 
     def dummy(self):
         pass
-
-
-
-
-

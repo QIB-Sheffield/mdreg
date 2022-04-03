@@ -14,107 +14,129 @@ def test_df():
 
     columns = ['Bool', 'Name', 'Age', 'Stream', 'Percentage']
     record = {
-        'Bool' : [True, True, False, True, False, True] , 
-        'Name': ['Ankit', 'Amit', 'Aishwarya', 'Priyanka', 'Priya', 'Shaurya' ],
+        'Bool': [True, True, False, True, False, True],
+        'Name': ['Ankit', 'Amit', 'Aishwarya', 'Priyanka', 'Priya', 'Shaurya'],
         'Age': [21, 19, 20, 18, 17, 21],
         'Stream': ['Math', 'Commerce', 'Science', 'Math', 'Math', 'Science'],
-        'Percentage': [88, 92, 95, 70, 65, 78] } 
-    df = pd.DataFrame(record, 
-        columns = columns, 
-        index = ['A','A','C',None,'E','F'])
+        'Percentage': [88, 92, 95, 70, 65, 78]}
+    df = pd.DataFrame(record,
+                      columns=columns,
+                      index=['A', 'A', 'C', None, 'E', 'F'])
     print(df)
+
 
 def test_set_array_mip():
     pass
 
+
 def test_set_slice_array_invert():
 
-    folder = Folder(test_folder2).open() # enhancement: open automatically on init
+    # enhancement: open automatically on init
+    folder = Folder(test_folder2).open()
     instance = folder.series(12).instances(0)
     array = instance.array()
     instance.set_array(-array)
     array_invert = instance.array()
 
-    print('These should be equal: ', np.sum(np.square(array)), np.sum(np.square(array_invert)))
+    print(
+        'These should be equal: ', np.sum(
+            np.square(array)), np.sum(
+            np.square(array_invert)))
     print('This should be zero: ', np.sum(np.square(array + array_invert)))
 
     col = 3
-    fig = plt.figure(figsize=(16,16))
-    i=0
-    fig.add_subplot(1,col,i+1)
+    fig = plt.figure(figsize=(16, 16))
+    i = 0
+    fig.add_subplot(1, col, i + 1)
     plt.imshow(array)
     plt.colorbar()
-    i=1
-    fig.add_subplot(1,col,i+1)
+    i = 1
+    fig.add_subplot(1, col, i + 1)
     plt.imshow(array_invert)
     plt.colorbar()
-    i=2
-    fig.add_subplot(1,col,i+1)
-    plt.imshow(array+array_invert)
+    i = 2
+    fig.add_subplot(1, col, i + 1)
+    plt.imshow(array + array_invert)
     plt.colorbar()
     plt.show()
     folder.restore()
+
 
 def test_set_array_invert():
 
-    folder = Folder(test_folder2).open() # enhancement: open automatically on init
-    series = folder.series(12) # T1-MOLLI multi-TI
+    # enhancement: open automatically on init
+    folder = Folder(test_folder2).open()
+    series = folder.series(12)  # T1-MOLLI multi-TI
     array, _ = series.array()
     invert = series.copy().set_array(-array)
     array_invert, _ = invert.array()
-    print('Round-off error (%): ', 100*np.sum(np.square(array + array_invert))/np.sum(np.square(array)))
+    print(
+        'Round-off error (%): ',
+        100 *
+        np.sum(
+            np.square(
+                array +
+                array_invert)) /
+        np.sum(
+            np.square(array)))
     col = 3
-    fig = plt.figure(figsize=(16,16))
-    i=0
-    fig.add_subplot(1,col,i+1)
-    plt.imshow(array[0,:,:])
+    fig = plt.figure(figsize=(16, 16))
+    i = 0
+    fig.add_subplot(1, col, i + 1)
+    plt.imshow(array[0, :, :])
     plt.colorbar()
-    i=1
-    fig.add_subplot(1,col,i+1)
-    plt.imshow(array_invert[0,:,:])
+    i = 1
+    fig.add_subplot(1, col, i + 1)
+    plt.imshow(array_invert[0, :, :])
     plt.colorbar()
-    i=2
-    fig.add_subplot(1,col,i+1)
-    plt.imshow(array[0,:,:]+array_invert[0,:,:])
+    i = 2
+    fig.add_subplot(1, col, i + 1)
+    plt.imshow(array[0, :, :] + array_invert[0, :, :])
     plt.colorbar()
     plt.show()
 
     folder.restore()
+
 
 def test_sort_series():
 
     folder = Folder(test_folder2).open()
-    series = folder.series(12) # T1-MOLLI multi-TI
+    series = folder.series(12)  # T1-MOLLI multi-TI
 #    data = series.sort(['SliceLocation','InversionTime', 'PatientName'])
-    data = series.dataset(['SliceLocation','InversionTime', 'PatientName'])
-    print(data[0,0,0,0].__class__.__name__)
+    data = series.dataset(['SliceLocation', 'InversionTime', 'PatientName'])
+    print(data[0, 0, 0, 0].__class__.__name__)
     print(data.shape)
-    print(data[0,0,0,0].SliceLocation)
-    print(data[0,0,0,0].InversionTime)
-    print(data[0,0,0,0].PatientName)
-    loc = [data[z,0,0,0].SliceLocation for z in range(data.shape[0])]
+    print(data[0, 0, 0, 0].SliceLocation)
+    print(data[0, 0, 0, 0].InversionTime)
+    print(data[0, 0, 0, 0].PatientName)
+    loc = [data[z, 0, 0, 0].SliceLocation for z in range(data.shape[0])]
     print(loc)
+
 
 def test_read_series_array():
 
     folder = Folder(test_folder2).open()
-    series = folder.series(12) # T1-MOLLI multi-TI
-    array, data = series.array(['SliceLocation','InversionTime', 'PatientName'], pixels_first=True)
+    series = folder.series(12)  # T1-MOLLI multi-TI
+    array, data = series.array(
+        ['SliceLocation', 'InversionTime', 'PatientName'], pixels_first=True)
     print(array.shape)
     print(data.shape)
-    print([data[0,0,0,0].SliceLocation, data[0,0,0,0].InversionTime, data[0,0,0,0].PatientName])
+    print([data[0, 0, 0, 0].SliceLocation, data[0, 0, 0,
+                                                0].InversionTime, data[0, 0, 0, 0].PatientName])
+
 
 def test_read_and_open():
 
-    folder = Folder(path = test_folder)
+    folder = Folder(path=test_folder)
     folder.scan()
     folder.print()
     folder.open()
     folder.print()
 
+
 def test_retrieve():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
 
     print('Printing SeriesDescription of all series in the folder')
@@ -133,37 +155,46 @@ def test_retrieve():
     print('Description of the first series of the first study of the first patient')
     print(folder.patients(0).studies(0).series(0).SeriesDescription)
 
+
 def test_find():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     print('Find series with series description ax 15 flip and given PatientID')
-    series = folder.patients(0).series(SeriesDescription="ax 15 flip", PatientID='RIDER Neuro MRI-5244517593')
-    for s in series: print(s.SeriesDescription) 
+    series = folder.patients(0).series(
+        SeriesDescription="ax 15 flip",
+        PatientID='RIDER Neuro MRI-5244517593')
+    for s in series:
+        print(s.SeriesDescription)
+
 
 def test_read_item_instance():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
-    tags = ['SeriesDescription', (0x0010, 0x0020), (0x0010, 0x0020), 'PatientID', (0x0011, 0x0020)]
+    tags = ['SeriesDescription',
+            (0x0010, 0x0020), (0x0010, 0x0020), 'PatientID', (0x0011, 0x0020)]
     instance = folder.instances(0)
     print(instance.PatientID)
     print(instance[tags])
 
+
 def test_read_item():
 
-    folder = Folder(path = test_folder)  
+    folder = Folder(path=test_folder)
     folder.scan()
-    tags = ['SeriesDescription', (0x0010, 0x0020), (0x0010, 0x0020), 'PatientID', (0x0011, 0x0020)]
+    tags = ['SeriesDescription',
+            (0x0010, 0x0020), (0x0010, 0x0020), 'PatientID', (0x0011, 0x0020)]
     series = folder.series(0)
     print(series.PatientID)
     print(series[tags])
     patient = folder.patients(0)
     print(patient[tags])
 
+
 def test_set_attr_instance():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     instance = folder.instances(0)
 
@@ -181,9 +212,10 @@ def test_set_attr_instance():
 
     folder.restore()
 
+
 def test_set_item_instance():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     instance = folder.instances(0)
 
@@ -201,9 +233,10 @@ def test_set_item_instance():
 
     folder.restore()
 
+
 def test_set_item():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     series = folder.series(0)
     instance = series.instances(1)
@@ -230,20 +263,21 @@ def test_set_item():
     print('2nd IMAGE')
     print('New Slice location: ' + str(values[0]))
     print('New Acquisition Time: ' + str(values[1]))
-    print('New Clinical Trial Sponsor: ' + str(values[2]))    
+    print('New Clinical Trial Sponsor: ' + str(values[2]))
 
     folder.restore()
 
+
 def test_copy_remove_instance():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     folder.print()
-    
+
     print('****************************************')
     print('MOVE AND COPY FROM ONE SERIES TO ANOTHER')
     print('****************************************')
-    
+
     parent = folder.patients(0).studies(0).series(7)
     instance = parent.instances(0)
     new_parent = folder.patients(0).studies(0).series(6)
@@ -282,33 +316,34 @@ def test_copy_remove_instance():
 
     folder.restore()
 
+
 def test_create():
 
-    folder = Folder(path = test_folder) 
-    folder.scan()  
+    folder = Folder(path=test_folder)
+    folder.scan()
     patient = folder.new_child()
     study = patient.new_child()
     series = study.new_child()
     instance = series.new_child()
     print(instance.UID)
 
+
 def test_copy_remove():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
-    folder.print() 
+    folder.print()
     # create a new study and copy the first series to it.
     study = folder.patients(0).new_child()
     folder.series(0).copy_to(study)
     folder.print()
     folder.restore()
 
+
 def test_merge():
 
-
-
     # first create two new patients
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
 
     print('')
@@ -335,13 +370,12 @@ def test_merge():
             study.copy_to(patient3)
     folder.print()
 
-
     print('')
     print('***************************************')
     print('            MERGE ALL STUDIES          ')
     print('***************************************')
 
-    # now merge all studies of the new patient 
+    # now merge all studies of the new patient
     # into a new study of the same patient.
     studies_to_merge = patient3.studies()
     new_study = patient3.new_child()
@@ -374,7 +408,7 @@ def test_save_restore():
     print('            ORIGINAL FOLDER            ')
     print('***************************************')
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     folder.print()
 
@@ -416,13 +450,14 @@ def test_save_restore():
     folder.save()
     folder.print()
 
+
 def test_read_write_dataset():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
 
     instance = folder.instances(0)
-    ds = instance.read() # work from memory
+    ds = instance.read()  # work from memory
     print('Original rows and columns')
     print(ds.Rows)
     print(ds.Columns)
@@ -433,14 +468,14 @@ def test_read_write_dataset():
     print(ds.Rows)
     print(ds.Columns)
 
-    matrix = ['Rows','Columns']
+    matrix = ['Rows', 'Columns']
     d = instance[matrix]
-    instance[matrix] = [int(d[0]*2), int(d[1]*2)]
+    instance[matrix] = [int(d[0] * 2), int(d[1] * 2)]
     print('Modified rows and columns again')
     print(ds.Rows)
     print(ds.Columns)
-    
-    ds = instance.read() # read original values from disk again
+
+    ds = instance.read()  # read original values from disk again
     print('Original rows and columns')
     print(ds.Rows)
     print(ds.Columns)
@@ -449,30 +484,32 @@ def test_read_write_dataset():
     instance.write()
     instance.clear()
 
-    instance.read() # read original values from disk again
+    instance.read()  # read original values from disk again
     print('Modified rows and columns')
     print(instance.Rows)
     print(instance.Columns)
     instance.clear()
 
-    print('Modified rows and columns') #  read from disk
+    print('Modified rows and columns')  # read from disk
     print(instance.Rows)
     print(instance.Columns)
 
-    folder.restore()    
+    folder.restore()
+
 
 def test_export():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     instance = folder.instances(0)
     instance.export(test_export_folder)
     series = folder.series(0)
     series.export(test_export_folder)
 
+
 def test_SOPClass():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.scan()
     for instance in folder.instances():
         print(instance.__class__.__name__)
@@ -480,7 +517,7 @@ def test_SOPClass():
 
 def test_checking():
 
-    folder = Folder(path = test_folder) 
+    folder = Folder(path=test_folder)
     folder.open()
     folder.check()
     folder.uncheck()
@@ -520,9 +557,8 @@ def test_all():
     test_save_restore()
     test_read_write_dataset()
     test_export()
-    test_SOPClass() 
+    test_SOPClass()
     test_checking()
-    
 
 
 # For development purposes
