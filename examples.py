@@ -1,19 +1,5 @@
 """
-MDR tutorial showing how to motion-correct DICOM data.
-
-The tutorial uses the DICOM example data provided *here*. 
-
-The `dicomdb` package is used to read the DICOM data 
-and return numpy arrays. 
-
-In order to run the tutorial as is, extract the data in a folder 
-"data" in the same directory as this script.
-The results will be saved in a folder "results".
-
-In order to read and write from other locations, 
-change the path names in the script below.
-
-Then just run this module as a script.
+Example uses of mdreg
 """
 
 import os
@@ -29,8 +15,8 @@ results = os.path.join(os.path.dirname(__file__), 'results')
 elastix_pars = os.path.join(os.path.dirname(__file__), 'elastix')
 
 # To read and write from/to other locations, set these path names
-#data = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_data'
-#results = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_results'
+data = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_data'
+results = 'C:\\Users\\steve\\Dropbox\\Data\\mdr_results'
 
 
 
@@ -324,8 +310,8 @@ if __name__ == '__main__':
 #    fit_T1()
 #    fit_T2_simple()
 #    fit_T2()
-#    fit_T2star_simple()
-    fit_T2star()
+    fit_T2star_simple()
+#    fit_T2star()
 #    fit_DCE_2CFM()
 #    fit_DTI()
 #    fit_constant()   

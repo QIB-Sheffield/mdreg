@@ -5,7 +5,7 @@
 Pixel-by-pixel exponential decay fit 
 2022
 """
-import tqdm
+from tqdm import tqdm
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -58,7 +58,7 @@ def main(images, t,
     par = np.empty((shape[0], 2)) 
     fit = np.empty(shape)
 
-    for x in tqdm(range(shape[0]), dec='Fitting exponential decay'):
+    for x in tqdm(range(shape[0]), desc='Fitting exponential decay'):
 
         signal = images[x,:]
         p0 = [np.max(signal)*initial_value[0], initial_value[1]]

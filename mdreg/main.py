@@ -170,7 +170,7 @@ class MDReg:
         self.iter.to_csv(os.path.join(path, 'largest_deformations.csv'))
 
 
-def _default_bspline(*argv):
+def _default_bspline():
     param_obj = itk.ParameterObject.New()
     parameter_map_bspline = param_obj.GetDefaultParameterMap('bspline')
     param_obj.AddParameterMap(parameter_map_bspline)
@@ -208,10 +208,6 @@ def _default_bspline(*argv):
     param_obj.SetParameter("WriteResultImage", "true")
     param_obj.SetParameter("ResultImagePixelType", "float")
     param_obj.SetParameter("ResultImageFormat", "mhd")
-    for list_arguments in argv:
-        parameter = str(list_arguments[0])
-        value = str(list_arguments[1])
-        param_obj.SetParameter(parameter, value)
     return param_obj
 
 
