@@ -11,7 +11,7 @@ def pars():
 
 def bounds():
     lower = [-np.inf]
-    upper = [np.ing]
+    upper = [np.inf]
     return lower, upper
 
 def main(images, dummy):

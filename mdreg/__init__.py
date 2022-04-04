@@ -1,3 +1,3 @@
-from mdreg.main import *
+from . import main, models
+from .main import *
 __all__ = ['MDReg']
-from mdreg.models import *
