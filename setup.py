@@ -21,7 +21,8 @@ data = json.loads(contents)
 LATEST_VERSION = data['info']['version']
 latest_major, latest_minor, latest_patch = LATEST_VERSION.split(".")
 new_major = "0"
-new_minor = "2"
+new_minor = "3"
+new_patch = "0"
 new_patch = str(int(latest_patch) + 1)  # The authors can modify this to be minor or major versions instead
 
 NEW_VERSION = new_major + "." + new_minor + "." + new_patch
