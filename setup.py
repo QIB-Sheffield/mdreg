@@ -38,7 +38,7 @@ if __name__ == '__main__':
         url="https://github.com/QIB-Sheffield/mdreg",
         license='Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)',
         python_requires='>=3.6, <4',
-        packages=['mdreg'],
+        packages=['mdreg', 'mdreg.models'],
         install_requires=required,
         include_package_data=True,
         keywords=['python', "medical imaging", "DICOM", "MRI", "renal", "kidney", "motion correction", "registration"],

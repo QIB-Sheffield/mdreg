@@ -8,7 +8,7 @@ import matplotlib.animation as animation
 import itk
 import SimpleITK as sitk
 
-from mdreg.models import constant
+from .models import constant
 
 default_path = os.path.dirname(__file__)
 
