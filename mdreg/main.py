@@ -22,6 +22,9 @@ class MDReg:
         self.pixel_spacing = 1.0
         self.signal_model = constant
         self.elastix = _default_bspline()
+        self.coreg_mask = None
+        self.parallel = True
+        self.log = False
 
         # mdr optimization
         self.max_iterations = 5
@@ -73,7 +76,7 @@ class MDReg:
             self.fit_signal()
             if self.export_unregistered:
                 if it == 1: self.export_fit(name='_unregistered')
-            deformation = self.fit_deformation()
+            deformation = self.fit_deformation(parallel=self.parallel, log=self.log, mask=self.coreg_mask)
             improvement.append(_maxnorm(self.deformation-deformation))
             self.deformation = deformation
             converged = improvement[-1] <= self.precision 
