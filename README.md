@@ -50,6 +50,8 @@ mdr.read_elastix(par_file)
 mdr.fit()
 ```
 
+`im_mask` must be a binary (0s and 1s) or boolean (Trues and Falses) image array in numpy format with the same dimensions as `im`.
+
 The signal model often depends on fixed constants and signal parameters 
 such as sequence parameters in MRI, or patient-specific constants. These 
 should all be grouped in a list and set before running the signal model. 
