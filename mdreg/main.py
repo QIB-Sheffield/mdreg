@@ -18,11 +18,11 @@ class MDReg:
 
         # input
         self.array = None
+        self.coreg_mask = None
         self.signal_parameters = None
         self.pixel_spacing = 1.0
         self.signal_model = constant
         self.elastix = _default_bspline()
-        self.coreg_mask = None
         self.parallel = True
         self.log = False
 
@@ -52,6 +52,11 @@ class MDReg:
         self.coreg = array
         n = self._npdt
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
+    
+    def set_mask(self, mask_array):
+        self.coreg_mask = mask_array
+        n = self._npdt
+        self.coreg_mask = np.reshape(self.coreg_mask, (n[0],n[2]))
 
     def read_elastix(self, file):
         self.elastix.AddParameterFile(file)
@@ -76,7 +81,7 @@ class MDReg:
             self.fit_signal()
             if self.export_unregistered:
                 if it == 1: self.export_fit(name='_unregistered')
-            deformation = self.fit_deformation(parallel=self.parallel, log=self.log, mask=self.coreg_mask)
+            deformation = self.fit_deformation()
             improvement.append(_maxnorm(self.deformation-deformation))
             self.deformation = deformation
             converged = improvement[-1] <= self.precision 
@@ -104,7 +109,7 @@ class MDReg:
         self.pars = np.reshape(pars, shape[:-1] + (pars.shape[-1],))
         print('Finished fitting signal model (' + str((time.time()-start)/60) + ' min)')
 
-    def fit_deformation(self, parallel=True, log=False, mask=None):
+    def fit_deformation(self):
 
         start = time.time()
         print('Performing coregistration..')
@@ -112,22 +117,24 @@ class MDReg:
         deformation = np.empty(self._npdt)
         dict_param = _elastix2dict(self.elastix) # Hack necessary for parallelization
         # If mask isn't same shape as images, then don't use it
-        if isinstance(mask, np.ndarray):
-            if np.shape(mask) != self.array.shape: mask = None  
-        if not parallel:
+        if isinstance(self.coreg_mask, np.ndarray):
+            if np.shape(self.coreg_mask) != self.array.shape: mask = None
+            else: mask = self.coreg_mask
+        else: mask = None
+        if not self.parallel:
             for t in tqdm(range(nt), desc='Coregistration progress'): #dynamics
                 if mask is not None: 
                     mask_t = mask[...,t]
                 else: 
                     mask_t = None
-                args = (self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask_t)
+                args = (self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask_t)
                 self.coreg[:,t], deformation[:,:,t] = _coregister(args)
         else:
             pool = multiprocessing.Pool(processes=os.cpu_count()-1)
             if mask is None:
-                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask) for t in range(nt)] #dynamics
+                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask) for t in range(nt)] #dynamics
             else:
-                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, log, mask[...,t]) for t in range(nt)] #dynamics
+                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask[...,t]) for t in range(nt)] #dynamics
             results = list(tqdm(pool.imap(_coregister, args), total=nt, desc='Coregistration progress'))
             for t in range(nt):
                 self.coreg[:,t] = results[t][0]
