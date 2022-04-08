@@ -4,6 +4,7 @@ numpy
 pandas
 pdoc3
 Pillow
+requests
 scipy
 SimpleITK
 tqdm

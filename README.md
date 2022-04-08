@@ -36,8 +36,7 @@ MDR can be configured to apply different signal models and elastix coregistratio
 A number of example models and alternative elastix parameter files are included 
 in the distribution as templates.
 
-The following example fits a mono-exponential decay and applies an elastix parameter file 
-`par_file` optimized for a previous DTI-MRI study:
+The following example fits a mono-exponential decay, uses a mask `im_mask` for co-registration and applies an elastix parameter file `par_file` optimized for a previous DTI-MRI study:
 
 ```python
 from mdreg import MDReg
@@ -45,10 +44,13 @@ from mdreg.models import exponential_decay
 
 mdr = MDReg()
 mdr.set_array(im)
+mdr.set_mask(im_mask)
 mdr.signal_model = exponential_decay
 mdr.read_elastix(par_file)
 mdr.fit()
 ```
+
+`im_mask` must be a binary (0s and 1s) or boolean (Trues and Falses) image array in numpy format with the same dimensions as `im`.
 
 The signal model often depends on fixed constants and signal parameters 
 such as sequence parameters in MRI, or patient-specific constants. These 
@@ -57,7 +59,9 @@ should all be grouped in a list and set before running the signal model.
 Equally elastix parameters can be fine tuned, either by importing a 
 dedicated elastix file, or by modifying the settings. 
 
-Then a number of parameters are available to optimize MDR such as 
+You may also choose if you wish to run the process in multiple cores (`parallel`) and to print the co-registration progress to the terminal plus a text file (`log`) or not.
+
+Then, a number of parameters are available to optimize MDR such as 
 the precision (stopping criterion) and maximum number of iterations.
 
 Some examples:
@@ -75,6 +79,8 @@ mdr.signal_model = exponential_decay
 mdr.set_elastix(MaximumNumberOfIterations = 256)   # change defaults
 mdr.precision = 0.5         # default = 1
 mdr.max_iterations = 3      # default = 5
+mdr.parallel = False        # default = True
+mdr.log = True              # default = False
 mdr.fit()
 ```
 
