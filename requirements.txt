@@ -1,4 +1,4 @@
-dbdicom==0.0.5
+dbdicom==0.0.6
 itk-elastix
 matplotlib
 numpy
