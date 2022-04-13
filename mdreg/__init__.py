@@ -6,7 +6,8 @@ if req.status_code == requests.codes.ok:
     req = req.json()  # the response is a JSON
     content = base64.b64decode(req['content'])
     introduction = content.decode()
-__doc__ = introduction
+    __doc__ = introduction
+req.close()
 
 from .main import *
 __all__ = ['MDReg', 'models']
