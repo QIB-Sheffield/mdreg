@@ -7,7 +7,7 @@ try:
         req = req.json()  # the response is a JSON
         content = base64.b64decode(req['content'])
         introduction = content.decode()
-    __doc__ = introduction
+        __doc__ = introduction
 except: # if there's no internet connection
     pass
 
