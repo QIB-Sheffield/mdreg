@@ -12,7 +12,7 @@ import SimpleITK as sitk
 
 from .models import constant
 
-
+default_path = os.path.dirname(__file__)
 
 class MDReg:
 
@@ -38,7 +38,7 @@ class MDReg:
         self.deformation = None
         self.pars = None
         self.iter = None
-        self.export_path = os.path.join(os.path.dirname(__file__), 'results')
+        self.export_path = os.path.join(default_path, 'results')
         self.export_unregistered = False
 
         # status
