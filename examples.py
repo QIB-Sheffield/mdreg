@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from dbdicom import Folder
+from dbdicom.folder import Folder
 from mdreg import MDReg
 import mdreg.models as mdl
 
