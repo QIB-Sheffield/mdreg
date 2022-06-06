@@ -24,8 +24,8 @@ class MDReg:
         self.signal_parameters = None
         self.pixel_spacing = 1.0
         self.signal_model = constant
-        self.elastix = elastix_template()
-        self.parallel = True
+        self.elastix = default_bspline()
+        self.parallel = False # Turning this on somehow causes weasel to relaunch
         self.log = False
 
         # mdr optimization
@@ -39,7 +39,13 @@ class MDReg:
         self.pars = None
         self.iter = None
         self.export_path = os.path.join(os.path.dirname(__file__), 'results')
-        self.export_unregistered = True
+        self.export_unregistered = False
+
+        # status
+        self.status = None
+        self.pinned_message = ''
+        self.message = ''
+        self.iteration = 1
 
     @property
     def _npdt(self): 
@@ -182,7 +188,7 @@ class MDReg:
         self.iter.to_csv(os.path.join(path, 'largest_deformations.csv'))
 
 
-def elastix_template():
+def default_bspline():
     param_obj = itk.ParameterObject.New()
     parameter_map_bspline = param_obj.GetDefaultParameterMap('bspline')
     param_obj.AddParameterMap(parameter_map_bspline)
