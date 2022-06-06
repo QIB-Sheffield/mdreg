@@ -12,4 +12,3 @@ except: # if there's no internet connection
     pass
 
 from .main import *
-__all__ = ['MDReg', 'models']

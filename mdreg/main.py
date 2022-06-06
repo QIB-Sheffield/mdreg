@@ -1,4 +1,4 @@
-__all__ = ['MDReg', 'elastix_template']
+__all__ = ['MDReg', 'default_bspline']
 
 import time, os, copy
 import multiprocessing
@@ -125,7 +125,6 @@ class MDReg:
     def fit_deformation(self):
 
         msg = self.pinned_message + ', fitting deformation field (iteration ' + str(self.iteration) + ')'
-        print(msg)
         if self.status is not None:
             self.status.message(msg)
         start = time.time()
