@@ -10,7 +10,7 @@ Run `pip install mdreg`.
 ## Example data
 Example data in [DICOM format](https://shorturl.at/rwCUV) are provided for testing the setup.
 
-## How to use
+## How to run
 Input data must be image arrays in numpy format, with dimensions `(x,y,z,t)` or `(x,y,t)`. 
 To perform MDR on an image array `im` with default settings do: 
 
@@ -22,13 +22,16 @@ mdr.set_array(im)
 mdr.fit()
 ```
 
-When fitting is complete the motion-corrected data are in `mdr.coreg` in the same dimensions 
-as the original `im`. The calculated deformation fields in format `(x,y,d,t)` or `(x,y,z,d,t)` 
-can be found as `mdr.deformation`. The dimension `d` holds `x`, `y` components 
-of the deformation field, and a third `z` component if the input array is 3D.
-
-The default settings will apply a linear signal model and coregistration 
+These default settings will apply a linear signal model and coregistration 
 as defined in the elastix parameter file `Bsplines.txt`. 
+
+## Outputs
+When fitting is complete the following data are available:
+
+- `mdr.coreg`: motion-corrected data are in the same dimensions as the original `im`. 
+- `mdr.deformation`: the calculated deformation fields in format `(x,y,d,t)` or `(x,y,z,d,t)`. The dimension `d` holds `x`, `y` components of the deformation field. The third `z` component exists if the input array is 3D. 
+- `mdr.fit`: the model fit to the coregistered images in the same dimensions `(x,y,z,t)` or `(x,y,t)` as the original `im`. 
+- `mdr.par`: the fitted parameters are in dimensions `(x,z,p)` or `(x,y,z,p)` (for 3D data), where `p` enumerates the model parameters.
 
 # Customization
 
@@ -50,7 +53,7 @@ mdr.read_elastix(par_file)
 mdr.fit()
 ```
 
-`im_mask` must be a binary (0s and 1s) or boolean (Trues and Falses) image array in numpy format with the same dimensions as `im`.
+`im_mask` must be a binary (0's and 1's) or boolean (True's and False's) image array in numpy format with the same dimensions as `im`.
 
 The signal model often depends on fixed constants and signal parameters 
 such as sequence parameters in MRI, or patient-specific constants. These 
