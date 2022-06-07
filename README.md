@@ -4,6 +4,8 @@ for quantitative medical imaging applications.
 
 The distribution comes with a number of common signal models and uses [ITK-Elastix](https://github.com/InsightSoftwareConsortium/ITKElastix) for deformable image registration.
 
+***CAUTION: mdreg is developed in public but is work in progress and backwards compatibility is not guaranteed. It is likely there WILL be breaking changes in future versions***
+
 ## Installation
 Run `pip install mdreg`. 
 
