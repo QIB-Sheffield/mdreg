@@ -1,7 +1,6 @@
 __all__ = ['MDReg', 'default_bspline']
 
 import time, os, copy
-import multiprocessing
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
@@ -25,7 +24,6 @@ class MDReg:
         self.pixel_spacing = 1.0
         self.signal_model = constant
         self.elastix = default_bspline()
-        self.parallel = False # Turning this on somehow causes weasel to relaunch
         self.log = False
 
         # mdr optimization
@@ -130,7 +128,6 @@ class MDReg:
         start = time.time()
         nt = self._npdt[-1]
         deformation = np.empty(self._npdt)
-        dict_param = _elastix2dict(self.elastix) # Hack necessary for parallelization
         # If mask isn't same shape as images, then don't use it
         if isinstance(self.coreg_mask, np.ndarray):
             if np.shape(self.coreg_mask) != self.array.shape: 
@@ -139,26 +136,22 @@ class MDReg:
                 mask = self.coreg_mask
         else: 
             mask = None
-        if not self.parallel:
-            for t in tqdm(range(nt), desc=msg): # dynamics
-                if self.status is not None:
-                    self.status.progress(t, nt)
-                if mask is not None:
-                    mask_t = mask[...,t]
-                else: 
-                    mask_t = None
-                args = (self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask_t)
-                self.coreg[:,t], deformation[:,:,t] = _coregister(args)
-        else:
-            pool = multiprocessing.Pool(processes=os.cpu_count())
-            if mask is None:
-                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask) for t in range(nt)] #dynamics
-            else:
-                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask[...,t]) for t in range(nt)] #dynamics
-            results = list(tqdm(pool.imap(_coregister, args), total=nt, desc=msg))
-            for t in range(nt):
-                self.coreg[:,t] = results[t][0]
-                deformation[:,:,t] = results[t][1]
+        
+        for t in tqdm(range(nt), desc=msg): # dynamics
+            if self.status is not None:
+                self.status.progress(t, nt)
+            if mask is not None:
+                mask_t = mask[...,t]
+            else: 
+                mask_t = None
+            self.coreg[:,t], deformation[:,:,t] = _coregister(
+                self.array[...,t], 
+                self.model_fit[...,t], 
+                self.elastix, 
+                self.pixel_spacing, 
+                self.log, 
+                mask_t,
+            )
         print('Coregistration time: ' + str((time.time()-start)/60) +' min')
         return deformation
 
@@ -377,35 +370,11 @@ def _maxnorm(d):
     return np.nanmax(np.sqrt(d))
 
 
-def _elastix2dict(elastix_model_parameters):
-    """
-    Hack to allow parallel processing
-    """
-    list_dictionaries_parameters = []
-    for index in range(elastix_model_parameters.GetNumberOfParameterMaps()):
-        parameter_map = elastix_model_parameters.GetParameterMap(index)
-        one_parameter_map_dict = {}
-        for i in parameter_map:
-            one_parameter_map_dict[i] = parameter_map[i]
-        list_dictionaries_parameters.append(one_parameter_map_dict)
-    return list_dictionaries_parameters
 
-
-def _dict2elastix(list_dictionaries_parameters):
-    """
-    Hack to allow parallel processing
-    """
-    elastix_model_parameters = itk.ParameterObject.New()
-    for one_map in list_dictionaries_parameters:
-        elastix_model_parameters.AddParameterMap(one_map)
-    return elastix_model_parameters
-
-
-def _coregister(args):
+def _coregister(target, source, elastix_model_parameters, spacing, log, mask):
     """
     Coregister two arrays and return coregistered + deformation field 
     """
-    target, source, elastix_model_parameters, spacing, log, mask = args
     shape_source = np.shape(source)
     shape_target = np.shape(target)
 
@@ -433,7 +402,6 @@ def _coregister(args):
         elastixImageFilter.SetMovingMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
 
     ## call the parameter map file specifying the registration parameters
-    elastix_model_parameters = _dict2elastix(elastix_model_parameters) # Hack
     elastixImageFilter.SetParameterObject(elastix_model_parameters)
 
     ## set additional options
