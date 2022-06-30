@@ -102,7 +102,6 @@ def fit_constant():
 
     mdr = MDReg()
     mdr.set_array(np.squeeze(array[:,:,slice,:,0]))
-    mdr.signal_parameters = [0,30,40,50,60,70,80,90,100,110,120]
     mdr.pixel_spacing = header[slice,0,0].PixelSpacing
     mdr.signal_model = mdl.constant
     mdr.read_elastix(os.path.join(elastix_pars, 'BSplines_MT.txt'))
@@ -193,8 +192,8 @@ if __name__ == '__main__':
 #    fit_DWI_simple()
 #    fit_T1_simple()
 #    fit_T2_simple()
-    fit_T2star_simple()
+#    fit_T2star_simple()
 #    fit_DCE_2CFM()
 #    fit_DTI()
-#    fit_constant()   
+    fit_constant()   
     

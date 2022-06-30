@@ -1,0 +1,61 @@
+
+# minimal required information
+
+[project]
+name = "mdreg"
+version = "0.3.4"
+dependencies = [
+  "itk-elastix",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "Pillow",
+  "scipy",
+  "QSimpleITK",
+  "tqdm",
+]
+
+# optional information
+
+description = "Model-driven image registration"
+readme = "README.md"
+authors = [
+  { name = "Kanishka Sharma", email = "kanishka.sharma@sheffield.ac.uk" },
+  { name = "Joao Almeida e Sousa", email = "j.g.sousa@sheffield.ac.uk" }, 
+  { name = "Steven Sourbron", email = "s.sourbron@sheffield.ac.uk" }
+  ]
+license = { file = "LICENSE" }
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  'Development Status :: 3 - Alpha',
+
+  # Indicate who your project is intended for
+  'Intended Audience :: Developers',
+  'Intended Audience :: Science/Research',
+  'Topic :: Scientific/Engineering',
+  'Environment :: Console',
+  'Operating System :: OS Independent',
+
+  'License :: OSI Approved :: Apache Software License',
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3"
+]
+keywords = ['python', "medical imaging", "motion correction", "registration"]
+
+requires-python = ">=3.6"
+
+[project.urls]
+"Homepage" = "https://github.com/QIB-Sheffield/mdreg"
+
+[tool.setuptools]
+packages = ["mdreg"]
+
+
+
+
+
+
+
