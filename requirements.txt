@@ -1,11 +1,8 @@
-dbdicom==0.0.6
 itk-elastix
 matplotlib
 numpy
 pandas
-pdoc3
 Pillow
-requests
 scipy
 SimpleITK
 tqdm

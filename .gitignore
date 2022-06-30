@@ -2,9 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 
 ### mdreg folder structure
-tests/test_data/*
-data/*
-results/*
+.venv/*
 docs/*
 
 ### Python ###
