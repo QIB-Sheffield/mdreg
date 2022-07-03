@@ -4,6 +4,7 @@
 ### mdreg folder structure
 .venv/*
 docs/*
+dev/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
