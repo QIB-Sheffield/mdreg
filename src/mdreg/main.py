@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import itk
-import SimpleITK as sitk
+#import SimpleITK as sitk
 
 from .models import constant
 
