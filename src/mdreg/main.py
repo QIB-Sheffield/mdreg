@@ -7,7 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import itk
-import SimpleITK as sitk
 
 from .models import constant
 
@@ -17,13 +16,13 @@ class MDReg:
 
     def __init__(self):
 
-        # input
+        # input DEFAULT
         self.array = None
         self.coreg_mask = None
         self.signal_parameters = None
         self.pixel_spacing = 1.0
         self.signal_model = constant
-        self.elastix = default_bspline()
+        self.elastix = default_bspline('2')
         self.log = False
 
         # mdr optimization
@@ -58,6 +57,8 @@ class MDReg:
         self.coreg = array
         n = self._npdt
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
+        if n[1] == 3:
+            self.elastix = default_bspline('3')
     
     def set_mask(self, mask_array):
         self.coreg_mask = mask_array
@@ -77,17 +78,20 @@ class MDReg:
         self.coreg = copy.deepcopy(self.array)
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
         self.deformation = np.zeros(n)
+
         start = time.time()
         improvement = []
         converged = False
         self.iteration = 1
         while not converged: 
             startit = time.time()
-            self.fit_signal()
+            self.fit_signal() 
             if self.export_unregistered:
                 if self.iteration == 1: 
                     self.export_fit(name='_unregistered')
             deformation = self.fit_deformation()
+            #reshape for maxnorm
+            deformation  = np.reshape(deformation,[n[0],n[1],n[2]]) 
             improvement.append(_maxnorm(self.deformation-deformation))
             self.deformation = deformation
             converged = improvement[-1] <= self.precision 
@@ -116,8 +120,9 @@ class MDReg:
         start = time.time()
         fit, pars = self.signal_model.main(self.coreg, self.signal_parameters)
         shape = self.array.shape
-        self.model_fit = np.reshape(fit, shape)
+        self.model_fit = np.reshape(fit, shape) 
         self.pars = np.reshape(pars, shape[:-1] + (pars.shape[-1],))
+       
         print('Model fitting time: ' + str((time.time()-start)/60) + ' min')
 
     def fit_deformation(self):
@@ -127,24 +132,34 @@ class MDReg:
             self.status.message(msg)
         start = time.time()
         nt = self._npdt[-1]
-        deformation = np.empty(self._npdt)
+
+        deformation = np.empty(self._npdt) 
+        # reshape the deformation field 
+        if self._npdt[1] == 2: #2D
+            deformation = np.reshape(deformation,(self.array.shape[0], self.array.shape[1], 2, self.array.shape[2])) 
+        else: #3D
+            deformation = np.reshape(deformation,(self.array.shape[0], self.array.shape[1], self.array.shape[2], 3, self.array.shape[3])) 
+
         # If mask isn't same shape as images, then don't use it
         if isinstance(self.coreg_mask, np.ndarray):
             if np.shape(self.coreg_mask) != self.array.shape: 
                 mask = None
+                print("using mask shape: If mask isn't same shape as images, then don't use it")
             else: 
                 mask = self.coreg_mask
         else: 
             mask = None
-        
-        for t in tqdm(range(nt), desc=msg): # dynamics
+        # coregistration per dynamic (i.e. image time-point)
+        for t in tqdm(range(nt), desc=msg): 
             if self.status is not None:
                 self.status.progress(t, nt)
+
             if mask is not None:
                 mask_t = mask[...,t]
             else: 
                 mask_t = None
-            self.coreg[:,t], deformation[:,:,t] = _coregister(
+            
+            self.coreg[:,t], deformation[...,t] = _coregister(
                 self.array[...,t], 
                 self.model_fit[...,t], 
                 self.elastix, 
@@ -152,6 +167,7 @@ class MDReg:
                 self.log, 
                 mask_t,
             )
+
         print('Coregistration time: ' + str((time.time()-start)/60) +' min')
         return deformation
 
@@ -173,37 +189,48 @@ class MDReg:
         print('Exporting fit..' + name)
         path = self.export_path 
         pars = self.signal_model.pars()
+    
         if not os.path.exists(path): os.mkdir(path)
         lower, upper = self.signal_model.bounds()
         for i in range(len(pars)):
             _export_imgs(self.pars[...,i], path, pars[i] + name, bounds=[lower[i],upper[i]])
         _export_animation(self.model_fit, path, 'modelfit' + name)
+        
 
     def export_registered(self):
 
         print('Exporting registration..')
         path = self.export_path 
         if not os.path.exists(path): os.mkdir(path)
-        defx = np.squeeze(self.deformation[:,:,0,:])
-        defy = np.squeeze(self.deformation[:,:,1,:])
         _export_animation(self.coreg, path, 'coregistered')
+        defx = np.squeeze(self.deformation[...,0,:])
+        defy = np.squeeze(self.deformation[...,1,:])
         _export_animation(defx, path, 'deformation_field_x')
         _export_animation(defy, path, 'deformation_field_y')
-        _export_animation(np.sqrt(defx**2 + defy**2), path, 'deformation_field')
+        if self._npdt[1] == 3: #3D
+            defz = np.squeeze(self.deformation[...,2,:])
+            _export_animation(defz, path, 'deformation_field_z')
+            _export_animation(np.sqrt(defx**2 + defy**2 + defz**2), path, 'deformation_field')
+        else: #2D
+            _export_animation(np.sqrt(defx**2 + defy**2), path, 'deformation_field')
         self.iter.to_csv(os.path.join(path, 'largest_deformations.csv'))
 
 
-def default_bspline():
+def default_bspline(d):
     param_obj = itk.ParameterObject.New()
     parameter_map_bspline = param_obj.GetDefaultParameterMap('bspline')
-    param_obj.AddParameterMap(parameter_map_bspline) #why??
+    ## add parameter map file to the parameter object: required in itk-elastix
+    param_obj.AddParameterMap(parameter_map_bspline) 
+    #OPTIONAL: Write the default parameter file to output file
+    # param_obj.WriteParameterFile(parameter_map_bspline, "bspline.default.txt")
     # *********************
     # * ImageTypes
     # *********************
     param_obj.SetParameter("FixedInternalImagePixelType", "float")
     param_obj.SetParameter("MovingInternalImagePixelType", "float")
-    param_obj.SetParameter("FixedImageDimension", "2")
-    param_obj.SetParameter("MovingImageDimension", "2")
+    ## selection based on 3D or 2D image data: newest elastix version does not require input image dimension
+    param_obj.SetParameter("FixedImageDimension", d) 
+    param_obj.SetParameter("MovingImageDimension", d) 
     param_obj.SetParameter("UseDirectionCosines", "true")
     # *********************
     # * Components
@@ -269,7 +296,8 @@ def default_bspline():
     # The grid spacing here is specified in voxel units.
     #(FinalGridSpacingInPhysicalUnits 10.0 10.0)
     #(FinalGridSpacingInVoxels 8)
-    param_obj.SetParameter("FinalGridSpacingInPhysicalUnits", ["50.0", "50.0"])
+    #param_obj.SetParameter("FinalGridSpacingInPhysicalUnits", ["50.0", "50.0"])
+    param_obj.SetParameter("FinalGridSpacingInPhysicalUnits", "50.0")
     # *********************
     # * Optimizer settings
     # *********************
@@ -327,7 +355,8 @@ def default_bspline():
     param_obj.SetParameter("WriteResultImage", "true")
     # The pixel type and format of the resulting deformed moving image
     param_obj.SetParameter("ResultImagePixelType", "float")
-    param_obj.SetParameter("ResultImageFormat", "mhd")
+    param_obj.SetParameter("ResultImageFormat", "nii")
+    
     return param_obj
 
 
@@ -335,28 +364,52 @@ def _export_animation(array, path, filename):
 
     file = os.path.join(path, filename + '.gif')
     array[np.isnan(array)] = 0
-    fig = plt.figure()
-    im = plt.imshow(np.squeeze(array[:,:,0]).T, animated=True)
-    def updatefig(i):
-        im.set_array(np.squeeze(array[:,:,i]).T)
-    anim = animation.FuncAnimation(fig, updatefig, interval=50, frames=array.shape[2])
-    anim.save(file)
-    #plt.show()
+    shape = np.shape(array)
+
+    if len(shape)==4: ##save 3D data
+        fig = plt.figure()
+        file_3D_save = os.path.join(path, filename)
+        for k in range(shape[2]): 
+            im = plt.imshow(np.squeeze(array[:,:,k,0]).T, animated=True) 
+            def updatefig(i):
+                im.set_array(np.squeeze(array[:,:,k,i]).T) # export each slice all dynamics
+            anim = animation.FuncAnimation(fig, updatefig, interval=50, frames=array.shape[3])
+            anim.save(file_3D_save + '_' + str(k) + ".gif")
+
+    else: # save 2D data   
+        fig = plt.figure()
+        im = plt.imshow(np.squeeze(array[:,:,0]).T, animated=True) 
+        def updatefig(i):
+            im.set_array(np.squeeze(array[:,:,i]).T) 
+        anim = animation.FuncAnimation(fig, updatefig, interval=50, frames=array.shape[2])
+        anim.save(file) 
 
 
 def _export_imgs(array, path, filename, bounds=[-np.inf, np.inf]):
 
     file = os.path.join(path, filename + '.png')
-    array[np.isnan(array)] = 0
+    array[np.isnan(array)] = 0 
     array[np.isinf(array)] = 0
     array = np.clip(array, bounds[0], bounds[1])
-    plt.imshow(array.T)
-    plt.clim(np.amin(array), np.amax(array))
-    cBar = plt.colorbar()
-    cBar.minorticks_on()
-    plt.savefig(fname=file)
-    plt.close()
+    shape_arr = np.shape(array)
 
+    if len(shape_arr) == 2: #2D data save
+        plt.imshow((array).T)
+        plt.clim(np.amin(array), np.amax(array))
+        cBar = plt.colorbar()
+        cBar.minorticks_on()
+        plt.savefig(fname=file)
+        plt.close()
+    else: #3D data save
+        file_3D = os.path.join(path, filename)
+        for i in range(shape_arr[2]):
+            plt.imshow((array[:,:,i]).T)
+            plt.clim(np.amin(array), np.amax(array))
+            cBar = plt.colorbar()
+            cBar.minorticks_on()
+            plt.savefig(fname=[file_3D + '_' + str(i) + ".png"])
+            plt.close()
+   
 
 def _maxnorm(d):
     """This function calculates diagnostics from the registration process.
@@ -366,7 +419,12 @@ def _maxnorm(d):
     The maximum deformation per pixel is calculated as 
     the euclidean distance of difference between the old and new deformation field. 
     """
-    d = d[:,0,:]**2 + d[:,1,:]**2
+    shape_deformation = np.shape(d) 
+    if (shape_deformation[1] == 3): #3D
+       d = d[:,0,:]**2 + d[:,1,:]**2 + d[:,2,:]**2
+    else: #2D
+       d = d[:,0,:]**2 + d[:,1,:]**2
+
     return np.nanmax(np.sqrt(d))
 
 
@@ -376,64 +434,45 @@ def _coregister(target, source, elastix_model_parameters, spacing, log, mask):
     Coregister two arrays and return coregistered + deformation field 
     """
     shape_source = np.shape(source)
-    shape_target = np.shape(target)
-
-    source = sitk.GetImageFromArray(source)
+    #shape_target = np.shape(target)
+    source = itk.GetImageFromArray(np.array(source, np.float32)) 
     source.SetSpacing(spacing)
-    source.__SetPixelAsUInt16__
-    source = np.nan_to_num(np.reshape(source, [shape_source[0], shape_source[1]]))
-    
-    target = sitk.GetImageFromArray(target)
+ 
+    target = itk.GetImageFromArray(np.array(target, np.float32))
     target.SetSpacing(spacing)
-    target.__SetPixelAsUInt16__
-    target = np.nan_to_num(np.reshape(target, [shape_target[0], shape_target[1]]))
+
+    ## TODO: mask not included TBC
+    ## read the source and target images ## removed: NOT USING anymore: SET MOVING IMG; SET FIXED IMAGE
+    #elastixImageFilter = itk.ElastixRegistrationMethod.New() 
     
-    ## read the source and target images
-    elastixImageFilter = itk.ElastixRegistrationMethod.New()
-    elastixImageFilter.SetFixedImage(itk.GetImageFromArray(np.array(source, np.float32)))
-    elastixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
-    if mask is not None:
-        shape_mask = np.shape(mask)
-        mask = sitk.GetImageFromArray(mask)
-        mask.SetSpacing(spacing)
-        mask.__SetPixelAsUInt8__
-        mask = np.nan_to_num(np.reshape(mask, [shape_mask[0], shape_mask[1]]))
-        elastixImageFilter.SetFixedMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
-        elastixImageFilter.SetMovingMask(itk.GetImageFromArray(np.array(mask, np.uint8)))
+    # Call registration function: NEW
+    coregistered, result_transform_parameters = itk.elastix_registration_method(
+    source, target,
+    parameter_object=elastix_model_parameters)
 
-    ## call the parameter map file specifying the registration parameters
-    elastixImageFilter.SetParameterObject(elastix_model_parameters)
-
-    ## set additional options
-    elastixImageFilter.SetNumberOfThreads(os.cpu_count()-1)
+    # OPTIONAL:print the resulting transform parameters and the elastix bspline paramter file
+    # print(result_transform_parameters)
     
-    # logging; note that nothing is printed in Jupyter Notebooks
-    elastixImageFilter.SetLogToFile(log)
-    elastixImageFilter.SetLogToConsole(log)
-    if log == True:
-        print("Parameter Map: ")
-        print(elastix_model_parameters)
-        output_dir = os.path.join(os.getcwd(), "Elastix Log")
-        os.makedirs(output_dir, exist_ok=True)
-        #log_filename = "ITK-Elastix.log"
-        i = 0
-        while os.path.exists(os.path.join(output_dir, f"ITK-Elastix_{i}.log")): i += 1
-        log_filename = f"ITK-Elastix_{i}.log"
-        elastixImageFilter.SetOutputDirectory(output_dir)
-        elastixImageFilter.SetLogFileName(log_filename)
-
-    ## update filter object (required)
-    elastixImageFilter.UpdateLargestPossibleRegion()
-
     ## RUN ELASTIX using ITK-Elastix filters
-    coregistered = itk.GetArrayFromImage(elastixImageFilter.GetOutput()).flatten()
+    coregistered = itk.GetArrayFromImage(coregistered).flatten()
 
-    transformixImageFilter = itk.TransformixFilter.New()
-    transformixImageFilter.SetTransformParameterObject(elastixImageFilter.GetTransformParameterObject())
-    transformixImageFilter.ComputeDeformationFieldOn()
-    transformixImageFilter.SetMovingImage(itk.GetImageFromArray(np.array(target, np.float32)))
-    deformation_field = itk.GetArrayFromImage(transformixImageFilter.GetOutputDeformationField()).flatten()
-    deformation_field = np.reshape(deformation_field, [int(len(deformation_field)/2), 2])
+    # Load Transformix Object
+    transformix_object = itk.TransformixFilter.New(target)
+    transformix_object.SetTransformParameterObject(result_transform_parameters)
+    
+    # Update object (required)
+    transformix_object.UpdateLargestPossibleRegion()
+    # Compute the deformation field
+    transformix_object.ComputeDeformationFieldOn() 
+    deformation_field = itk.GetArrayFromImage(transformix_object.GetOutputDeformationField()).flatten()
+
+    # Results of Transformation # optional
+    # result_image_transformix = transformix_object.GetOutput()
+  
+    if len(shape_source) == 2: # 2D
+        deformation_field = np.reshape(deformation_field,(shape_source[0], shape_source[1], 2)) 
+    else: #3D 
+        deformation_field = np.reshape(deformation_field,(shape_source[0], shape_source[1], shape_source[2], 3)) 
 
     return coregistered, deformation_field
 
