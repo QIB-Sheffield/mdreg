@@ -7,7 +7,7 @@ iBEAt study DTI model fit for mdreg
 import numpy as np
 
 def pars():
-    return ['FA', 'ADC']
+    return ['FA', 'ADC','S0']
 
 def bounds():
     lower = [0,0]
@@ -70,15 +70,19 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
     # Slog = [Bv, -1] * [M; -log(S0)]
     minus_one_column = -np.ones((np.shape(Bv)[0]))
     Bv_new = np.c_[Bv, minus_one_column]
+    
     assert method=='linear', "Wrong method as argument!!!"
     M = np.linalg.lstsq(Bv_new, -imlog.T, rcond=None)
     M = M[0].T
+    S0_log = M[:,6]
+    S0 = np.exp(S0_log)
     
     M[np.isnan(M)]=0
     M[np.isinf(M)]=0
     
     ### Initialize Variables
     npixels = np.shape(M)[0]
+   
     FA_mask = np.empty(npixels) 
     ADC_mask = np.empty(npixels) 
 
@@ -121,10 +125,11 @@ def DTI_fitting(im, b, thresh_val, method='linear'):
 
     Bv_new_times_M_new = np.moveaxis(np.dot(Bv_new, M.T),0,-1).reshape(sz) 
     fit = np.exp(-Bv_new_times_M_new)
-    
-    par = np.empty((npixels, 2))
+       
+    par = np.empty((npixels, 3))
     par[:,0] = FA_mask
     par[:,1] = ADC_mask
+    par[:,2] = S0
     
     return fit, par
 
@@ -142,10 +147,11 @@ def main(images_to_be_fitted, signal_model_parameters):
     fit (numpy.ndarray): signal model fit at all time-series (i.e. at each b-value and direction) with shape [x-dim*y-dim, total time-series].   
     fitted_parameters (numpy.ndarray): output signal model fit parameters 'FA' and 'ADC' stored in a single nd-array with shape [2, x-dim*y-dim].   
     """
+  
     b_values = signal_model_parameters[0]
     bVec_original = signal_model_parameters[1]
     image_orientation_patient = signal_model_parameters[2]
- 
+    
     R1 = image_orientation_patient[0][3:6]
     R1 = [-float(x) for x in R1] 
 
