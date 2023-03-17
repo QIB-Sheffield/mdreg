@@ -9,8 +9,8 @@ import matplotlib.animation as animation
 #import dask
 import itk
 import multiprocessing
-from multiprocessing import shared_memory
-import psutil
+#from multiprocessing import shared_memory
+#import psutil
 import gc
 
 from .models import constant
