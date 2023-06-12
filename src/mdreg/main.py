@@ -6,7 +6,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+#import dask
 import itk
+import multiprocessing
+#from multiprocessing import shared_memory
+#import psutil
+import gc
 
 from .models import constant
 
@@ -21,9 +26,10 @@ class MDReg:
         self.coreg_mask = None
         self.signal_parameters = None
         self.pixel_spacing = 1.0
-        self.signal_model = constant
+        #self.signal_model = constant
         self.elastix = default_bspline('2')
         self.log = False
+        self.parallel = True
 
         # mdr optimization
         self.max_iterations = 5
@@ -73,12 +79,10 @@ class MDReg:
             self.elastix.SetParameter(tag, str(value))       
 
     def fit(self):
-
         n = self._npdt
         self.coreg = copy.deepcopy(self.array)
         self.coreg = np.reshape(self.coreg, (n[0],n[2]))
         self.deformation = np.zeros(n)
-
         start = time.time()
         improvement = []
         converged = False
@@ -91,7 +95,7 @@ class MDReg:
                     self.export_fit(name='_unregistered')
             deformation = self.fit_deformation()
             #reshape for maxnorm
-            deformation  = np.reshape(deformation,[n[0],n[1],n[2]]) 
+            deformation  = np.reshape(deformation,[n[0],n[1],n[2]])
             improvement.append(_maxnorm(self.deformation-deformation))
             self.deformation = deformation
             converged = improvement[-1] <= self.precision 
@@ -100,6 +104,8 @@ class MDReg:
             calctime = (time.time()-startit)/60
             print('Finished MDR iteration ' + str(self.iteration) + ' after ' + str(calctime) + ' min') 
             print('Improvement after MDR iteration ' + str(self.iteration) + ': ' + str(improvement[-1]) + ' pixels')  
+            del deformation
+            gc.collect()
             self.iteration += 1 
 
         self.fit_signal()
@@ -110,6 +116,7 @@ class MDReg:
         self.iter = pd.DataFrame({'Maximum deformation': improvement}) 
 
         print('Total calculation time: ' + str((time.time()-start)/60) + ' min')
+        gc.collect()
 
     def fit_signal(self):
 
@@ -125,6 +132,7 @@ class MDReg:
        
         print('Model fitting time: ' + str((time.time()-start)/60) + ' min')
 
+
     def fit_deformation(self):
 
         msg = self.pinned_message + ', fitting deformation field (iteration ' + str(self.iteration) + ')'
@@ -133,7 +141,9 @@ class MDReg:
         start = time.time()
         nt = self._npdt[-1]
 
-        deformation = np.empty(self._npdt) 
+        deformation = np.empty(self._npdt)
+        dict_param = _elastix2dict(self.elastix)
+
         # reshape the deformation field 
         if self._npdt[1] == 2: #2D
             deformation = np.reshape(deformation,(self.array.shape[0], self.array.shape[1], 2, self.array.shape[2])) 
@@ -150,25 +160,68 @@ class MDReg:
         else: 
             mask = None
         # coregistration per dynamic (i.e. image time-point)
-        for t in tqdm(range(nt), desc=msg): 
-            if self.status is not None:
-                self.status.progress(t, nt)
 
-            if mask is not None:
-                mask_t = mask[...,t]
-            else: 
-                mask_t = None
+        if self.parallel == False:
+
+            for t in tqdm(range(nt), desc=msg): 
+                if self.status is not None:
+                    self.status.progress(t, nt)
+
+                if mask is not None:
+                    mask_t = mask[...,t]
+                else: 
+                    mask_t = None
+                
+                self.coreg[:,t], deformation[...,t] = _coregister(
+                    self.array[...,t], 
+                    self.model_fit[...,t], 
+                    self.elastix, 
+                    self.pixel_spacing, 
+                    self.log, 
+                    mask_t,
+                )
+
+        if self.parallel == True:
+            #print("Part 1 before multiprocessing: " + str(psutil.virtual_memory()[3]/1000000000))
+
+            if mask is None:
+                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask) for t in range(nt)] #dynamics
+            else:
+                args = [(self.array[...,t], self.model_fit[...,t], dict_param, self.pixel_spacing, self.log, mask[...,t]) for t in range(nt)] #dynamics
+
+            #print("Part 1_2 after args before multiprocessing: " + str(psutil.virtual_memory()[3]/1000000000))
+            #args = shared_memory.ShareableList(args)
+
+            try: 
+                num_workers = int(len(os.sched_getaffinity(0)))
+            except: 
+                num_workers = int(os.cpu_count())
             
-            self.coreg[:,t], deformation[...,t] = _coregister(
-                self.array[...,t], 
-                self.model_fit[...,t], 
-                self.elastix, 
-                self.pixel_spacing, 
-                self.log, 
-                mask_t,
-            )
+            pool = multiprocessing.Pool(processes=num_workers)
+            
+            #print("Part 2 after multiprocessing but before results: " + str(psutil.virtual_memory()[3]/1000000000))
+            
+            results = list(tqdm(pool.imap(_coregister_par, args), total=nt, desc=msg))
+            #print("Part 3 after multiprocessing after results: " + str(psutil.virtual_memory()[3]/1000000000))
+
+            pool.close()
+            pool.join()
+
+            #print("Part 4 after closing multiprocessing before unpacking results: " + str(psutil.virtual_memory()[3]/1000000000))
+
+            for t in range(nt):
+                self.coreg[:,t] = results[t][0]
+                deformation[...,t] = results[t][1]
+
+            #print("Part 5 after unpacking results: " + str(psutil.virtual_memory()[3]/1000000000))
+
+            del args
+            gc.collect()
+
+            #print("Part 6 after setting args to None: " + str(psutil.virtual_memory()[3]/1000000000))
 
         print('Coregistration time: ' + str((time.time()-start)/60) +' min')
+
         return deformation
 
     def export(self):
@@ -427,6 +480,56 @@ def _maxnorm(d):
 
     return np.nanmax(np.sqrt(d))
 
+def _coregister_par(args):
+    """
+    Coregister two arrays and return coregistered + deformation field 
+    """
+    target, source, elastix_model_parameters, spacing, log, mask = args
+
+    elastix_model_parameters = _dict2elastix(elastix_model_parameters)
+
+    shape_source = np.shape(source)
+    #shape_target = np.shape(target)
+    source = itk.GetImageFromArray(np.array(source, np.float32)) 
+    source.SetSpacing(spacing)
+ 
+    target = itk.GetImageFromArray(np.array(target, np.float32))
+    target.SetSpacing(spacing)
+
+    ## TODO: mask not included TBC
+    ## read the source and target images ## removed: NOT USING anymore: SET MOVING IMG; SET FIXED IMAGE
+    #elastixImageFilter = itk.ElastixRegistrationMethod.New() 
+    
+    # Call registration function: NEW
+    coregistered, result_transform_parameters = itk.elastix_registration_method(
+    source, target,
+    parameter_object=elastix_model_parameters)
+
+    # OPTIONAL:print the resulting transform parameters and the elastix bspline paramter file
+    # print(result_transform_parameters)
+    
+    ## RUN ELASTIX using ITK-Elastix filters
+    coregistered = itk.GetArrayFromImage(coregistered).flatten()
+
+    # Load Transformix Object
+    transformix_object = itk.TransformixFilter.New(target)
+    transformix_object.SetTransformParameterObject(result_transform_parameters)
+    
+    # Update object (required)
+    transformix_object.UpdateLargestPossibleRegion()
+    # Compute the deformation field
+    transformix_object.ComputeDeformationFieldOn() 
+    deformation_field = itk.GetArrayFromImage(transformix_object.GetOutputDeformationField()).flatten()
+
+    # Results of Transformation # optional
+    # result_image_transformix = transformix_object.GetOutput()
+  
+    if len(shape_source) == 2: # 2D
+        deformation_field = np.reshape(deformation_field,(shape_source[0], shape_source[1], 2)) 
+    else: #3D 
+        deformation_field = np.reshape(deformation_field,(shape_source[0], shape_source[1], shape_source[2], 3)) 
+
+    return coregistered, deformation_field
 
 
 def _coregister(target, source, elastix_model_parameters, spacing, log, mask):
@@ -475,4 +578,27 @@ def _coregister(target, source, elastix_model_parameters, spacing, log, mask):
         deformation_field = np.reshape(deformation_field,(shape_source[0], shape_source[1], shape_source[2], 3)) 
 
     return coregistered, deformation_field
+
+def _elastix2dict(elastix_model_parameters):
+    """
+    Hack to allow parallel processing
+    """
+    list_dictionaries_parameters = []
+    for index in range(elastix_model_parameters.GetNumberOfParameterMaps()):
+        parameter_map = elastix_model_parameters.GetParameterMap(index)
+        one_parameter_map_dict = {}
+        for i in parameter_map:
+            one_parameter_map_dict[i] = parameter_map[i]
+        list_dictionaries_parameters.append(one_parameter_map_dict)
+    return list_dictionaries_parameters
+
+
+def _dict2elastix(list_dictionaries_parameters):
+    """
+    Hack to allow parallel processing
+    """
+    elastix_model_parameters = itk.ParameterObject.New()
+    for one_map in list_dictionaries_parameters:
+        elastix_model_parameters.AddParameterMap(one_map)
+    return elastix_model_parameters
 
