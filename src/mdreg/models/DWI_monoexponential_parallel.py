@@ -36,6 +36,41 @@ def exp_func(b, S0, ADC):
     return S0*np.exp(-b*ADC)
 
 
+
+
+def IVIM_fitting_pixel(parallel_arguments):
+    """ Runs the curve fit function for 1 pixel.
+
+    Args
+    ----
+    parallel_arguments (tuple): tuple containing the input arguments for curve_fit, such as the input images, the bvalues and more for the signal model fit.
+                                This tuple format is required for the success of the parallelisation process and consequent speed-up of the fitting.
+
+    Returns
+    -------
+    fitx (numpy.ndarray): signal model fit at all time-series with shape [total time-series].  
+    S0x, ADCx (numpy.ndarray): fitted parameters 'S0' and 'ADC' (mm2/sec*10^-3) each with shape [1].  
+    """
+    pixel_index, images_to_be_fitted, initial_guess, b_val, strt_idx, end_idx, lb, ub = parallel_arguments
+    popt_x, pcov_x = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,:10], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
+    popt_y, pcov_y = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,strt_idx: end_idx], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
+    popt_z, pcov_z = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,-10:], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
+    S0_xx =  popt_x[0] 
+    S0_yx =  popt_y[0]
+    S0_zx =  popt_z[0]
+    ADC_xx =  popt_x[1] 
+    ADC_yx =  popt_y[1] 
+    ADC_zx =  popt_z[1]
+    fit_xx = []
+    fit_yx = []
+    fit_zx = []
+    for i in range(10): # time-series with 10 b-vals per image series
+        fit_xx.append(exp_func(b_val[i], S0_xx, ADC_xx))
+        fit_yx.append(exp_func(b_val[i], S0_yx, ADC_yx))
+        fit_zx.append(exp_func(b_val[i], S0_zx, ADC_zx))
+    return fit_xx, fit_yx, fit_zx, S0_xx, S0_yx, S0_zx, ADC_xx, ADC_yx, ADC_zx
+
+
 def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
     """  Calls IVIM_fitting_pixel which contains the curve_fit function and returns the fit, and fitted params (S0 and ADC).  
 
@@ -96,38 +131,6 @@ def IVIM_fitting(images_to_be_fitted, signal_model_parameters):
     fit = np.hstack((fit_x, fit_y, fit_z)) 
    
     return fit, S0, ADC
-
-def IVIM_fitting_pixel(parallel_arguments):
-    """ Runs the curve fit function for 1 pixel.
-
-    Args
-    ----
-    parallel_arguments (tuple): tuple containing the input arguments for curve_fit, such as the input images, the bvalues and more for the signal model fit.
-                                This tuple format is required for the success of the parallelisation process and consequent speed-up of the fitting.
-
-    Returns
-    -------
-    fitx (numpy.ndarray): signal model fit at all time-series with shape [total time-series].  
-    S0x, ADCx (numpy.ndarray): fitted parameters 'S0' and 'ADC' (mm2/sec*10^-3) each with shape [1].  
-    """
-    pixel_index, images_to_be_fitted, initial_guess, b_val, strt_idx, end_idx, lb, ub = parallel_arguments
-    popt_x, pcov_x = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,:10], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
-    popt_y, pcov_y = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,strt_idx: end_idx], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
-    popt_z, pcov_z = curve_fit(exp_func, xdata = b_val[:10], ydata = images_to_be_fitted[pixel_index,-10:], p0=initial_guess, bounds=(lb,ub), method='trf', maxfev=1000000)
-    S0_xx =  popt_x[0] 
-    S0_yx =  popt_y[0]
-    S0_zx =  popt_z[0]
-    ADC_xx =  popt_x[1] 
-    ADC_yx =  popt_y[1] 
-    ADC_zx =  popt_z[1]
-    fit_xx = []
-    fit_yx = []
-    fit_zx = []
-    for i in range(10): # time-series with 10 b-vals per image series
-        fit_xx.append(exp_func(b_val[i], S0_xx, ADC_xx))
-        fit_yx.append(exp_func(b_val[i], S0_yx, ADC_yx))
-        fit_zx.append(exp_func(b_val[i], S0_zx, ADC_zx))
-    return fit_xx, fit_yx, fit_zx, S0_xx, S0_yx, S0_zx, ADC_xx, ADC_yx, ADC_zx
 
 
 def main(images_to_be_fitted, signal_model_parameters):
