@@ -1,26 +1,15 @@
-""" 
-@author: Steven Sourbron 
-Fitting to a constant  
-2022  
-"""
 
 import numpy as np
 
 def pars():
     return ['const']
 
-def bounds():
-    lower = [-np.inf]
-    upper = [np.inf]
-    return lower, upper
-
-def main(images, dummy):
+def main(images):
     """ main function that performs the T2*-map signal model-fit for input 2D image at multiple time-points (TEs).
 
     Args
     ----
-    images (numpy.ndarray): input image at all time-series (i.e. at each TE time) with shape [x-dim*y-dim, total time-series].  
-    t (list): list containing time points of exponential.  
+    images (numpy.ndarray): input image at all time-series (i.e. at each TE time) with shape [x-dim*y-dim, total time-series].    
 
     Returns
     -------
@@ -30,7 +19,7 @@ def main(images, dummy):
 
     shape = np.shape(images)
     avr = np.mean(images, axis=1) # fitting a constant model
-    par = np.empty((shape[0], 1)) # pixels should be first for consistency
+    par = np.empty((shape[0], 1)) 
     par[:,0] = avr
     fit = np.repeat(avr[:,np.newaxis], shape[1], axis=1)
     
