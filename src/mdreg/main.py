@@ -139,7 +139,7 @@ class MDReg:
 
     def fit_signal(self):
 
-        msg = self.pinned_message + ', fitting signal model (iteration ' + str(self.iteration) + ')'
+        msg = self.pinned_message + ' fitting signal model (iteration ' + str(self.iteration) + ')'
         print(msg)
         if self.status is not None:
             self.status.message(msg)
@@ -468,11 +468,6 @@ def __coregister_elastix(source, target, elastix_model_parameters, spacing, log,
     coregistered = itk.GetArrayFromImage(coregistered).flatten()
 
     # Get deformation field
-    # transformix_object = itk.TransformixFilter.New(target)
-    # transformix_object.SetTransformParameterObject(result_transform_parameters)
-    # transformix_object.UpdateLargestPossibleRegion() # Update object (required)
-    # transformix_object.ComputeDeformationFieldOn() 
-    # deformation_field = transformix_object.GetOutputDeformationField()
     deformation_field = itk.transformix_deformation_field(
         target, 
         result_transform_parameters, 
