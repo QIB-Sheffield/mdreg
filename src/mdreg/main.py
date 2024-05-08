@@ -500,9 +500,9 @@ def _coregister_elastix(source_large, target_large, elastix_model_parameters, sp
     #   = (spacing_small - spacing_large)/2
     target_small = block_reduce(target_large, block_size=downsample, func=np.mean)
     source_small = block_reduce(source_large, block_size=downsample, func=np.mean)
-    spacing_small = [spacing_large[0]*downsample, spacing_large[1]*downsample]
+    spacing_small = [spacing_large[1]*downsample, spacing_large[0]*downsample]
     origin_large = [0,0]
-    origin_small = [(spacing_small[0] - spacing_large[0])/2, (spacing_small[1] - spacing_large[1]) / 2]
+    origin_small = [(spacing_small[1] - spacing_large[1])/2, (spacing_small[0] - spacing_large[0]) / 2]
 
     # Coregister downsampled source to target
     source_small = itk.GetImageFromArray(np.array(source_small, np.float32)) 
@@ -517,8 +517,8 @@ def _coregister_elastix(source_large, target_large, elastix_model_parameters, sp
         log_to_console=log)
     
     # Get coregistered image at original size
-    result_transform_parameters.SetParameter(0, "Size", [str(source_large.shape[0]), str(source_large.shape[1])])
-    result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large[0]), str(spacing_large[1])])
+    result_transform_parameters.SetParameter(0, "Size", [str(source_large.shape[1]), str(source_large.shape[0])])
+    result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large[1]), str(spacing_large[0])])
     source_large = itk.GetImageFromArray(np.array(source_large, np.float32))
     source_large.SetSpacing(spacing_large)
     source_large.SetOrigin(origin_large)
