@@ -190,20 +190,37 @@ class MDReg:
                     mask_t = None
                 
                 if self.package=='elastix':
-                    try:
-                        self.coreg[:,t], deformation[...,t] = _coregister_elastix(
-                            self.array[...,t], 
-                            self.model_fit[...,t], 
-                            self.elastix, 
-                            self.pixel_spacing, 
-                            self.log, 
-                            mask_t,
-                            self.downsample,
-                        )
-                    except:
+                    if self._npdt[1] == 2: #2D
+                        try:
+                            self.coreg[:,t], deformation[...,t] = _coregister_elastix_2d(
+                                self.array[...,t], 
+                                self.model_fit[...,t], 
+                                self.elastix, 
+                                self.pixel_spacing, 
+                                self.log, 
+                                mask_t,
+                                self.downsample,
+                            )
+                        except:
                         # An error sometimes happpens when too many samples are outside the image buffer
                         # Pass over quietly in that case
-                        pass
+                            pass
+                    elif self._npdt[1] == 3: #3D
+                        try:
+                            self.coreg[:,t], deformation[...,t] = _coregister_elastix_3d(
+                                self.array[...,t], 
+                                self.model_fit[...,t], 
+                                self.elastix, 
+                                self.pixel_spacing, 
+                                self.log, 
+                                mask_t,
+                                self.downsample,
+                            )
+                        except:
+                        # An error sometimes happpens when too many samples are outside the image buffer
+                        # Pass over quietly in that case
+                            pass
+
                 elif self.package=='dipy':
                     self.coreg[:,t], deformation[...,t] = _coregister_dipy(
                         self.array[...,t], 
@@ -448,7 +465,7 @@ def __coregister_elastix_parallel(args):
     """
     source, target, elastix_model_parameters, spacing, log, mask = args
     elastix_model_parameters = _dict2elastix(elastix_model_parameters)
-    return _coregister_elastix(source, target, elastix_model_parameters, spacing, log, mask)
+    return _coregister_elastix_2d(source, target, elastix_model_parameters, spacing, log, mask)
 
 
 def __coregister_elastix(source, target, elastix_model_parameters, spacing, log, mask):
@@ -484,12 +501,12 @@ def _coregister_elastix_parallel(args):
     """
     source, target, elastix_model_parameters, spacing, log, mask, downsample = args
     elastix_model_parameters = _dict2elastix(elastix_model_parameters)
-    return _coregister_elastix(source, target, elastix_model_parameters, spacing, log, mask, downsample)
+    return _coregister_elastix_2d(source, target, elastix_model_parameters, spacing, log, mask, downsample)
 
 
-def _coregister_elastix(source_large, target_large, elastix_model_parameters, spacing_large, log, mask, downsample:int=1):
+def _coregister_elastix_2d(source_large, target_large, elastix_model_parameters, source_spacing, log, mask, downsample:int=1):
     """
-    Coregister two arrays and return coregistered + deformation field 
+    Coregister two 2D arrays and return coregistered + deformation field 
     """
 
     # Downsample source and target
@@ -500,9 +517,17 @@ def _coregister_elastix(source_large, target_large, elastix_model_parameters, sp
     #   = (spacing_small - spacing_large)/2
     target_small = block_reduce(target_large, block_size=downsample, func=np.mean)
     source_small = block_reduce(source_large, block_size=downsample, func=np.mean)
-    spacing_small = [spacing_large[1]*downsample, spacing_large[0]*downsample]
+
+    spacing_large = [source_spacing[1], source_spacing[0]] # correct numpy(x,y) ordering for itk(y,x)
+    spacing_small = [spacing_large[0]*downsample, spacing_large[1]*downsample] # downsample large spacing
+
+    spacing_large_y, spacing_large_x = spacing_large # seperate for straightforward readable implementation with ITK ordering
+    spacing_small_y, spacing_small_x = spacing_small
+
+    large_shape_x, large_shape_y = source_large.shape
+    
     origin_large = [0,0]
-    origin_small = [(spacing_small[1] - spacing_large[1])/2, (spacing_small[0] - spacing_large[0]) / 2]
+    origin_small = [(spacing_small_y - spacing_large_y)/2, (spacing_small_x - spacing_large_x) / 2]
 
     # Coregister downsampled source to target
     source_small = itk.GetImageFromArray(np.array(source_small, np.float32)) 
@@ -517,8 +542,8 @@ def _coregister_elastix(source_large, target_large, elastix_model_parameters, sp
         log_to_console=log)
     
     # Get coregistered image at original size
-    result_transform_parameters.SetParameter(0, "Size", [str(source_large.shape[1]), str(source_large.shape[0])])
-    result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large[1]), str(spacing_large[0])])
+    result_transform_parameters.SetParameter(0, "Size", [str(large_shape_y), str(large_shape_x)])
+    result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large_y), str(spacing_large_x)])
     source_large = itk.GetImageFromArray(np.array(source_large, np.float32))
     source_large.SetSpacing(spacing_large)
     source_large.SetOrigin(origin_large)
@@ -537,8 +562,70 @@ def _coregister_elastix(source_large, target_large, elastix_model_parameters, sp
         result_transform_parameters, 
         log_to_console=log)
     deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
-    #deformation_field = np.reshape(deformation_field, (target_large.shape[0], target_large.shape[1], 2)) 
+
     deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
+    return coreg_large, deformation_field
+
+def _coregister_elastix_3d(source_large, target_large, elastix_model_parameters, source_spacing, log, mask, downsample:int=1):
+    """
+    Coregister two 3D arrays and return coregistered + deformation field 
+    """
+
+    # Downsample source and target
+    # The origin of an image is the center of the voxel in the lower left corner
+    # The origin of the large image is (0,0,0).
+    # The original of the small image is therefore: 
+    #   spacing_large/2 + (spacing_small/2 - spacing_large)
+    #   = (spacing_small - spacing_large)/2
+    target_small = block_reduce(target_large, block_size=downsample, func=np.mean)
+    source_small = block_reduce(source_large, block_size=downsample, func=np.mean)
+
+    spacing_large = [source_spacing[2], source_spacing[1], source_spacing[0]] # correct numpy(x,y,z) ordering for itk(z,y,x)
+    spacing_small = [spacing_large[0]*downsample, spacing_large[1]*downsample, spacing_large[2]*downsample] # downsample large spacing
+
+    spacing_large_z, spacing_large_y, spacing_large_x = spacing_large # seperate for straightforward readable implementation with ITK ordering
+    spacing_small_z, spacing_small_y, spacing_small_x = spacing_small
+
+    large_shape_x, large_shape_y, large_shape_z = source_large.shape
+
+    origin_large = [0,0,0]
+    origin_small = [(spacing_small_z - spacing_large_z)/2, (spacing_small_y - spacing_large_y) / 2, (spacing_small_x - spacing_large_x) / 2]
+
+    # Coregister downsampled source to target
+    source_small = itk.GetImageFromArray(np.array(source_small, np.float32)) # convert to itk compatiable format
+    target_small = itk.GetImageFromArray(np.array(target_small, np.float32)) # convert to itk compatiable format
+    source_small.SetSpacing(spacing_small)
+    target_small.SetSpacing(spacing_small)
+    source_small.SetOrigin(origin_small)
+    target_small.SetOrigin(origin_small)
+    coreg_small, result_transform_parameters = itk.elastix_registration_method(
+        target_small, source_small,
+        parameter_object=elastix_model_parameters, 
+        log_to_console=log) # perform registration of downsampled image
+    
+    # Get coregistered image at original size
+    result_transform_parameters.SetParameter(0, "Size", [str(large_shape_z), str(large_shape_y), str(large_shape_x)])
+    result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large_z), str(spacing_large_y), str(spacing_large_x)])
+    source_large = itk.GetImageFromArray(np.array(source_large, np.float32))
+    source_large.SetSpacing(spacing_large)
+    source_large.SetOrigin(origin_large)
+    coreg_large = itk.transformix_filter(
+        source_large,
+        result_transform_parameters,
+        log_to_console=log)
+    coreg_large = itk.GetArrayFromImage(coreg_large).flatten()
+    
+    # Get deformation field at original size
+    target_large = itk.GetImageFromArray(np.array(target_large, np.float32))
+    target_large.SetSpacing(spacing_large)
+    target_large.SetOrigin(origin_large)
+    deformation_field = itk.transformix_deformation_field(
+        target_large, 
+        result_transform_parameters, 
+        log_to_console=log)
+    deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
+    deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
+
     return coreg_large, deformation_field
 
 
