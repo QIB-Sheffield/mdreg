@@ -44,7 +44,7 @@ Build release notes
 - Save the token in the environment variable GH_TOKEN. On windows:
 >>> $env:GH_TOKEN='token'
 - Build the changelog from current version to current main. For instance:
->>> changelist QIB-Sheffield/dcmri 0.6.2 main --format rst
+>>> changelist QIB-Sheffield/mdreg v0.3.8 main --format rst
 - Copy-paste the terminal output in an .rst file and save it in docs/source/releases
 - Add an entry in the index of docs/source/releases
 
