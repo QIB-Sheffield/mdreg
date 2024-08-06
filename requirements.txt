@@ -1,8 +1,8 @@
-itk-elastix
-matplotlib
-numpy
-pandas
-Pillow
-scipy
-SimpleITK
+importlib-resources>=1.1.0
 tqdm
+numpy<=1.26.4
+scipy
+matplotlib
+Pillow
+itk-elastix
+scikit-image

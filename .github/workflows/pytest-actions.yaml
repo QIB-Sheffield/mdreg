@@ -1,0 +1,41 @@
+# GitHub Actions Configuration for integrated testing using pytest
+name: Test package
+run-name: "Running tests as ${{ github.actor }} has pushed changes"
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install packages
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r tests/requirements.txt
+          pip install .
+          pip list
+
+      - name: Install dcmri
+        run: |
+          pip install -e .[extensions]
+
+      - name: Test with pytest
+        run: pytest --cov=dcmri --cov-report=xml
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
