@@ -1,12 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 
-### mdreg folder structure
+### package builds
 .venv/*
+docs/build
+tests/tmp/*
+tests/export/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*__pycache__/
 *.py[cod]
 *$py.class
 
@@ -21,7 +24,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/ # taken out as this ignores dcm4che lib folder in external
 lib64/
 parts/
 sdist/
