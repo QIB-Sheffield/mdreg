@@ -128,9 +128,7 @@ As expected, the result is the same as before using the built-in model `abs_exp_
 Pixel-by-pixel fitting
 ----------------------
 
-In cases where the model is not available in any existing package, or the user is not prepared to import an existing package, the fit function must be written from scratch. In general, ``mdreg`` only requires that it has the same interface as the `ukat_t1_model` defined above: one argument (the image array), any number of keyword arguments, and two return values (the model fit and the fit parameters).
-
-``mdreg`` offers a convenient shortcut for the common scenario where a 1D signal model is applied for each pixel independently (*pixel-by-pixel fitting*). All that is needed is to define the 1D model explicitly. 
+``mdreg`` offers a convenient shortcut for the scenario where a 1D signal model is applied for each pixel independently (*pixel-by-pixel fitting*). All that is needed is to define the 1D model explicitly. 
 
 .. code-block:: python
 
