@@ -1,27 +1,27 @@
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/#pyproject-toml-spec
 
-# minimal required information
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = ['setuptools>=61.2']
 
 [project]
 name = "mdreg"
-version = "0.3.7"
+version = "0.3.8"
 dependencies = [
-  "itk-elastix",
-  "matplotlib",
-  "numpy",
-  "pandas",
-  "Pillow",
+  'importlib-resources>=1.1.0',
+  'tqdm',
+  "numpy<=1.26.4", 
   "scipy",
-  "SimpleITK",
-  "tqdm",
+  "matplotlib",
+  "itk-elastix",
+  "Pillow",
+#  "SimpleITK", 
 ]
 
 # optional information
-
 description = "Model-driven image registration"
 readme = "README.md"
 authors = [
-  { name = "Kanishka Sharma", email = "kanishka.sharma@sheffield.ac.uk" },
-  { name = "Joao Almeida e Sousa", email = "j.g.sousa@sheffield.ac.uk" }, 
   { name = "Steven Sourbron", email = "s.sourbron@sheffield.ac.uk" }
   ]
 license = { file = "LICENSE" }

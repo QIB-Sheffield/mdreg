@@ -1,0 +1,2 @@
+include src/mdreg/datafiles/*.pkl
+include src/mdreg/datafiles/*.npy
