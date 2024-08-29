@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 import numpy as np
 from scipy.optimize import curve_fit
+from scipy import integrate
 
 
 # filepaths need to be identified with importlib_resources
@@ -26,7 +27,12 @@ try:
 except: 
     num_workers = int(os.cpu_count())
 
-
+def ddint(c, t):
+    ci = integrate.cumtrapz(c, t)
+    ci = np.insert(ci, 0, 0)
+    cii = integrate.cumtrapz(ci, t)
+    cii = np.insert(cii, 0, 0)
+    return cii, ci
 
 def fetch(dataset:str)->dict:
     f = importlib_resources.files('mdreg.datafiles')
