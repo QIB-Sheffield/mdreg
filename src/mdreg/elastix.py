@@ -218,7 +218,6 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         source_large,
         result_transform_parameters,
         log_to_console=log)
-    coreg_large = itk.GetArrayFromImage(coreg_large).flatten()
     
     # Get deformation field at original size
     target_large = itk.GetImageFromArray(np.array(target_large, np.float32))
