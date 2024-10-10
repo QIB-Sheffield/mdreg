@@ -9,7 +9,25 @@ from mdreg import utils
 
 
 def coreg_series(*args, parallel=False, **kwargs):
+    """
+    Coregister a series of images.
 
+    Parameters
+    ----------
+    *args : dict
+            Coregistration arguments.
+    parallel : bool
+            Whether to perform coregistration in parallel.
+    **kwargs : dict
+            Coregistration keyword arguments.
+
+    Returns
+    -------
+    coreg : numpy.ndarray
+            Coregistered series.
+    deformation : numpy.ndarray
+            Deformation field.
+    """
     if parallel:
         return _coreg_series_parallel(*args, **kwargs)
     else:
@@ -96,6 +114,27 @@ def _coreg_parallel(args):
 
 
 def coreg(source:np.ndarray, *args, **kwargs):
+
+    """
+    Coregister two arrays
+    
+    Parameters
+    ----------
+    source : numpy.ndarray
+        The source image.
+    *args : dict
+        Coregistration arguments.
+    **kwargs : dict
+        Coregistration keyword arguments.
+    
+    Returns
+    -------
+    coreg : numpy.ndarray
+        Coregistered image.
+    deformation : numpy.ndarray
+        Deformation field.
+    
+    """
 
     if source.ndim == 2: 
         return _coreg_2d(source, *args, **kwargs)
@@ -234,6 +273,23 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
 
 
 def params(default='freeform', **override):
+
+    """
+    Generate parameters for elastix registration.
+
+    Parameters
+    ----------
+    default : str
+        The default parameter set to use.
+    **override : dict
+        Parameters to override.
+    
+    Returns
+    -------
+    params : dict
+        The parameter set.
+
+    """
     if default=='freeform':
         params = _freeform()
     else:
@@ -290,8 +346,8 @@ def _freeform():
     #      If Recursive is chosen and only # of resolutions is given 
     #      then downsamlping by a factor of 2 (default)
     # 3)	Shrinking -> Smoothing: NO, Downsampling: YES
-    settings["FixedImagePyramid"]="FixedSmoothingImagePyramid"
-    settings["MovingImagePyramid"]="MovingSmoothingImagePyramid"
+    settings["FixedImagePyramid"]="FixedRecursiveImagePyramid"
+    settings["MovingImagePyramid"]="MovingRecursiveImagePyramid"
     settings["Optimizer"]="AdaptiveStochasticGradientDescent"
     # Whether transforms are combined by composition or by addition.
     # In generally, Compose is the best option in most cases.
@@ -385,7 +441,18 @@ def _freeform():
 
 
 def make_params_obj(default='bspline', settings=None):
-    param_obj = itk.ParameterObject.New()
+
+    """
+    Make an elastix parameter object.
+
+    Parameters
+    ----------
+    default : str
+        The default parameter set to use.
+    settings : dict
+        Parameters to override.
+    """
+    param_obj = itk.ParameterObject.New() # long runtime ~20s
     parameter_map_bspline = param_obj.GetDefaultParameterMap(default) 
     param_obj.AddParameterMap(parameter_map_bspline) 
     if settings is None:
