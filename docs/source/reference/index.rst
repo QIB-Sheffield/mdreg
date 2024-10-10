@@ -15,5 +15,7 @@ This reference manual details all functions included in `mdreg`, describing what
    mdr
    elastix
    models
+   plot
    utils
+   
    
