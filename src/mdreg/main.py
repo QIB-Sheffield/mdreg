@@ -16,20 +16,40 @@ def fit(moving,
         verbose = 0,
         plot_params = {},
     ):
-    """_summary_
 
-    Args:
-        moving (_type_): _description_
-        fit_pixel (_type_, optional): _description_. Defaults to None.
-        fit_image (dict, optional): _description_. Defaults to { 'func': models.constant, }.
-        fit_coreg (dict, optional): _description_. Defaults to {}.
-        precision (float, optional): _description_. Defaults to 1.0.
-        maxit (int, optional): _description_. Defaults to 3.
-        verbose (int, optional): the level of feedback to provide to the user. 0: no feedback; 1: text output only; 2: text output and progress bars; 3: text output, progress bars and image exports. Defaults to 0.
-        plot_params (dict, optional): _description_. Defaults to {}.
+    """
+    Fit a signal model to a series of images and perform coregistration to correct for motion artefacts.
 
-    Returns:
-        _type_: _description_
+    Parameters
+    ----------
+    moving : numpy.array
+        The series of images to be corrected.
+    fit_pixel : dict, optional
+        The parameters for fitting the signal model to each pixel. The default is None.
+    fit_image : dict, optional
+        The parameters for fitting the signal model to the whole image. The default is {'func': models.constant, }.
+    fit_coreg : dict, optional
+        The parameters for coregistering the images. The default is {}.
+    precision : float, optional
+        The precision of the coregistration. The default is 1.0.
+    maxit : int, optional
+        The maximum number of iterations. The default is 3.
+    verbose : int, optional
+        The level of feedback to provide to the user. 0: no feedback; 1: text output only; 2: text output and progress bars; 3: text output, progress bars and image exports. The default is 0.
+    plot_params : dict, optional
+        The parameters for plotting the images. The default is {}.
+    
+    Returns
+    -------
+    coreg : numpy.array
+        The coregistered images.
+    defo : numpy.array
+        The deformation field.
+    fit : numpy.array
+        The fitted signal model.
+    pars : dict
+        The parameters of the fitted signal model.
+
     """
     coreg, defo = utils._init_output(moving)
     converged = False
@@ -67,7 +87,7 @@ def fit(moving,
             print('Deformation correction after iteration ' + str(it) + ': ' + str(corr) + ' pixels')
             print('Calculation time for iteration ' + str(it) + ': ' + str((time.time()-startit)/60) + ' min')  
         if verbose==3:
-            plot.plot_series(moving, fit, coreg, filename='mdreg['+str(it)+']', **plot_params)
+            anim = plot.plot_series(moving, fit, coreg, filename='mdreg['+str(it)+']', **plot_params)
 
         if it == maxit: 
             break

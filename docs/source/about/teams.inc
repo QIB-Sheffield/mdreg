@@ -1,10 +1,7 @@
 
 .. _core-developers-team:
 
-
-These are the current developers of dcmri:
-
-
+These are the current developers of `mdreg`:
 
 .. raw:: html
 
@@ -22,22 +19,73 @@ These are the current developers of dcmri:
      <div class="team-member-handle">@plaresmedima</div>
    </div>
 
-
-.. raw:: html
-
-   <div class="team-member">
-     <a href="https://github.com/EbonyGunwhy" class="team-member-name">
+         <div class="team-member">
+     <a href="https://github.com/EShalom" class="team-member-name">
         <div class="team-member-photo">
            <img
-             src="https://avatars.githubusercontent.com/u/100941618?v=4"
+             src="https://avatars.githubusercontent.com/u/79933818?v=4"
              loading="lazy"
-             alt="Avatar picture of @EbonyGunwhy"
+             alt="Avatar picture of @EShalom"
            />
         </div>
-        Ebony Gunwhy
+        Eve Shalom
      </a>
-     <div class="team-member-handle">@bonyGunwhy</div>
+     <div class="team-member-handle">@EShalom</div>
    </div>
 
+   
+   <div class="team-member">
+     <a href="https://github.com/JoaoPeriquito" class="team-member-name">
+        <div class="team-member-photo">
+           <img
+             src="https://avatars.githubusercontent.com/u/48806417?v=4"
+             loading="lazy"
+             alt="Avatar picture of @JoaoPeriquito"
+           />
+        </div>
+        João Periquito
+     </a>
+     <div class="team-member-handle">@JoaoPeriquito</div>
+   </div>
 
+   <div class="team-member">
+     <a href="https://github.com/KanishkaS" class="team-member-name">
+        <div class="team-member-photo">
+           <img
+             src="https://avatars.githubusercontent.com/u/42036722?v=4"
+             loading="lazy"
+             alt="Avatar picture of @KanishkaS"
+           />
+        </div>
+        Kanishka Sharma
+     </a>
+     <div class="team-member-handle">@KanishkaS</div>
+   </div>
 
+   <div class="team-member">
+     <a href="https://github.com/JSousa-UoL" class="team-member-name">
+        <div class="team-member-photo">
+           <img
+             src="https://avatars.githubusercontent.com/u/53518061?v=4"
+             loading="lazy"
+             alt="Avatar picture of @JSousa-UoL"
+           />
+        </div>
+        Jo&atildeo Almeida e Sousa
+     </a>
+     <div class="team-member-handle">@JSousa-UoL</div>
+   </div>
+
+   <div class="team-member">
+     <a href="https://github.com/lauracbell" class="team-member-name">
+        <div class="team-member-photo">
+           <img
+             src="https://avatars.githubusercontent.com/u/46763125?v=4"
+             loading="lazy"
+             alt="Avatar picture of @lauracbell"
+           />
+        </div>
+        Laura Bell
+     </a>
+     <div class="team-member-handle">@lauracbell</div>
+   </div>

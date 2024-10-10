@@ -6,6 +6,33 @@ import numpy as np
 
 def animation(array, path=None, filename='animation', vmin=None, vmax=None, interval=250, show=False):
 
+    """
+    Produce an animation of a 3D image.
+
+    Parameters
+    ----------
+    array : numpy.array
+        The 3D image to animate.
+    path : str, optional
+        The path to save the animation. The default is None.
+    filename : str, optional
+        The filename of the animation. The default is 'animation'.
+    vmin : float, optional
+        The minimum value for the colormap. The default is None.
+    vmax : float, optional
+        The maximum value for the colormap. The default is None.
+    interval : int, optional
+        The interval between frames. The default is 250ms.
+    show : bool, optional
+        Whether to display the animation. The default is False.
+    
+    Returns
+    -------
+    anim : matplotlib.animation.ArtistAnimation
+        The animation object
+
+    """
+
     array[np.isnan(array)] = 0
     shape = np.shape(array)
 
@@ -40,13 +67,65 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None, inte
         if show:
             plt.show()
 
+        return anim
 
-def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None, vmax=None, interval=250, show=False):
-    titlesize=6
+
+def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None, vmax=None, slice=None, interval=250, show=False):
+
+    """
+    Produce an animation of the original, fitted and coregistered images for a 2D slice.
+
+    Parameters
+    ----------
+    moving : numpy.array
+        The moving image.
+    fixed : numpy.array
+        The fixed/fitted image.
+    coreg : numpy.array
+        The coregistered image.
+    path : str, optional
+        The path to save the animation. The default is None.
+    filename : str, optional
+        The filename of the animation. The default is 'animation'.
+    vmin : float, optional
+        The minimum value for the colormap. The default is None.
+    vmax : float, optional
+        The maximum value for the colormap. The default is None.
+    slice : int, optional
+        The slice to plot. The default is None, which plots the central slice.
+    interval : int, optional
+        The interval between frames. The default is 250ms.
+    show : bool, optional
+        Whether to display the animation. The default is False.
+
+    Returns
+    -------
+    anim : matplotlib.animation.ArtistAnimation
+        The animation object
+
+    """
+
+    if ((show==False) and (path is None)):
+        print('No plot produced. If required either set show=True or provide a path to save the plot.')
+        return None
+    
+    if len(np.shape(moving)[:-1]) == 3:
+        if slice is None:
+            mid_slice = int(moving.shape[2]/2)
+            fixed = fixed[:,:,mid_slice,:]
+            moving = moving[:,:,mid_slice,:]
+            coreg = coreg[:,:,mid_slice,:]
+        else:
+            fixed = fixed[:,:,slice,:]
+            moving = moving[:,:,slice,:]
+            coreg = coreg[:,:,slice,:]
+    
+    titlesize = 6
+
     fig, ax = plt.subplots(figsize=(6, 2), ncols=3, nrows=1)
-    ax[0].set_title('model fit', fontsize=titlesize)
-    ax[1].set_title('data', fontsize=titlesize)
-    ax[2].set_title('coregistered', fontsize=titlesize)
+    ax[0].set_title('Model fit', fontsize=titlesize)
+    ax[1].set_title('Data', fontsize=titlesize)
+    ax[2].set_title('Coregistered', fontsize=titlesize)
     for i in range(3):
         ax[i].set_yticklabels([])
         ax[i].set_xticklabels([])
@@ -66,10 +145,45 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None
     if show:
         plt.show()   
     else:
-        plt.close() 
+        plt.close()
+    
+    return anim
 
 
 def plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
+
+    """
+    Plot the moving, fixed and coregistered images, and the deformation field.
+
+    Parameters
+    ----------
+    moving : numpy.array
+        The moving image.
+    fixed : numpy.array
+        The fixed/fitted image.
+    coreg : numpy.array
+        The coregistered image.
+    defo : numpy.array
+        The deformation field.
+    dmax : float, optional
+        The maximum value for the deformation field. The default is 2.0.
+    vmax : float, optional
+        The maximum value for the colormap. The default is 10000.
+    
+    Returns
+    -------
+    None, shows the plot.    
+
+    """
+
+    if len(np.shape(moving)[:-1]) == 3:
+        mid_slice = int(moving.shape[2]/2)
+        fixed = fixed[:,:,mid_slice]
+        moving = moving[:,:,mid_slice]
+        coreg = coreg[:,:,mid_slice]
+        defo = defo[:,:,mid_slice]
+    elif len(np.shape(moving)[:-1]) == 2:
+        pass
 
     titlesize = 6
     # Plot
@@ -110,9 +224,30 @@ def plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
 
     plt.show()
 
+    return 
 
 
-def params(array, path, filename, bounds=[-np.inf, np.inf]):
+def plot_params(array, path, filename, bounds=[-np.inf, np.inf]):
+
+    """
+    Plot and save the parameters of the model.
+
+    Parameters
+    ----------
+    array : numpy.array
+        The array of parameters to plot.
+    path : str
+        The path to save the plot.
+    filename : str
+        The filename of the plot.
+    bounds : list, optional
+        The bounds of the colormap. The default is [-np.inf, np.inf].
+    
+    Returns
+    -------
+    None, saves the plot.
+
+    """
 
     file = os.path.join(path, filename + '.png')
     array[np.isnan(array)] = 0 
@@ -136,3 +271,5 @@ def params(array, path, filename, bounds=[-np.inf, np.inf]):
             cBar.minorticks_on()
             plt.savefig(fname=[file_3D + '_' + str(i) + ".png"])
             plt.close()
+
+    return

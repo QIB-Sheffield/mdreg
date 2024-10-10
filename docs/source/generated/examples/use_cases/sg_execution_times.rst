@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.000** total execution time for 0 files **from generated\examples\use_cases**:
+**50:10.094** total execution time for 1 file **from generated\examples\use_cases**:
 
 .. container::
 
@@ -32,6 +32,6 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - N/A
-     - N/A
-     - N/A
+   * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py` (``plot_3Dexample_vfa.py``)
+     - 50:10.094
+     - 0.0
