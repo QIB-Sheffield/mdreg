@@ -1,12 +1,32 @@
 
 import numpy as np
-
 from mdreg import utils
 
     
 
 
 def constant(ydata):
+
+    """
+    Constant model fit
+
+    Parameters
+    ----------
+    
+    ydata : numpy.ndarray 
+            Signal data
+    
+    Returns
+    -------
+
+    fit : numpy.ndarray
+        Fitted data
+
+    par : numpy.ndarray
+        Parameters
+
+    """
+
     shape = np.shape(ydata)
     avr = np.mean(ydata, axis=-1) 
     par = avr.reshape(shape[:-1] + (1,))
@@ -31,6 +51,33 @@ def exp_decay(ydata,
         p0 = [1,1], 
         parallel = False,
         **kwargs):
+    
+    """
+    Exponential decay model fit
+
+    Parameters
+    ----------
+        ydata : numpy.ndarray
+            Signal data
+        time : numpy.ndarray
+            Time data
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+    
+    Returns
+    -------
+    fit : numpy.ndarray
+        Fitted data
+    par : numpy.ndarray
+        Parameters
+        
+    """
     
     if time is None:
         raise ValueError('time is a required argument.')
@@ -63,6 +110,33 @@ def abs_exp_recovery_2p(signal,
         parallel = False,
         **kwargs):
     
+    """
+    2-parameter absolute exponential recovery model fit
+
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        TI : numpy.array
+            Inversion times
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+    
+    Returns
+    -------
+    fit : numpy.ndarray
+        Fitted data
+    par : numpy.ndarray
+        Parameters
+        
+    """
+    
     if TI is None:
         raise ValueError('TI is a required parameter.')
     
@@ -93,6 +167,33 @@ def exp_recovery_2p(signal,
         p0 = [1,1.3], 
         parallel = False,
         **kwargs):
+    
+    """
+    2-parameter exponential recovery model fit
+    
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        TI : numpy.array
+            Inversion times
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+    
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        par : numpy.ndarray
+            Parameters
+        
+    """
     
     if TI is None:
         raise ValueError('TI is a required parameter.')
@@ -126,6 +227,33 @@ def abs_exp_recovery_3p(signal,
         parallel = False,
         **kwargs):
     
+    """
+    3-parameter absolute exponential recovery model fit
+    
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        TI : numpy.array
+            Inversion times
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+    
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        par : numpy.ndarray
+            Parameters
+        
+    """
+    
     if TI is None:
         raise ValueError('TI is a required parameter.')
     
@@ -157,6 +285,33 @@ def exp_recovery_3p(signal,
         parallel = False,
         **kwargs):
     
+    """
+    3-parameter exponential recovery model fit
+    
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        TI : numpy.array
+            Inversion times
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        par : numpy.ndarray
+            Parameters
+        
+        """
+    
     if TI is None:
         raise ValueError('TI is a required parameter.')
     
@@ -174,11 +329,39 @@ def spgr_vfa_nonlin(signal,
         TR = None,
         bounds = (
             [0,0],
-            [np.inf, 1.3], 
+            [np.inf, np.inf], 
         ),
         p0 = [1,1.3], 
         parallel = False,
         **kwargs):
+    
+    """
+    Non-linear SPGR model fit
+
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        FA : float
+            Flip Angles
+        TR : float
+            Repetition time
+        bounds : tuple
+            Bounds for the fit
+        p0 : list
+            Initial parameters
+        parallel : bool
+            Use parallel processing
+        **kwargs :
+            Additional keyword arguments
+
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        pars : numpy.ndarray
+    
+    """
     
     if FA is None:
         raise ValueError('FLip Angles (FA) are a required parameter.')
@@ -204,43 +387,66 @@ def _spgr_vfa_nonlin_func_init(FA, signal, init):
 
 def spgr_vfa_lin(signal, 
         FA = None,
-        TR = None,
         bounds = (
             [0,0],
-            [np.inf, 1.3], 
-        ),
-        p0 = [1,1.3], 
-        parallel = False,
-        **kwargs):
+            [np.inf, np.inf]
+        )):
+    
+    """
+    Linearised SPGR model fit
+
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        FA : float
+            Flip Angles
+        bounds : tuple
+            Bounds for the fit
+    
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        pars : numpy.ndarray
+            Parameters
+    
+    """
     
     if FA is None:
         raise ValueError('FLip Angles (FA) are a required parameter.')
     
-    FA = np.array(FA)
-    if FA.ndim == 1:        
-        FA = FA[np.newaxis, :]
+    FA_array = np.ones_like(signal)*FA
+    X = signal/np.sin(FA_array)
+    Y = (signal * np.cos(FA_array)) / np.sin(FA_array)
 
     signal_flat = signal.reshape(-1,signal.shape[-1])
-    X = signal_flat/np.sin(FA)
+    X_flat = X.reshape(-1,signal.shape[-1])
+    Y_flat = Y.reshape(-1,signal.shape[-1])
 
-    Y = (signal_flat * np.cos(FA)) / np.sin(FA)
-    
-    return _spgr_vfa_lin_fit(X, Y, signal.shape)
+    return _spgr_vfa_lin_fit(X_flat, Y_flat, FA, signal, signal.shape)
 
 def _spgr_vfa_lin_func(A, Y):
     return (np.linalg.lstsq(A, Y, rcond=None)[0])
 
-def _spgr_vfa_lin_fit(X, Y, signal_shape):
-
-    fit = np.empty(X.shape)
-
+def _spgr_vfa_lin_fit(X, Y, FA, signal, signal_shape):
+    
+    pars = np.empty(X.shape[:-1]+(2,))
+    
     for i in range(X.shape[0]):
         A = np.vstack([X[i,:], np.ones(len(X[i,:]))]).T
         m, c = _spgr_vfa_lin_func(A, Y[i,:])
-        pars = (m, c)
-        fit[i,:] = X[i,:]*pars[0] + pars[1]
+        pars[i,0] = m
+        pars[i,1] = c
+    
+    
+    pars = pars.reshape(signal_shape[:-1] + (2,))
+    fit = (pars[...,1][..., np.newaxis]*np.sin(FA))/(np.cos(FA)-pars[...,0][..., np.newaxis])
+    smax = np.amax(signal)
+    fit[fit<0]=0
+    fit[np.isnan(fit)] = 0
+    fit[fit>2*smax]=2*smax
 
-    fit = fit.reshape(signal_shape)
     return fit, pars
 
 
@@ -249,10 +455,33 @@ def array_2cfm_lin(signal,
         aif = None,
         time = None,
         baseline = None,
-        Hct = None,
-        parallel = False,
-        **kwargs):
+        Hct = None):
     
+    """
+    Linearised 2-compartment filtration model fit
+
+    Parameters
+    ----------
+        signal : numpy.ndarray
+            Signal data
+        aif : numpy.ndarray
+            Arterial input function
+        time : numpy.ndarray
+            Time data
+        baseline : int
+            Baseline
+        Hct : float
+            Haematocrit
+    
+    Returns
+    -------
+        fit : numpy.ndarray
+            Fitted data
+        par : numpy.ndarray
+            Parameters
+
+    """
+
     if aif is None:
         raise ValueError('aif is a required parameter.')
     elif time is None:
@@ -346,4 +575,5 @@ def _array_2cfm_lin_params(X):
     if PS>2000: PS=2000
     if Te<0: Te=0
     if Te>600: Te=600
+    
     return [Fp, Tp, PS, Te]
