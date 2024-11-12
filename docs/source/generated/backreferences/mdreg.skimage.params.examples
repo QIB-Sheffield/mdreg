@@ -15,7 +15,7 @@ Examples using ``mdreg.skimage.params``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or 3D images. It applies specifically to situations where a model exists that can describe the changes in signal intensity through the series. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or  3D images. It applies specifically to situations where a model exists that can  describe the changes in signal intensity through the series. ">
 
 .. only:: html
 

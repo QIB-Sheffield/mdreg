@@ -1,4 +1,4 @@
-﻿mdreg.ddint
+﻿mdreg._ddint
 ===========
 
 
@@ -6,13 +6,13 @@
 
 
 
-.. autofunction:: ddint
+.. autofunction:: _ddint
 
 
 
 
 
-.. minigallery:: mdreg.ddint
+.. minigallery:: mdreg._ddint
    :add-heading:
 
 

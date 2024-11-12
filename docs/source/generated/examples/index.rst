@@ -38,7 +38,7 @@ Tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or 3D images. It applies specifically to situations where a model exists that can describe the changes in signal intensity through the series. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or  3D images. It applies specifically to situations where a model exists that can  describe the changes in signal intensity through the series. ">
 
 .. only:: html
 
@@ -75,7 +75,7 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA) dataset.  The data is fetched using the fetch function, and the desired slice is extracted from the data array.  The VFA parameters are defined, and the coregistration parameters are set.  The model-driven coregistration is performed, and the results are visualized.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA)  dataset. The data is fetched using the fetch function, and the desired slice  is extracted from the data array. The VFA parameters are defined, and the  coregistration parameters are set. The model-driven coregistration is  performed, and the results are visualized.">
 
 .. only:: html
 
@@ -87,6 +87,23 @@ Use cases
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Example 3D data: Variable Flip Angle</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates the effect of poor model fitting on coregistration for the 3D Variable Flip Angle (VFA) dataset used in the 3D data example.">
+
+.. only:: html
+
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_poor_model_fitting_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_use_cases_plot_poor_model_fitting.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Example: Poor Model Fitting</div>
     </div>
 
 

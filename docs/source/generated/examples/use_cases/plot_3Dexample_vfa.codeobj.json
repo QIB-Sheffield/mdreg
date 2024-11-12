@@ -1,4 +1,13 @@
 {
+ "(": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "("
+  }
+ ],
  ":math:": [
   {
    "is_class": false,
@@ -36,13 +45,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "FA"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "FA"
   }
  ],
  "S": [
@@ -70,32 +72,9 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "S_{0}"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "S_{0}"
-  }
- ],
- "TR": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "TR"
   }
  ],
  "T_{1}": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "T_{1}"
-  },
   {
    "is_class": false,
    "is_explicit": true,
@@ -140,6 +119,22 @@
    "name": "\\phi"
   }
  ],
+ "anim": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.animation",
+   "module_short": "matplotlib.animation",
+   "name": "ArtistAnimation"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib",
+   "module_short": "matplotlib",
+   "name": "ArtistAnimation"
+  }
+ ],
  "array": [
   {
    "is_class": false,
@@ -149,16 +144,7 @@
    "name": "ndarray"
   }
  ],
- "coreg_lin": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ndarray"
-  }
- ],
- "coreg_nonlin": [
+ "coreg": [
   {
    "is_class": false,
    "is_explicit": false,
@@ -199,16 +185,7 @@
    "name": "data"
   }
  ],
- "defo_lin": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ndarray"
-  }
- ],
- "defo_nonlin": [
+ "defo": [
   {
    "is_class": false,
    "is_explicit": false,
@@ -242,16 +219,7 @@
    "name": "filename"
   }
  ],
- "fit_lin": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ndarray"
-  }
- ],
- "fit_nonlin": [
+ "fit": [
   {
    "is_class": false,
    "is_explicit": false,
@@ -261,13 +229,6 @@
   }
  ],
  "func": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "func"
-  },
   {
    "is_class": false,
    "is_explicit": true,
@@ -285,15 +246,6 @@
    "name": "interval"
   }
  ],
- "lin_time": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "float"
-  }
- ],
  "mdreg": [
   {
    "is_class": false,
@@ -301,13 +253,45 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "mdreg"
+  }
+ ],
+ "mdreg.animation": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "animation"
   },
   {
    "is_class": false,
    "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "animation"
+  }
+ ],
+ "mdreg.elastix.params": [
+  {
+   "is_class": false,
+   "is_explicit": false,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "mdreg"
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mdreg.elastix",
+   "module_short": "mdreg.elastix",
+   "name": "params"
   }
  ],
  "mdreg.fetch": [
@@ -354,9 +338,23 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "fit"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "fit"
   }
  ],
  "mdreg.plot": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "plot"
+  },
   {
    "is_class": false,
    "is_explicit": true,
@@ -375,14 +373,7 @@
  "mdreg.plot_series": [
   {
    "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
+   "is_explicit": true,
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "plot_series"
@@ -423,77 +414,6 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "spgr_vfa_lin"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "spgr_vfa_lin"
-  }
- ],
- "mdreg.spgr_vfa_nonlin": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "spgr_vfa_nonlin"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "spgr_vfa_nonlin"
-  }
- ],
- "non_lin_time": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "float"
-  }
- ],
- "np.array": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "builtin_function_or_method"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "array"
-  }
- ],
- "np.deg2rad": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ufunc"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "deg2rad"
   }
  ],
  "np.percentile": [
@@ -510,6 +430,22 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "percentile"
+  }
+ ],
+ "np.round": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "_ArrayFunctionDispatcher"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "round"
   }
  ],
  "package": [
@@ -530,16 +466,7 @@
    "name": "params"
   }
  ],
- "pars_lin": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ndarray"
-  }
- ],
- "pars_nonlin": [
+ "pars": [
   {
    "is_class": false,
    "is_explicit": false,
@@ -582,6 +509,15 @@
    "name": "slice"
   }
  ],
+ "stime": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
  "time.time": [
   {
    "is_class": false,
@@ -598,6 +534,15 @@
    "name": "time"
   }
  ],
+ "tot_time": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
  "verbose": [
   {
    "is_class": false,
@@ -608,22 +553,6 @@
   }
  ],
  "vfa_fit": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "vfa_fit"
-  }
- ],
- "vfa_lin_fit": [
   {
    "is_class": false,
    "is_explicit": false,

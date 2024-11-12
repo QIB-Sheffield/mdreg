@@ -15,24 +15,24 @@ Examples using ``mdreg.animation``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or 3D images. It applies specifically to situations where a model exists that can describe the changes in signal intensity through the series. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates the effect of poor model fitting on coregistration for the 3D Variable Flip Angle (VFA) dataset used in the 3D data example.">
 
 .. only:: html
 
-  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.png
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_poor_model_fitting_thumb.png
     :alt:
 
-  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+  :ref:`sphx_glr_generated_examples_use_cases_plot_poor_model_fitting.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Getting started</div>
+      <div class="sphx-glr-thumbnail-title">Example: Poor Model Fitting</div>
     </div>
 
 
 .. only:: not html
 
- * :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+ * :ref:`sphx_glr_generated_examples_use_cases_plot_poor_model_fitting.py`
 
 .. thumbnail-parent-div-close
 

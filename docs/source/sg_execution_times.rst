@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**75:27.107** total execution time for 2 files **from all galleries**:
+**128:14.110** total execution time for 3 files **from all galleries**:
 
 .. container::
 
@@ -32,9 +32,12 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py` (``..\examples\use_cases\plot_3Dexample_vfa.py``)
-     - 50:10.094
+   * - :ref:`sphx_glr_generated_examples_use_cases_plot_poor_model_fitting.py` (``..\examples\use_cases\plot_poor_model_fitting.py``)
+     - 128:14.110
      - 0.0
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py` (``..\examples\tutorials\plot_getting_started.py``)
-     - 25:17.013
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py` (``..\examples\use_cases\plot_3Dexample_vfa.py``)
+     - 00:00.000
      - 0.0

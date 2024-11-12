@@ -12,4 +12,3 @@ Elastix wrappers
     coreg_series
     coreg
     params
-    make_params_obj

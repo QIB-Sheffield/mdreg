@@ -15,7 +15,7 @@ Examples using ``mdreg.spgr_vfa_lin``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA) dataset.  The data is fetched using the fetch function, and the desired slice is extracted from the data array.  The VFA parameters are defined, and the coregistration parameters are set.  The model-driven coregistration is performed, and the results are visualized.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA)  dataset. The data is fetched using the fetch function, and the desired slice  is extracted from the data array. The VFA parameters are defined, and the  coregistration parameters are set. The model-driven coregistration is  performed, and the results are visualized.">
 
 .. only:: html
 

@@ -6,13 +6,13 @@
 
 
 
-.. autofunction:: make_params_obj
+.. autofunction:: _make_params_obj
 
 
 
 
 
-.. minigallery:: mdreg.elastix.make_params_obj
+.. minigallery:: mdreg.elastix._make_params_obj
    :add-heading:
 
 
