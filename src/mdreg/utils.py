@@ -27,7 +27,7 @@ try:
 except: 
     num_workers = int(os.cpu_count())
 
-def ddint(c, t):
+def _ddint(c, t):
 
     """
     Double cumulative integral
@@ -129,13 +129,14 @@ def _fit_func(args):
         return p0
     
 
-def fit_pixels(ydata, 
+def fit_pixels(ydata,
         model = None,
         xdata = None,
         func_init = _func_init,
         bounds = (-np.inf, +np.inf),
         p0 = None, 
         parallel = False,
+        progress_bar = False,
         **kwargs, 
     ):
 
@@ -158,6 +159,8 @@ def fit_pixels(ydata,
             Initial guess for the model parameters
         parallel : bool
             Option to perform fitting in parallel
+        progress_bar : bool
+            Option to display a progress bar
         **kwargs: Additional arguments to pass to the curve_fit function
 
     Returns
@@ -175,7 +178,7 @@ def fit_pixels(ydata,
 
     if not parallel:
         p = []
-        for x in tqdm(range(nx), desc='Fitting pixels'):
+        for x in tqdm(range(nx), desc='Fitting pixels', disable=not progress_bar):
             args_x = (model, func_init, xdata, ydata[x,:], p0, bounds, kwargs)
             p_x = _fit_func(args_x)
             p.append(p_x)
