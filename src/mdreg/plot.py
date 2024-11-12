@@ -2,9 +2,11 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import ArtistAnimation
 import numpy as np
+import math
+import inspect
 
 
-def animation(array, path=None, filename='animation', vmin=None, vmax=None, interval=250, show=False):
+def animation(array, path=None, filename='animation', vmin=None, vmax=None, slice=None, title = '', interval=250, show=False):
 
     """
     Produce an animation of a 3D image.
@@ -21,6 +23,11 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None, inte
         The minimum value for the colormap. The default is None.
     vmax : float, optional
         The maximum value for the colormap. The default is None.
+    slice : int, optional
+        The slice to plot for 3D data. The default is None which plots all slices.
+    title : str, optional
+        The title of the animation to be rendered on the figure.
+        The default is ''.
     interval : int, optional
         The interval between frames. The default is 250ms.
     show : bool, optional
@@ -35,23 +42,54 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None, inte
 
     array[np.isnan(array)] = 0
     shape = np.shape(array)
+    titlesize = 10
 
-    if len(shape)==4: ##save 3D data
-        for k in range(shape[2]): 
-            fig, ax = plt.subplots()
-            im = ax.imshow(array[:,:,k,0].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax)
+    if array.ndim == 4 and slice is None : ##save 3D data
+
+        # Determine the grid size for the panels
+        num_slices = array.shape[2]
+        grid_size = math.ceil(math.sqrt(num_slices))
+
+        fig_3d, axes1 = plt.subplots(grid_size, grid_size, figsize=(grid_size*2, grid_size*2))
+        fig_3d.subplots_adjust(wspace=0.5, hspace=0.01)
+
+        fig_3d.suptitle('Series Type: {} \n \n'.format(title), fontsize=titlesize+2)
+        plt.tight_layout()
+
+        for i in range(grid_size * grid_size):
+                row = i // grid_size
+                col = i % grid_size
+                if i < num_slices:
+                    axes1[row, col].imshow(array[:, :, i, 0].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax)
+                    axes1[row, col].set_title('Slice {}'.format(i+1), fontsize=titlesize)
+                else:
+                    axes1[row, col].axis('off')  # Turn off unused subplots
+                axes1[row, col].set_xticks([])  # Remove x-axis ticks
+                axes1[row, col].set_yticks([])
+
+        images = []
+        for j in range(array.shape[-1]):
             ims = []
-            for i in range(shape[-1]):
-                im = ax.imshow(array[:,:,k,i].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax) 
-                ims.append([im]) 
-            anim = ArtistAnimation(fig, ims, interval=interval)
-            if path is not None:
-                file_3D_save = os.path.join(path, filename)
-                anim.save(file_3D_save + '_' + str(k) + ".gif")
-            if show:
-                plt.show()
-            else:
-                plt.close()
+            for i in range(grid_size * grid_size):
+                row = i // grid_size
+                col = i % grid_size
+                if i < num_slices:
+                    im = axes1[row, col].imshow(array[:, :, i, j].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax)
+                    ims.append(im)
+            images.append(ims,)
+
+        anim = ArtistAnimation(fig_3d, images, interval=interval, repeat_delay=interval)
+        if path is not None:
+            file_3D_save = os.path.join(path, filename)
+            anim.save(file_3D_save + "_"  + ".gif")
+        if show:
+            plt.show()
+        else:
+            plt.close()
+        return anim
+    
+    elif array.ndim-1 == 3 and slice is not None: # save 3D data
+        array = array[:,:,slice,:]
 
     else: # save 2D data  
         fig, ax = plt.subplots()
@@ -105,26 +143,71 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None
 
     """
 
-    if ((show==False) and (path is None)):
-        print('No plot produced. If required either set show=True or provide a path to save the plot.')
-        return None
-    
-    if len(np.shape(moving)[:-1]) == 3:
-        if slice is None:
-            mid_slice = int(moving.shape[2]/2)
-            fixed = fixed[:,:,mid_slice,:]
-            moving = moving[:,:,mid_slice,:]
-            coreg = coreg[:,:,mid_slice,:]
-        else:
+    titlesize = 6
+
+    if (moving.ndim == fixed.ndim == coreg.ndim == 4) and (slice is None):
+
+        # Determine the grid size for the panels
+        num_slices = moving.shape[2]
+        grid_size = math.ceil(math.sqrt(num_slices))
+        titles = ['Original Data', 'Model Fit', 'Coregistered']
+        anims = []
+
+        for data in (moving, fixed, coreg):
+            fig_3d, axes1 = plt.subplots(grid_size, grid_size, figsize=(grid_size*2, grid_size*2))
+            fig_3d.subplots_adjust(wspace=0.5, hspace=0.01)
+            data_name = titles[[np.array_equal(data, moving), np.array_equal(data, fixed), np.array_equal(data, coreg)].index(True)]
+
+            fig_3d.suptitle('Series Type: {} \n \n'.format(data_name), fontsize=titlesize+2)
+            plt.tight_layout()
+
+            for i in range(grid_size * grid_size):
+                    row = i // grid_size
+                    col = i % grid_size
+                    if i < num_slices:
+                        axes1[row, col].imshow(data[:, :, i, 0].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax)
+                        axes1[row, col].set_title('Slice {}'.format(i+1), fontsize=titlesize)
+                    else:
+                        axes1[row, col].axis('off')  # Turn off unused subplots
+                    axes1[row, col].set_xticks([])  # Remove x-axis ticks
+                    axes1[row, col].set_yticks([])
+
+            images = []
+            for j in range(data.shape[-1]):
+                ims = []
+                for i in range(grid_size * grid_size):
+                    row = i // grid_size
+                    col = i % grid_size
+                    if i < num_slices:
+                        im = axes1[row, col].imshow(data[:, :, i, j].T, cmap='gray', animated=True, vmin=vmin, vmax=vmax)
+                        ims.append(im)
+                images.append(ims,)
+
+            anim = ArtistAnimation(fig_3d, images, interval=interval, repeat_delay=interval)
+            if path is not None:
+                file_3D_save = os.path.join(path, filename)
+                data_type_name = _get_var_name(data)
+                anim.save(file_3D_save + "_" + data_type_name + ".gif")
+            if show:
+                plt.show()
+                anims.append(anim)
+            else:
+                plt.close()
+        return anims
+
+    elif (moving.ndim == fixed.ndim == coreg.ndim == 4) and (slice is not None):
             fixed = fixed[:,:,slice,:]
             moving = moving[:,:,slice,:]
             coreg = coreg[:,:,slice,:]
-    
-    titlesize = 6
+
+    elif not (moving.ndim == fixed.ndim == coreg.ndim):
+        raise ValueError("Dimension mis-match in arrays provided please ensure the three arrays have the same dimensions")
 
     fig, ax = plt.subplots(figsize=(6, 2), ncols=3, nrows=1)
+    if slice is not None:
+        fig.suptitle('Slice {} of {}'.format(slice, moving.shape[2]), fontsize=titlesize)
     ax[0].set_title('Model fit', fontsize=titlesize)
-    ax[1].set_title('Data', fontsize=titlesize)
+    ax[1].set_title('Original Data', fontsize=titlesize)
     ax[2].set_title('Coregistered', fontsize=titlesize)
     for i in range(3):
         ax[i].set_yticklabels([])
@@ -176,14 +259,8 @@ def plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
 
     """
 
-    if len(np.shape(moving)[:-1]) == 3:
-        mid_slice = int(moving.shape[2]/2)
-        fixed = fixed[:,:,mid_slice]
-        moving = moving[:,:,mid_slice]
-        coreg = coreg[:,:,mid_slice]
-        defo = defo[:,:,mid_slice]
-    elif len(np.shape(moving)[:-1]) == 2:
-        pass
+    if (len(np.shape(moving)[:-1]) == 3):
+        raise ValueError("Plotting not compatible for 3D dynamic data.")
 
     titlesize = 6
     # Plot
@@ -273,3 +350,10 @@ def plot_params(array, path, filename, bounds=[-np.inf, np.inf]):
             plt.close()
 
     return
+
+def _get_var_name(var):
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    for var_name, var_val in callers_local_vars:
+        if var_val is var:
+            return var_name
+    return None
