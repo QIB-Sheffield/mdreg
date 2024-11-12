@@ -133,8 +133,7 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 
 #%%
 # As expected, the result is the same as before using the built-in model 
-# `abs_exp_recovery_2p` **TODO: currently NOT the case - fix bug in ukat 
-# solution**
+# `abs_exp_recovery_2p`
 
 
 #%%
