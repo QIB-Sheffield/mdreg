@@ -5,7 +5,7 @@ from mdreg import utils
     
 
 
-def constant(ydata):
+def constant(signal, **kwargs):
 
     """
     Constant model fit
@@ -13,22 +13,29 @@ def constant(ydata):
     Parameters
     ----------
     
-    ydata : numpy.ndarray 
-            Signal data
+    signal : numpy.ndarray 
+            Signal data. 2D or 3D spatial array with signal intensities over an
+            additional dimension e,g, time, flip angle. For 2D spatial data: 
+            (X, Y, T). For 3D spatial data: (X, Y, Z, T).
+
+    **kwargs :
+            Additional keyword arguments
     
     Returns
     -------
 
     fit : numpy.ndarray
-        Fitted data
+        Fitted data. Array has the same shape as the input signal.
 
     par : numpy.ndarray
-        Parameters
+        Parameters. Array has the same shape as the input signal, with a final
+        extra axis of length 1. The parameters are: S0. For 2D spatial data: (X, Y, 1).
+        For 3D spatial data: (X, Y, Z, 1).
 
     """
 
-    shape = np.shape(ydata)
-    avr = np.mean(ydata, axis=-1) 
+    shape = np.shape(signal)
+    avr = np.mean(signal, axis=-1) 
     par = avr.reshape(shape[:-1] + (1,))
     fit = np.repeat(avr[...,np.newaxis], shape[-1], axis=-1)
     return fit, par
@@ -42,7 +49,7 @@ def _exp_decay_func_init(t, signal, init):
     S0 = np.amax([np.amax(signal),0])
     return [S0*init[0], init[1]]
     
-def exp_decay(ydata, 
+def exp_decay(signal,
         time = None,
         bounds = (
             [0,0],
@@ -57,10 +64,15 @@ def exp_decay(ydata,
 
     Parameters
     ----------
-        ydata : numpy.ndarray
-            Signal data
+        signal : numpy.ndarray
+            Signal data 
+            2D or 3D spatial array with signal intensities over an
+            temporal dimension. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         time : numpy.ndarray
             Time data
+            1D array of time points, length equal to the number of
+            time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -74,15 +86,19 @@ def exp_decay(ydata,
     -------
     fit : numpy.ndarray
         Fitted data
+        Array has the same shape as the input signal.
     par : numpy.ndarray
         Parameters
+        Array has the same shape as the spatial coordinates of the signal, with 
+        a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D spatial data: 
+        (X, Y, Z, 2).
         
     """
     
     if time is None:
         raise ValueError('time is a required argument.')
     
-    return utils.fit_pixels(ydata, 
+    return utils.fit_pixels(signal,
         model = _exp_decay_func, 
         xdata = np.array(time),
         func_init = _exp_decay_func_init,
@@ -116,9 +132,14 @@ def abs_exp_recovery_2p(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         TI : numpy.array
             Inversion times
+            1D array of inversion times, length equal to the number of
+            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -131,9 +152,11 @@ def abs_exp_recovery_2p(signal,
     Returns
     -------
     fit : numpy.ndarray
-        Fitted data
+        Fitted data. Array has the same shape as the input signal.
     par : numpy.ndarray
-        Parameters
+        Parameters. Array has the same shape as the spatial coordinates of the 
+        signal, with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
+        spatial data: (X, Y, Z, 2).
         
     """
     
@@ -174,9 +197,14 @@ def exp_recovery_2p(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         TI : numpy.array
             Inversion times
+            1D array of inversion times, length equal to the number of
+            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -190,8 +218,12 @@ def exp_recovery_2p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
+            Array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
+            Array has the same shape as the spatial coordinates of the signal, 
+            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
+            spatial data: (X, Y, Z, 2).
         
     """
     
@@ -233,9 +265,14 @@ def abs_exp_recovery_3p(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         TI : numpy.array
             Inversion times
+            1D array of inversion times, length equal to the number of
+            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -249,8 +286,12 @@ def abs_exp_recovery_3p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
+            The array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
+            The array has the same shape as the spatial coordinates of the
+            signal, with a final extra axis length 3. For 2D spatial data: (X, Y, 3). 
+            For 3D spatial data: (X, Y, Z, 3).
         
     """
     
@@ -291,9 +332,14 @@ def exp_recovery_3p(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         TI : numpy.array
             Inversion times
+            1D array of inversion times, length equal to the number of
+            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -307,8 +353,12 @@ def exp_recovery_3p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
+            Array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
+            Array has the same shape as the spatial coordinates of the signal,
+            with a final extra axis length 3. For 2D spatial data: (X, Y, 3). For 3D 
+            spatial data: (X, Y, Z, 3).
         
         """
     
@@ -329,9 +379,9 @@ def spgr_vfa_nonlin(signal,
         TR = None,
         bounds = (
             [0,0],
-            [np.inf, np.inf], 
+            [+np.inf, +np.inf], 
         ),
-        p0 = [1,1.3], 
+        p0 = [1,1], 
         parallel = False,
         **kwargs):
     
@@ -341,9 +391,14 @@ def spgr_vfa_nonlin(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
-        FA : float
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            flip angles. For 2D spatial data: (X, Y, FA). For 3D spatial data: 
+            (X, Y, Z, FA).
+        FA : numpy.array
             Flip Angles
+            1D array of flip angles, length equal to the number of
+            flip angle points in the signal data.
         TR : float
             Repetition time
         bounds : tuple
@@ -358,27 +413,37 @@ def spgr_vfa_nonlin(signal,
     Returns
     -------
         fit : numpy.ndarray
-            Fitted data
+            Fitted data 
+            Array has the same shape as the input signal.
         pars : numpy.ndarray
+            Fitted model parameters
+            Array has the same shape as the spatial coordinates of the signal,
+            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
+            spatial data: (X, Y, Z, 2).
+            
     
     """
     
     if FA is None:
-        raise ValueError('FLip Angles (FA) are a required parameter.')
+        raise ValueError('Flip Angles (FA) are a required parameter.')
+    
+    FA = np.deg2rad(FA)
     
     def myfunction(FA, S0, T1):
         return _spgr_vfa_nonlin_func(FA, S0, T1, TR)
 
-    return utils.fit_pixels(signal, 
+    fit, par = utils.fit_pixels(signal, 
         model = myfunction, 
-        xdata = np.array(FA),
+        xdata = FA,
         func_init = _spgr_vfa_nonlin_func_init,
         bounds = bounds,
         p0 = p0, 
         parallel = parallel,
         **kwargs)
 
-def _spgr_vfa_nonlin_func(FA, S0, T1,TR):
+    return fit, par
+
+def _spgr_vfa_nonlin_func(FA, S0, T1, TR):
     return (S0 * ( (np.sin(FA)*np.exp(-TR/T1)) / (1-np.cos(FA)*np.exp(-TR/T1)) ))
 
 def _spgr_vfa_nonlin_func_init(FA, signal, init):
@@ -389,8 +454,8 @@ def spgr_vfa_lin(signal,
         FA = None,
         bounds = (
             [0,0],
-            [np.inf, np.inf]
-        )):
+            [+np.inf, +np.inf]),
+        **kwargs):
     
     """
     Linearised SPGR model fit
@@ -398,9 +463,14 @@ def spgr_vfa_lin(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
-        FA : float
+            Signal data 
+            2D or 3D spatial array with signal intensities over different 
+            flip angles. For 2D spatial data: (X, Y, FA). For 3D spatial data:
+            (X, Y, Z, FA).
+        FA : numpy.array
             Flip Angles
+            1D array of flip angles, length equal to the number of
+            flip angle points in the signal data.
         bounds : tuple
             Bounds for the fit
     
@@ -408,19 +478,26 @@ def spgr_vfa_lin(signal,
     -------
         fit : numpy.ndarray
             Fitted data
+            Array has the same shape as the input signal.
         pars : numpy.ndarray
             Parameters
+            Array has the same shape as the spatial coordinates of the signal,
+            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
+            spatial data: (X, Y, Z, 2).
     
     """
     
     if FA is None:
         raise ValueError('FLip Angles (FA) are a required parameter.')
     
+    FA = np.deg2rad(FA)
+
+    # Construct FA array in matching shape to signal data
     FA_array = np.ones_like(signal)*FA
+
     X = signal/np.sin(FA_array)
     Y = (signal * np.cos(FA_array)) / np.sin(FA_array)
 
-    signal_flat = signal.reshape(-1,signal.shape[-1])
     X_flat = X.reshape(-1,signal.shape[-1])
     Y_flat = Y.reshape(-1,signal.shape[-1])
 
@@ -463,23 +540,31 @@ def array_2cfm_lin(signal,
     Parameters
     ----------
         signal : numpy.ndarray
-            Signal data
+            Signal data 
+            2D or 3D spatial array with signal intensities over an additional
+            time dimension. For 2D spatial data: (X, Y, T). For 3D spatial 
+            data: (X, Y, Z, T).
         aif : numpy.ndarray
-            Arterial input function
+            Arterial input function. 1D array of signal intensities, length
+            equal to the number of time points in the signal data.
         time : numpy.ndarray
-            Time data
+            Time data. 1D array of time points, length equal to the number of
+            time points in the signal data.
         baseline : int
-            Baseline
+            Baseline. Number of time points to use for the baseline signal.
         Hct : float
-            Haematocrit
+            Haematocrit.
     
     Returns
     -------
         fit : numpy.ndarray
             Fitted data
+            Array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
-
+            Array has the same shape as the input signal, with a final
+            extra axis of length 4. The parameters are: Fp, Tp, PS, Te. For 2D 
+            spatial data: (X, Y, 4). For 3D spatial data: (X, Y, Z, 4)
     """
 
     if aif is None:
@@ -508,13 +593,13 @@ def _array_2cfm_lin_func(signal:np.ndarray,
     ca = (aif-Sa0)/(1-Hct)
     
     A = np.empty((signal.shape[1],4))
-    A[:,2], A[:,3] = utils.ddint(ca, time)
+    A[:,2], A[:,3] = utils._ddint(ca, time)
 
     fit = np.empty(signal.shape)
     par = np.empty((signal.shape[0], 4))
     for x in range(signal.shape[0]):
         c = signal[x,:] - S0[x]
-        ctii, cti = utils.ddint(c, time)
+        ctii, cti = utils._ddint(c, time)
         A[:,0] = -ctii
         A[:,1] = -cti
         p = np.linalg.lstsq(A, c, rcond=None)[0] 
