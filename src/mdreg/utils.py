@@ -107,3 +107,53 @@ def fit_pixels(ydata,
   
     return fit.reshape(shape), par.reshape(shape[:-1]+(n,))
 
+def calc_jacobian(defo):
+    """
+    Calculate the Jacobian matrix and determinant from a deformation field.
+    
+    Parameters
+    ----------
+    defo : np.ndarray
+        The deformation field to calculate the Jacobian from.
+
+    Returns
+    -------
+    jac_mat : np.ndarray
+        The Jacobian matrix of the deformation field. 
+    jac_det : np.ndarray
+        The determinant of the Jacobian matrix.
+    """
+    jac_mat = np.zeros((defo.shape[0], defo.shape[1], 2, 2, defo.shape[3], defo.shape[4]))
+    jac_det = np.zeros((defo.shape[0], defo.shape[1], defo.shape[3], defo.shape[4]))
+
+    for t in range(defo.shape[4]):
+        for z in range(defo.shape[3]):
+            grad_xx, grad_xy = np.gradient(defo[:, :, 1, z, t])
+            grad_yx, grad_yy = np.gradient(defo[:, :, 0, z, t])
+
+            grad_xx += 1
+            grad_yy += 1
+
+            for x in range(defo.shape[0]):
+                for y in range(defo.shape[1]):
+                    jac_mat[x, y, :, :, z, t] = np.array([[grad_xx[x, y], grad_xy[x, y]], [grad_yx[x, y], grad_yy[x, y]]])
+                    jac_det[x, y, z, t] = np.linalg.det(jac_mat[x, y, :, :, z, t])
+
+    return jac_mat, jac_det
+
+def calc_norm(defo):
+    """
+    Calculate the norm of a deformation field.
+    
+    Parameters
+    ----------
+    defo : np.ndarray
+        The deformation field to calculate the norm from.
+
+    Returns
+    -------
+    norm : np.ndarray
+        The norm of the deformation field.
+    """
+    norm = np.linalg.norm(defo, axis=2)
+    return norm
