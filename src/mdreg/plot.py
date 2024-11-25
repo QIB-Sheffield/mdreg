@@ -205,10 +205,10 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None
 
     fig, ax = plt.subplots(figsize=(6, 2), ncols=3, nrows=1)
     if slice is not None:
-        fig.suptitle('Slice {} of {}'.format(slice, moving.shape[2]), fontsize=titlesize)
-    ax[0].set_title('Model fit', fontsize=titlesize)
-    ax[1].set_title('Original Data', fontsize=titlesize)
-    ax[2].set_title('Coregistered', fontsize=titlesize)
+        fig.suptitle('Slice {} \n \n'.format(slice), fontsize=titlesize+2)
+    ax[0].set_title('Model fit', fontsize=titlesize+2)
+    ax[1].set_title('Original Data', fontsize=titlesize+2)
+    ax[2].set_title('Coregistered', fontsize=titlesize+2)
     for i in range(3):
         ax[i].set_yticklabels([])
         ax[i].set_xticklabels([])
@@ -233,7 +233,7 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None
     return anim
 
 
-def plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
+def _plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
 
     """
     Plot the moving, fixed and coregistered images, and the deformation field.
@@ -304,7 +304,7 @@ def plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
     return 
 
 
-def plot_params(array, path, filename, bounds=[-np.inf, np.inf]):
+def _plot_params(array, path, filename, bounds=[-np.inf, np.inf]):
 
     """
     Plot and save the parameters of the model.
