@@ -532,7 +532,7 @@ def array_2cfm_lin(signal,
         aif = None,
         time = None,
         baseline = None,
-        Hct = None):
+        Hct = None, **kwargs):
     
     """
     Linearised 2-compartment filtration model fit
@@ -576,13 +576,14 @@ def array_2cfm_lin(signal,
     elif Hct is None:    
         raise ValueError('Hct is a required parameter.')
     
-    return _array_2cfm_lin_func(signal, aif, time, baseline, Hct)
+    return _array_2cfm_lin_func(signal, aif, time, baseline, Hct, **kwargs)
 
 def _array_2cfm_lin_func(signal:np.ndarray, 
                    aif:np.ndarray=None, 
                    time:np.ndarray=None, 
                    baseline:int=1, 
-                   Hct=0.45):
+                   Hct=0.45,
+                   **kwargs):
 
     # Reshape to 2D (x,t)
     shape = np.shape(signal)
