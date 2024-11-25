@@ -31,9 +31,8 @@ import numpy as np
 import mdreg
 
 #%%
-# Fetch the data
-#`mdreg` includes a number of test data sets for demonstration purposes. Let's 
-# fetch the MOLLI example and use `mdreg`'s built-in plotting tools to 
+# ``mdreg`` includes a number of test data sets for demonstration purposes. Let's 
+# fetch the MOLLI example and use ``mdreg``'s built-in plotting tools to 
 # visualise the motion:
 
 # fetch the data
@@ -126,19 +125,19 @@ ukat_model = {
 }
 
 # Perform model-driven coregistration
-coreg, defo, fit, pars = mdreg.fit(array, fit_image=ukat_model)
+coreg, defo, fit, pars = mdreg.fit(array, fit_image=ukat_model, verbose=0)
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 
 #%%
 # As expected, the result is the same as before using the built-in model 
-# `abs_exp_recovery_2p`
+# ``abs_exp_recovery_2p``.
 
 
 #%%
 # Pixel-by-pixel fitting
-#----------------------
+# ----------------------
 #
 # In cases where the model is not available in any existing package, or the 
 # user is not prepared to import an existing package, the fit function must be 
@@ -147,7 +146,7 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 # array), any number of keyword arguments, and two return values (the model fit 
 # and the fit parameters).
 #
-# `mdreg` offers a convenient shortcut for the common scenario where a 1D 
+# ``mdreg`` offers a convenient shortcut for the common scenario where a 1D 
 # signal model is applied for each pixel independently (*pixel-by-pixel 
 # fitting*). All that is needed is to define the 1D model explicitly. 
 #
@@ -193,7 +192,7 @@ my_pixel_fit = {
 }   
 
 #%%
-#And this can be provided directly to `mdreg.fit` via the keyword argument 
+# And this can be provided directly to ``mdreg.fit`` via the keyword argument 
 # ``fit_pixel`` - instructing ``mdreg`` to perform pixel-based fitting using 
 # the parameters defined in ``my_pixel_fit``.
 
@@ -205,27 +204,26 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 
 #%%
 #
-#As expected, the result is the same as before using the built-in model 
-# `abs_exp_recovery_2p` and the ukat implementation `ukat_t1_model`. **TODO: 
-# currently NOT the case - fix bug in ukat solution**
+# As expected, the result is the same as before using the built-in model 
+# ``abs_exp_recovery_2p`` and the ukat implementation ``ukat_t1_model``.
 
 #%%
-#Customizing the coregistration
-#==============================
+# Customizing the coregistration
+# ------------------------------
 #
-#In the above examples we have not provided any detail on the coregistration 
+# In the above examples we have not provided any detail on the coregistration 
 # itself, which means that the default in ``mdreg`` has been applied. This is 
 # the standard b-spline coregistration of elastix, but modified to use a 
 # least-squares metric rather than mutual information. The detailed default 
-# parameter settings can be found in the function `mdreg.elastix.params`.
+# parameter settings can be found in the function ``mdreg.elastix.params``.
 #
-#We can try to improve the result further by customizing the coregistration 
+# We can try to improve the result further by customizing the coregistration 
 # model rather than using the default. This can be done either by modifying the
 # ``elastix`` parameters, or by using another coregistration package supported 
 # by ``mdreg`` (currently only ``skimage`` available).
 #
 # Customizing elastix coregistration
-#----------------------------------
+# ----------------------------------
 #
 # To illustrate customizing the ``elastix`` parameters, we perform ``mdreg`` 
 # with a more fine-grained deformation field. The default coregistration uses 
@@ -247,7 +245,7 @@ deform5mm = {
 # coregistration:
 
 # Perform model-driven coregistration
-coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli, fit_coreg=deform5mm)
+coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli, fit_coreg=deform5mm, verbose=0)
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
@@ -265,13 +263,13 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 # providing a custom set of elstix parameters.
 
 #%%
-#Coregistration with ``skimage``
-#-------------------------------
+# Coregistration with ``skimage``
+# -------------------------------
 #
-#While `itk-elastix` is the default package for coregistration, ``mdreg`` also 
-# has an option to use coregistration modules from the package `scikit-image`. 
+# While ``skimage`` is the default package for coregistration, ``mdreg`` also 
+# has an option to use coregistration modules from the package ``scikit-image``. 
 #
-#For this illustration we run skimage coregistration with default parameters, 
+# For this illustration we run skimage coregistration with default parameters, 
 # except for the attachment which is increased to 30 (default=15) to allow for 
 # finer deformations.
 #
@@ -288,11 +286,11 @@ attach30 = {
 #%%
 #
 # Run ``mdreg`` again with the correct signal model, but now using the 
-# customized `skimage` coregistration:
+# customized ``skimage`` coregistration:
 
 
 # Perform model-driven coregistration
-coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli, fit_coreg=attach30)
+coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli, fit_coreg=attach30, verbose=0)
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)

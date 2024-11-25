@@ -36,20 +36,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "abs_exp_recovery_2p"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "abs_exp_recovery_2p"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "abs_exp_recovery_2p"
   }
  ],
  "array": [
@@ -115,38 +101,6 @@
    "name": "ndarray"
   }
  ],
- "itk-elastix": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "itk-elastix"
-  }
- ],
- "mdreg": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "mdreg"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "mdreg"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "mdreg"
-  }
- ],
  "mdreg.abs_exp_recovery_2p": [
   {
    "is_class": false,
@@ -193,13 +147,6 @@
    "module": "mdreg.elastix",
    "module_short": "mdreg.elastix",
    "name": "params"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg.elastix",
-   "module_short": "mdreg.elastix",
-   "name": "params"
   }
  ],
  "mdreg.fetch": [
@@ -229,13 +176,6 @@
   {
    "is_class": false,
    "is_explicit": false,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "fit"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "fit"
@@ -414,24 +354,6 @@
    "name": "ndarray"
   }
  ],
- "scikit-image": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "scikit-image"
-  }
- ],
- "skimage": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "skimage"
-  }
- ],
  "ukat_model": [
   {
    "is_class": false,
@@ -448,13 +370,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "ukat_t1_model"
   },
   {
    "is_class": false,

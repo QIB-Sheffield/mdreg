@@ -21,5 +21,6 @@ what they are and what they do.
    models
    plot
    utils
+   info
    
    

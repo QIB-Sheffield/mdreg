@@ -12,5 +12,3 @@ Plotting
 
    animation
    plot_series
-   plot_coreg
-   plot_params
