@@ -109,12 +109,17 @@ def fit_pixels(ydata,
 
 def calc_jacobian(defo):
     """
-    Calculate the Jacobian matrix and determinant from a deformation field.
+    Calculate the Jacobian matrix and determinant from a 2D deformation field.
+    Can process multi-slice images, but the actual deformation 
+    field/registration must be 2D.
     
     Parameters
     ----------
     defo : np.ndarray
         The deformation field to calculate the Jacobian from.
+        Dimensions are expected in the order [x, y, z, t, d], where x, y, z are 
+        the spatial dimensions, d is the dimension of the deformation field 
+        (two for 2D registration), and t is the time/dynamic.
 
     Returns
     -------
@@ -123,21 +128,32 @@ def calc_jacobian(defo):
     jac_det : np.ndarray
         The determinant of the Jacobian matrix.
     """
-    jac_mat = np.zeros((defo.shape[0], defo.shape[1], 2, 2, defo.shape[3], defo.shape[4]))
-    jac_det = np.zeros((defo.shape[0], defo.shape[1], defo.shape[3], defo.shape[4]))
+    if defo.ndim != 5:
+        raise ValueError('Deformation field must have dimensions '
+                         '[x, y, z, t, d].')
+    if defo.shape[-1] != 2:
+        raise ValueError('Deformation field must be 2D.')
+    
+    jac_mat = np.zeros((defo.shape[0], defo.shape[1], defo.shape[2], 
+                        defo.shape[3], 2, 2))
+    jac_det = np.zeros((defo.shape[:4]))
 
-    for t in range(defo.shape[4]):
-        for z in range(defo.shape[3]):
-            grad_xx, grad_xy = np.gradient(defo[:, :, 1, z, t])
-            grad_yx, grad_yy = np.gradient(defo[:, :, 0, z, t])
+    for t in range(defo.shape[3]):
+        for z in range(defo.shape[2]):
+            grad_xx, grad_xy = np.gradient(defo[:, :, z, t, 1])
+            grad_yx, grad_yy = np.gradient(defo[:, :, z, t, 0])
 
             grad_xx += 1
             grad_yy += 1
 
             for x in range(defo.shape[0]):
                 for y in range(defo.shape[1]):
-                    jac_mat[x, y, :, :, z, t] = np.array([[grad_xx[x, y], grad_xy[x, y]], [grad_yx[x, y], grad_yy[x, y]]])
-                    jac_det[x, y, z, t] = np.linalg.det(jac_mat[x, y, :, :, z, t])
+                    jac_mat[x, y, z, t, :, :] = np.array([[grad_xx[x, y], 
+                                                           grad_xy[x, y]], 
+                                                          [grad_yx[x, y], 
+                                                           grad_yy[x, y]]])
+                    jac_det[x, y, z, t] = np.linalg.det(jac_mat[x, y, z, t,
+                                                                 :, :])
 
     return jac_mat, jac_det
 
@@ -148,12 +164,22 @@ def calc_norm(defo):
     Parameters
     ----------
     defo : np.ndarray
-        The deformation field to calculate the norm from.
+        The deformation field to calculate the norm from. 
+        Dimensions are expected in the order [x, y, z, t, d], where x, y, z are 
+        the spatial dimensions, d is the dimension of the deformation field 
+        (two for 2D registration, 3 for 3D registration), and t is the 
+        time/dynamic.
 
     Returns
     -------
     norm : np.ndarray
-        The norm of the deformation field.
+        The norm of the deformation field with dimensions [x, y, z, t].
     """
-    norm = np.linalg.norm(defo, axis=2)
+    if defo.ndim != 5:
+        raise ValueError('Deformation field must have dimensions '
+                         '[x, y, z, t, d].')
+    if defo.shape[-1] != 2 and defo.shape[-1] != 3:
+        raise ValueError('Deformation field must have 2 or 3 dimensions.')
+    
+    norm = np.linalg.norm(defo, axis=-1)
     return norm
