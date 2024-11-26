@@ -11,6 +11,7 @@ sphinxcontrib-htmlhelp
 sphinxcontrib-jsmath
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
+sphinxcontrib-video
 sphinx-gallery
 matplotlib
 sphinx-exec-code

@@ -9,7 +9,31 @@ from mdreg import utils
 
 
 def coreg_series(*args, parallel=False, **kwargs):
+    """
+    Coregister a series of images.
 
+    Parameters
+    ----------
+    *args : dict
+            Coregistration arguments.
+    parallel : bool
+            Whether to perform coregistration in parallel.
+    **kwargs : dict
+            Coregistration keyword arguments.
+
+    Returns
+    -------
+    coreg : numpy.ndarray
+            Coregistered series. 
+            The array can be either 3D or 4D with the following shapes: 3D: 
+            (X, Y, T). 4D: (X, Y, Z, T). Here, X, Y, Z are the spatial 
+            dimensions and T is the dimension denoting change e.g. temporal 
+            dimension or flip angle.
+    deformation : numpy.ndarray
+            Deformation field.
+            The array can be either 4D or 5D with the following shapes: 4D: 
+            (X, Y, 2, T). 5D: (X, Y, Z, 3, T)
+    """
     if parallel:
         return _coreg_series_parallel(*args, **kwargs)
     else:
@@ -22,13 +46,14 @@ def _coreg_series_sequential(source:np.ndarray, target:np.ndarray,
         log = False, 
         mask = None, 
         downsample = 1,
+        progress_bar = False,
     ):
 
     # This is a very slow step so needs to be done outside the loop
-    p_obj = make_params_obj(settings=params) 
+    p_obj = _make_params_obj(settings=params) 
 
     deformed, deformation = utils._init_output(source)
-    for t in tqdm(range(source.shape[-1]), desc='Coregistering series'): 
+    for t in tqdm(range(source.shape[-1]), desc='Coregistering series', disable=not progress_bar): 
 
         if mask is not None:
             mask_t = mask[...,t]
@@ -97,6 +122,33 @@ def _coreg_parallel(args):
 
 def coreg(source:np.ndarray, *args, **kwargs):
 
+    """
+    Coregister two arrays
+    
+    Parameters
+    ----------
+    source : numpy.ndarray
+        The source image. 
+        The array can be either 3D or 4D with the following shapes: 2D: (X, Y).
+        3D: (X, Y, Z).
+    *args : dict
+        Coregistration arguments.
+    **kwargs : dict
+        Coregistration keyword arguments.
+    
+    Returns
+    -------
+    coreg : numpy.ndarray
+        Coregistered image.
+        The array can be either 3D or 4D with the following shapes: 2D: (X, Y). 
+        3D: (X, Y, Z).
+    deformation : numpy.ndarray
+        Deformation field.
+        The array can be either 3D or 4D with the following shapes: 3D: 
+        (X, Y, 2). 4D: (X, Y, Z, 3).
+    
+    """
+
     if source.ndim == 2: 
         return _coreg_2d(source, *args, **kwargs)
     
@@ -110,7 +162,7 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None, spacing=
         spacing = [spacing, spacing]
 
     if params_obj is None:
-        params_obj = make_params_obj(settings=params)
+        params_obj = _make_params_obj(settings=params)
     # Downsample source and target
     # The origin of an image is the center of the voxel in the lower left corner
     # The origin of the large image is (0,0).
@@ -174,7 +226,7 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         spacing = [spacing, spacing, spacing]
 
     if params_obj is None:
-        params_obj = make_params_obj(settings=params)
+        params_obj = _make_params_obj(settings=params)
 
     # Downsample source and target
     # The origin of an image is the center of the voxel in the lower left corner
@@ -218,7 +270,6 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         source_large,
         result_transform_parameters,
         log_to_console=log)
-    coreg_large = itk.GetArrayFromImage(coreg_large).flatten()
     
     # Get deformation field at original size
     target_large = itk.GetImageFromArray(np.array(target_large, np.float32))
@@ -228,13 +279,56 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         target_large, 
         result_transform_parameters, 
         log_to_console=log)
-    deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
-    deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
+    
+    deformation_field = itk.GetArrayFromImage(deformation_field)
 
     return coreg_large, deformation_field
 
 
 def params(default='freeform', **override):
+
+    """
+    Generate parameters for elastix registration.
+
+    Parameters
+    ----------
+    default : str
+        The default parameter set to use.
+    **override : dict
+        Parameters to override.
+    
+    Returns
+    -------
+    params : dict
+        The parameter set.
+
+        
+    Example:
+
+        Adjust the default parameters associated with grid spacing for elastix 
+        registration.
+
+    .. plot::
+        :include-source:
+        :context: close-figs
+    
+        >>> import mdreg
+
+        Adjust the default parameters associated with grid spacing for elastix 
+        registration.
+
+        >>> params = mdreg.params()
+        >>> print(params['FinalGridSpacingInPhysicalUnits'])
+        50.0
+
+        Override the default parameters associated with grid spacing for 
+        elastix registration.
+
+        >>> params = mdreg.params(FinalGridSpacingInPhysicalUnits='5.0')
+        >>> print(params['FinalGridSpacingInPhysicalUnits'])
+        5.0
+    """
+
     if default=='freeform':
         params = _freeform()
     else:
@@ -291,8 +385,8 @@ def _freeform():
     #      If Recursive is chosen and only # of resolutions is given 
     #      then downsamlping by a factor of 2 (default)
     # 3)	Shrinking -> Smoothing: NO, Downsampling: YES
-    settings["FixedImagePyramid"]="FixedSmoothingImagePyramid"
-    settings["MovingImagePyramid"]="MovingSmoothingImagePyramid"
+    settings["FixedImagePyramid"]="FixedRecursiveImagePyramid"
+    settings["MovingImagePyramid"]="MovingRecursiveImagePyramid"
     settings["Optimizer"]="AdaptiveStochasticGradientDescent"
     # Whether transforms are combined by composition or by addition.
     # In generally, Compose is the best option in most cases.
@@ -385,8 +479,19 @@ def _freeform():
     return settings
 
 
-def make_params_obj(default='bspline', settings=None):
-    param_obj = itk.ParameterObject.New()
+def _make_params_obj(default='bspline', settings=None):
+
+    """
+    Make an elastix parameter object.
+
+    Parameters
+    ----------
+    default : str
+        The default parameter set to use.
+    settings : dict
+        Parameters to override.
+    """
+    param_obj = itk.ParameterObject.New() # long runtime ~20s
     parameter_map_bspline = param_obj.GetDefaultParameterMap(default) 
     param_obj.AddParameterMap(parameter_map_bspline) 
     if settings is None:

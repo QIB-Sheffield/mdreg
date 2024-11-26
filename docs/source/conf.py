@@ -65,6 +65,9 @@ sphinx_gallery_conf = {
 
     # Disabling download button of all scripts
     'download_all_examples': False,
+
+    # Default setting disbable animations. Set to True to enable.
+    'matplotlib_animations': (True, 'jshtml'),
 }
 
 # This way a link to other methods, classes, or modules can be made with back ticks so that you don't have to use qualifiers like :class:, :func:, :meth: and the likes
@@ -140,3 +143,4 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
  
 def setup(app):
     app.connect('autodoc-skip-member', autodoc_skip_member)
+    app.add_css_file("custom.css")
