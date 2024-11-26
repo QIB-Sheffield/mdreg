@@ -239,15 +239,12 @@ def calc_jacobian(defo):
 
             grad_xx += 1
             grad_yy += 1
+            jac_mat[:, :, z, t, 0, 0] = grad_xx
+            jac_mat[:, :, z, t, 0, 1] = grad_xy
+            jac_mat[:, :, z, t, 1, 0] = grad_yx
+            jac_mat[:, :, z, t, 1, 1] = grad_yy
 
-            for x in range(defo.shape[0]):
-                for y in range(defo.shape[1]):
-                    jac_mat[x, y, z, t, :, :] = np.array([[grad_xx[x, y], 
-                                                           grad_xy[x, y]], 
-                                                          [grad_yx[x, y], 
-                                                           grad_yy[x, y]]])
-                    jac_det[x, y, z, t] = np.linalg.det(jac_mat[x, y, z, t,
-                                                                 :, :])
+            jac_det[:, :, z, t] = np.linalg.det(jac_mat[:, :, z, t, :, :])
 
     return jac_mat, jac_det
 
@@ -273,7 +270,8 @@ def calc_norm(defo):
         raise ValueError('Deformation field must have dimensions '
                          '[x, y, z, t, d].')
     if defo.shape[-1] != 2 and defo.shape[-1] != 3:
-        raise ValueError('Deformation field must have 2 or 3 dimensions.')
+        raise ValueError('Deformation field must have 2 or 3 dimensions in the '
+                         'last axis.')
     
     norm = np.linalg.norm(defo, axis=-1)
     return norm
