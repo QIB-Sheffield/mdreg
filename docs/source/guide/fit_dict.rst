@@ -30,4 +30,4 @@ its purpose.
 All that is needed in order to create a custom function and use it inside mdreg
 is to wrap it into a function that takes the image array as argument, and 
 returns the fit to the model and the fitted model parameters. Use the format of
-functions in the `mdreg.models` module as a guide.
+functions in the :ref:`models` module as a guide.

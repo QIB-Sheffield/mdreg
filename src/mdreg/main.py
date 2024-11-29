@@ -31,11 +31,12 @@ def fit(moving,
         is None.
     fit_image : dict, optional
         The parameters for fitting the signal model to the whole image. The 
-        default is {}, which will apply the inbuilt :func:`constant` model fit. 
+        default is None, which will apply the inbuilt :func:`constant` model fit. 
         For more detail see table :ref:`fit-image-table`.
     fit_coreg : dict, optional
-        The parameters for coregistering the images. The default is {}.
-        For more detail see table :ref:`fit-coreg-table`.
+        The parameters for coregistering the images. The default is None, which 
+        uses the default elastix package setting. For more detail see table 
+        :ref:`fit-coreg-table`.
     precision : float, optional
         The precision of the coregistration. The default is 1.0.
     maxit : int, optional
@@ -45,8 +46,9 @@ def fit(moving,
         output only; 2: text output and progress bars; 3: text output, progress 
         bars and image exports. The default is 0.
     plot_params : dict, optional
-        The parameters for plotting the images. The default is {}. For more
-        detail see table :ref:`plot-param-table`.
+        The parameters for plotting the images. The default is None, which 
+        creates an empty dictionary. For more detail see table 
+        :ref:`plot-param-table`.
     
     Returns
     -------

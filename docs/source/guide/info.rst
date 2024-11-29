@@ -30,21 +30,31 @@ dimension, flip angle or similar.
       - 2D Motion Correction
       - 3D Motion Correction
       - Description
+    * - moving
+      - Original Dataset
+      - (X, Y, T)
+      - (X, Y, Z, T)
+      - The original series of images to be registered.
     * - signal
       - Signal for model fitting 
       - (X, Y, T)
       - (X, Y, Z, T)
-      - The current series of images to be corrected.
-    * - moving
-      - Intermediate image during motion correction
-      - (X, Y, T)
-      - (X, Y, Z, T)
-      - The series of images to be corrected. This is the original signal data, in the first iteration, and the coregistered image for refinement in subsequent iterations.
+      - The current series of images to be fit to a signal model.
+    * - source
+      - Source Image
+      - (X, Y)
+      - (X, Y, Z)
+      - A single frame (spatial only) of the source image to be registered to the target via pairwise registration, within the elastix or skimage wrappers.
+    * - target
+      - Target Image
+      - (X, Y)
+      - (X, Y, Z)
+      - A single frame (spatial only) of the target image for pairwise registration, within the elastix or skimage wrappers.
     * - coreg
       - Coregistered Images
       - (X, Y, T)
       - (X, Y, Z, T)
-      - The coregistered images.
+      - The coregistered images produce via mdreg.
     * - defo
       - Deformation Field
       - (X, Y, 2, T)
