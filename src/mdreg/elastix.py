@@ -28,6 +28,7 @@ def coreg_series(*args, parallel=False, **kwargs):
     deformation : numpy.ndarray
             Deformation field.
     
+            
     For more information on the main variables in terms of shape
     and description, see the :ref:`variable-types-table`.
     """
@@ -125,9 +126,8 @@ def coreg(source:np.ndarray, *args, **kwargs):
     Parameters
     ----------
     source : numpy.ndarray
-        The source image. 
-        The array can be either 3D or 4D with the following shapes: 2D: (X, Y).
-        3D: (X, Y, Z).
+        The source image. For additional information see table 
+        :ref:`variable-types-table`. 
     *args : dict
         Coregistration arguments.
     **kwargs : dict
@@ -137,12 +137,11 @@ def coreg(source:np.ndarray, *args, **kwargs):
     -------
     coreg : numpy.ndarray
         Coregistered image.
-        The array can be either 3D or 4D with the following shapes: 2D: (X, Y). 
-        3D: (X, Y, Z).
+        The array is the same shape as the source image.
     deformation : numpy.ndarray
         Deformation field.
-        The array can be either 3D or 4D with the following shapes: 3D: 
-        (X, Y, 2). 4D: (X, Y, Z, 3).
+        The array is the same shape as the source image with an additional 
+        dimension for each spatial dimension.
     
     """
 

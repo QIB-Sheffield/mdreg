@@ -32,7 +32,7 @@ type and a brief description of its purpose.
       - The package to use for coregistration. Options are 'elastix' or 'skimage'.
     * - parameters
       - `dict`
-      - The parameters to pass to the coregistration package to control specifcs of the registration. These are dependent on the package used. Leaving this empty will use default parameters for each package from `mdreg`.
+      - The parameters to pass to the coregistration package to control specifics of the registration. These are dependent on the package used. Leaving this empty will use default parameters for each package from `mdreg`.
     * - spacing
       - `list`
-      - The spacing of the images in mm [X,Y,Z]. This is used to scale the parameters for the coregistration package. The default is 1.0.
+      - The spacing of voxels in the images in mm [X,Y,Z]. The default is 1.0.

@@ -12,7 +12,7 @@ a brief description of its purpose.
 
 Not all arguments are required for each plotting function, and the default 
 values are provided in the table below. To use custom values, you should 
-create a dictionary with the desired arguments and pass it to the plotting 
+create a dictionary with the desired keys and pass it to the plotting 
 functions. See this carried out in the :ref:`examples`.
 
 .. _plot-param-table:
@@ -24,23 +24,23 @@ functions. See this carried out in the :ref:`examples`.
       - Type
       - Description
     * - path
-      - str, optional
+      - `str`, optional
       - The path to save the animation. The default is None.
     * - filename
-      - str, optional
+      - `str`, optional
       - The filename of the animation. The default is 'animation'.
     * - vmin
-      - float, optional
+      - `float`, optional
       - The minimum value for the colormap. The default is None.
     * - vmax
-      - float, optional
+      - `float`, optional
       - The maximum value for the colormap. The default is None.
     * - slice
-      - int, optional
+      - `int`, optional
       - The slice to plot. The default is None. This argument does not apply to 2D images, but is used for 3D images. None will plot all slices.
     * - interval
-      - int, optional
+      - `int`, optional
       - The interval between animation frames. The default is 250ms.
     * - show
-      - bool, optional
+      - `bool`, optional
       - Whether to display the animation. The default is False.

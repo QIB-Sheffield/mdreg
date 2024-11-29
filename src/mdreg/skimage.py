@@ -26,17 +26,14 @@ def coreg_series(*args, parallel=False, **kwargs):
     Returns
     -------
     coreg : numpy.ndarray
-            Coregistered series. The array can be either 3D or 4D with the 
-            following shapes:
-                - 3D: (X, Y, T)
-                - 4D: (X, Y, Z, T)
-            Here, X, Y, Z are the spatial dimensions and T is the dimension 
-            denoting change e.g. temporal dimension or flip angle.
+            Coregistered series.
     deformation : numpy.ndarray
             Deformation field.
-            The array can be either 4D or 5D with the following shapes:
-                - 4D: (X, Y, 3, T)
-                - 5D: (X, Y, Z, 3, T)
+    
+            
+    For more information on the main variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
+
     """
     
 
@@ -113,7 +110,8 @@ def coreg(source:np.ndarray, *args, **kwargs):
     Parameters
     ----------
     source : numpy.ndarray
-        The source image.
+        The source image. For additional information see table 
+        :ref:`variable-types-table`. 
     *args : dict
         Coregistration arguments.
     **kwargs : dict
@@ -123,8 +121,11 @@ def coreg(source:np.ndarray, *args, **kwargs):
     -------
     coreg : numpy.ndarray
         Coregistered image.
+        The array is the same shape as the source image.
     deformation : numpy.ndarray
         Deformation field.
+        The array is the same shape as the source image with an additional 
+        dimension for each spatial dimension.
     
     """
 
