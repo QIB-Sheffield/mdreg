@@ -29,27 +29,6 @@ except:
 
 def _ddint(c, t):
 
-    """
-    Double cumulative integral
-
-    Use to calculate the double and single cumulative integral of the concentration-time curve.
-    
-    Parameters
-    ----------
-    c : numpy.ndarray
-        Concentration-time curve
-    t : numpy.ndarray
-        Time points
-    
-    Returns
-    ----------
-    ci : numpy.ndarray
-        single cumulative integral of the concentration-time curve
-    cii : numpy.ndarray
-        double cumulative integral of the concentration-time curve
-                    
-        """
-
     ci = integrate.cumtrapz(c, t)
     ci = np.insert(ci, 0, 0)
     cii = integrate.cumtrapz(ci, t)

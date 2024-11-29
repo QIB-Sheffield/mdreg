@@ -11,3 +11,7 @@ User guide
 
    installation
    getting_started
+   coreg_dict
+   fit_dict
+   plot_dict
+   info
