@@ -137,29 +137,6 @@ def coreg(source:np.ndarray, *args, **kwargs):
 
 def _coreg_2d(moving, fixed, params=None, coords=None):
 
-    """
-    Coregister two arrays
-    
-    Parameters
-    ----------
-    moving : numpy.ndarray
-        The source image.
-    fixed : numpy.ndarray
-        The target image.
-    params : dict
-        Coregistration arguments.
-    coords : dict
-        Coregistration point coordinates
-    
-    Returns
-    -------
-    warped_moving : numpy.ndarray
-        Coregistered image.
-    deformation_field : numpy.ndarray
-        Deformation field.
-    
-    """
-
     # Does not work with float or mixed type for some reason
     moving = moving.astype(np.int16)
     fixed = fixed.astype(np.int16)
@@ -193,29 +170,6 @@ def _coreg_2d(moving, fixed, params=None, coords=None):
     return warped_moving, deformation_field
 
 def _coreg_3d(moving, fixed, params=None, coords=None):
-
-    """
-    Coregister two arrays
-    
-    Parameters
-    ----------
-    moving : numpy.ndarray
-        The source image.
-    fixed : numpy.ndarray
-        The target image.
-    params : dict
-        Coregistration arguments.
-    coords : dict
-        Coregistration point coordinates
-    
-    Returns
-    -------
-    warped_moving : numpy.ndarray
-        Coregistered image.
-    deformation_field : numpy.ndarray
-        Deformation field.
-    
-    """
 
     # Does not work with float or mixed type for some reason
     moving = moving.astype(np.int16)

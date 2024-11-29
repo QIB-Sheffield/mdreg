@@ -25,14 +25,11 @@ def coreg_series(*args, parallel=False, **kwargs):
     -------
     coreg : numpy.ndarray
             Coregistered series. 
-            The array can be either 3D or 4D with the following shapes: 3D: 
-            (X, Y, T). 4D: (X, Y, Z, T). Here, X, Y, Z are the spatial 
-            dimensions and T is the dimension denoting change e.g. temporal 
-            dimension or flip angle.
     deformation : numpy.ndarray
             Deformation field.
-            The array can be either 4D or 5D with the following shapes: 4D: 
-            (X, Y, 2, T). 5D: (X, Y, Z, 3, T)
+    
+    For more information on the main variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
     """
     if parallel:
         return _coreg_series_parallel(*args, **kwargs)

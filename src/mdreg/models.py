@@ -14,9 +14,9 @@ def constant(signal, **kwargs):
     ----------
     
     signal : numpy.ndarray 
-            Signal data. 2D or 3D spatial array with signal intensities over an
-            additional dimension e,g, time, flip angle. For 2D spatial data: 
-            (X, Y, T). For 3D spatial data: (X, Y, Z, T).
+            Signal data.
+            Spatial array with signal intensities over an additional temporal 
+            dimension.
 
     **kwargs :
             Additional keyword arguments
@@ -25,12 +25,15 @@ def constant(signal, **kwargs):
     -------
 
     fit : numpy.ndarray
-        Fitted data. Array has the same shape as the input signal.
+        Fitted data.
 
     par : numpy.ndarray
-        Parameters. Array has the same shape as the input signal, with a final
-        extra axis of length 1. The parameters are: S0. For 2D spatial data: (X, Y, 1).
-        For 3D spatial data: (X, Y, Z, 1).
+        The parameters of the fitted signal model.
+        The parameters are: S0, giving N=1.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
 
     """
 
@@ -66,13 +69,9 @@ def exp_decay(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over an
-            temporal dimension. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over a temporal dimension.
         time : numpy.ndarray
-            Time data
-            1D array of time points, length equal to the number of
-            time points in the signal data.
+            Timepoints of the signal data
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -85,13 +84,15 @@ def exp_decay(signal,
     Returns
     -------
     fit : numpy.ndarray
-        Fitted data
-        Array has the same shape as the input signal.
+        Fitted data.
+    
     par : numpy.ndarray
-        Parameters
-        Array has the same shape as the spatial coordinates of the signal, with 
-        a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D spatial data: 
-        (X, Y, Z, 2).
+        The parameters of the fitted signal model.
+        The parameters are: S0, T, giving N=2.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -133,13 +134,10 @@ def abs_exp_recovery_2p(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over different 
+            inversion times.
         TI : numpy.array
             Inversion times
-            1D array of inversion times, length equal to the number of
-            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -152,11 +150,14 @@ def abs_exp_recovery_2p(signal,
     Returns
     -------
     fit : numpy.ndarray
-        Fitted data. Array has the same shape as the input signal.
+        Fitted data.
     par : numpy.ndarray
-        Parameters. Array has the same shape as the spatial coordinates of the 
-        signal, with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
-        spatial data: (X, Y, Z, 2).
+        Parameters. 
+        The parameters are: S0, T1, giving N=2.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -198,13 +199,10 @@ def exp_recovery_2p(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over different 
+            inversion times.
         TI : numpy.array
             Inversion times
-            1D array of inversion times, length equal to the number of
-            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -218,12 +216,14 @@ def exp_recovery_2p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
-            Array has the same shape as the input signal.
+            
         par : numpy.ndarray
             Parameters
-            Array has the same shape as the spatial coordinates of the signal, 
-            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
-            spatial data: (X, Y, Z, 2).
+            The parameters are: S0, T1, giving N=2.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -266,13 +266,10 @@ def abs_exp_recovery_3p(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over different 
+            inversion times.
         TI : numpy.array
             Inversion times
-            1D array of inversion times, length equal to the number of
-            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -286,12 +283,13 @@ def abs_exp_recovery_3p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
-            The array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
-            The array has the same shape as the spatial coordinates of the
-            signal, with a final extra axis length 3. For 2D spatial data: (X, Y, 3). 
-            For 3D spatial data: (X, Y, Z, 3).
+            The parameters are: S0, T1, eff, giving N=3.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -333,13 +331,10 @@ def exp_recovery_3p(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            inversion times. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over different 
+            inversion times.
         TI : numpy.array
             Inversion times
-            1D array of inversion times, length equal to the number of
-            inversion time points in the signal data.
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -353,12 +348,13 @@ def exp_recovery_3p(signal,
     -------
         fit : numpy.ndarray
             Fitted data
-            Array has the same shape as the input signal.
         par : numpy.ndarray
             Parameters
-            Array has the same shape as the spatial coordinates of the signal,
-            with a final extra axis length 3. For 2D spatial data: (X, Y, 3). For 3D 
-            spatial data: (X, Y, Z, 3).
+            The parameters are: S0, T1, eff, giving N=3.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
         
         """
     
@@ -392,13 +388,10 @@ def spgr_vfa_nonlin(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            flip angles. For 2D spatial data: (X, Y, FA). For 3D spatial data: 
-            (X, Y, Z, FA).
+            Spatial array with signal intensities over different 
+            flip angles.
         FA : numpy.array
             Flip Angles
-            1D array of flip angles, length equal to the number of
-            flip angle points in the signal data.
         TR : float
             Repetition time
         bounds : tuple
@@ -414,12 +407,13 @@ def spgr_vfa_nonlin(signal,
     -------
         fit : numpy.ndarray
             Fitted data 
-            Array has the same shape as the input signal.
         pars : numpy.ndarray
             Fitted model parameters
-            Array has the same shape as the spatial coordinates of the signal,
-            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
-            spatial data: (X, Y, Z, 2).
+            The parameters are: S0, T1, giving N=2.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
             
     
     """
@@ -464,13 +458,10 @@ def spgr_vfa_lin(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over different 
-            flip angles. For 2D spatial data: (X, Y, FA). For 3D spatial data:
-            (X, Y, Z, FA).
+            Spatial array with signal intensities over different 
+            flip angles.
         FA : numpy.array
             Flip Angles
-            1D array of flip angles, length equal to the number of
-            flip angle points in the signal data.
         bounds : tuple
             Bounds for the fit
     
@@ -478,12 +469,13 @@ def spgr_vfa_lin(signal,
     -------
         fit : numpy.ndarray
             Fitted data
-            Array has the same shape as the input signal.
         pars : numpy.ndarray
             Parameters
-            Array has the same shape as the spatial coordinates of the signal,
-            with a final extra axis length 2. For 2D spatial data: (X, Y, 2). For 3D 
-            spatial data: (X, Y, Z, 2).
+            The parameters are: m,c, giving N=2.
+    
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
     
     """
     
@@ -541,15 +533,14 @@ def array_2cfm_lin(signal,
     ----------
         signal : numpy.ndarray
             Signal data 
-            2D or 3D spatial array with signal intensities over an additional
-            time dimension. For 2D spatial data: (X, Y, T). For 3D spatial 
-            data: (X, Y, Z, T).
+            Spatial array with signal intensities over an additional
+            time dimension.
         aif : numpy.ndarray
-            Arterial input function. 1D array of signal intensities, length
-            equal to the number of time points in the signal data.
+            Arterial input function. 1D array of input artery signal 
+            intensities, length equal to the number of time points in the 
+            signal data.
         time : numpy.ndarray
-            Time data. 1D array of time points, length equal to the number of
-            time points in the signal data.
+            Timepoints of the signal data
         baseline : int
             Baseline. Number of time points to use for the baseline signal.
         Hct : float
@@ -559,12 +550,13 @@ def array_2cfm_lin(signal,
     -------
         fit : numpy.ndarray
             Fitted data
-            Array has the same shape as the input signal.
         par : numpy.ndarray
-            Parameters
-            Array has the same shape as the input signal, with a final
-            extra axis of length 4. The parameters are: Fp, Tp, PS, Te. For 2D 
-            spatial data: (X, Y, 4). For 3D spatial data: (X, Y, Z, 4)
+            Fitted model parameters
+            The parameters are: Fp, Tp, PS, Te, giving N=4.
+
+
+    For more information on the input and returned variables in terms of shape
+    and description, see the :ref:`variable-types-table`.
     """
 
     if aif is None:
