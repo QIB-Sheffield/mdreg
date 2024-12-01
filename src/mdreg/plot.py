@@ -6,7 +6,8 @@ import math
 import inspect
 
 
-def animation(array, path=None, filename='animation', vmin=None, vmax=None, slice=None, title = '', interval=250, show=False):
+def animation(array, path=None, filename='animation', vmin=None, vmax=None, 
+              slice=None, title = '', interval=250, show=False):
 
     """
     Produce an animation of a 3D image.
@@ -108,10 +109,11 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None, slic
         return anim
 
 
-def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None, vmax=None, slice=None, interval=250, show=False):
+def plot_series(moving, fixed, coreg, path=None, filename='animation', 
+                vmin=None, vmax=None, slice=None, interval=250, show=False):
 
     """
-    Produce an animation of the original, fitted and coregistered images for a 2D slice.
+    Produce an animation of the original, fitted and coregistered images.
 
     Parameters
     ----------
@@ -201,7 +203,8 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation', vmin=None
             coreg = coreg[:,:,slice,:]
 
     elif not (moving.ndim == fixed.ndim == coreg.ndim):
-        raise ValueError("Dimension mis-match in arrays provided please ensure the three arrays have the same dimensions")
+        raise ValueError('Dimension mismatch in arrays provided. Please '
+                         'ensure the three arrays have the same dimensions')
 
     fig, ax = plt.subplots(figsize=(6, 2), ncols=3, nrows=1)
     if slice is not None:

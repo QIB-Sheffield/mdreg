@@ -1,8 +1,6 @@
 
 import mdreg
 import numpy as np
-from ukat.mapping.t1 import T1 as ukat_T1
-from scipy.optimize import curve_fit
 
 path="docs/source/_static/animations/"
 
@@ -58,34 +56,6 @@ def molli_builtin():
 
 
 
-
-def ukat_t1_model(images, TI=None):
-    map = ukat_T1(images, TI, np.eye(4), parameters=2, multithread=False)
-    fit = map.get_fit_signal()
-    return fit, (map.t1_map, map.m0_map)
-
-def molli_ukat():
-
-    # fetch the data
-    data = mdreg.fetch('MOLLI')
-
-    # We will consider the slice z=0 of the data array:
-    array = data['array'][:,:,0,:]
-    array[array<0] = 0
-
-    # Coregister with the ukat t1-model:
-    coreg, defo, fit, pars = mdreg.fit(array,
-        fit_image = {
-            'func': ukat_t1_model,
-            'TI': np.array(data['TI']),
-        },
-        verbose=3, maxit=2, plot_params = {'path':path, 'vmin':0, 'vmax':1e4},
-    )
-
-    # Show the result with mdreg's built-in plot functions
-    mdreg.plot_series(array, fit, coreg, path=path, filename='molli_ukat', vmin=0, vmax=1e4)
-
-
 def my_pixel_model(xdata, S0, T1):
     return np.abs(S0 * (1 - 2 * np.exp(-xdata/T1)))
 
@@ -109,7 +79,7 @@ def molli_my_fit():
         'p0': [1,1.3],  
     }  
 
-    # Coregister with the ukat t1-model:
+    # Coregister with the t1-model:
     coreg, defo, fit, pars = mdreg.fit(array,
         fit_pixel = my_pixel_fit,
         verbose=2,
@@ -156,7 +126,6 @@ if __name__ == '__main__':
     # fetch_molli()
     mdreg_default()
     # molli_builtin()
-    # molli_ukat()
     # molli_my_fit()
     # molli_custom_coreg()
     # molli_skimage()

@@ -12,3 +12,5 @@ Utilities
 
     fetch
     fit_pixels
+    defo_jacobian_2d
+    defo_norm
