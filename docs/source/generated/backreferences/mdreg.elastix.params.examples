@@ -15,24 +15,24 @@ Examples using ``mdreg.elastix.params``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Model-driven registration is a method to remove motion from a series of 2D or  3D images. It applies specifically to situations where a model exists that can  describe the changes in signal intensity through the series. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, dcmri uses free-form deformation implemented in the package  itk.elastix, which default settings for all configuration parameters. ">
 
 .. only:: html
 
-  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.png
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_defo_thumb.gif
     :alt:
 
-  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Getting started</div>
+      <div class="sphx-glr-thumbnail-title">Customizing the coregistration</div>
     </div>
 
 
 .. only:: not html
 
- * :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+ * :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
 
 .. thumbnail-parent-div-close
 

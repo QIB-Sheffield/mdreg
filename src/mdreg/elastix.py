@@ -8,18 +8,22 @@ from mdreg import utils
 
 
 
-def coreg_series(*args, parallel=False, **kwargs):
+def coreg_series(source, target, parallel=False, **kwargs):
     """
-    Coregister a series of images.
+    Coregister two series of images.
 
     Parameters
     ----------
-    *args : dict
-            Coregistration arguments.
+    source : numpy.ndarray
+        The source image. For additional information see table 
+        :ref:`variable-types-table`. 
+    target : numpy.ndarray
+        The target image. For additional information see table 
+        :ref:`variable-types-table`. 
     parallel : bool
-            Whether to perform coregistration in parallel.
+        Whether to perform coregistration in parallel.
     **kwargs : dict
-            Coregistration keyword arguments.
+        Coregistration keyword arguments.
 
     Returns
     -------
@@ -33,12 +37,13 @@ def coreg_series(*args, parallel=False, **kwargs):
     and description, see the :ref:`variable-types-table`.
     """
     if parallel:
-        return _coreg_series_parallel(*args, **kwargs)
+        return _coreg_series_parallel(source, target, **kwargs)
     else:
-        return _coreg_series_sequential(*args, **kwargs)
+        return _coreg_series_sequential(source, target, **kwargs)
     
 
-def _coreg_series_sequential(source:np.ndarray, target:np.ndarray, 
+def _coreg_series_sequential(
+        source, target, 
         params = None,
         spacing = 1.0, 
         log = False, 
@@ -70,7 +75,8 @@ def _coreg_series_sequential(source:np.ndarray, target:np.ndarray,
     return deformed, deformation
 
 
-def _coreg_series_parallel(source:np.ndarray, target:np.ndarray, 
+def _coreg_series_parallel(
+        source, target, 
         params = None,
         spacing = 1.0, 
         log = False, 
@@ -118,7 +124,7 @@ def _coreg_parallel(args):
     return coreg(source, target, params=params, spacing=spacing, log=log, mask=mask, downsample=downsample)
 
 
-def coreg(source:np.ndarray, *args, **kwargs):
+def coreg(source:np.ndarray, target:np.ndarray, **kwargs):
 
     """
     Coregister two arrays
@@ -128,8 +134,9 @@ def coreg(source:np.ndarray, *args, **kwargs):
     source : numpy.ndarray
         The source image. For additional information see table 
         :ref:`variable-types-table`. 
-    *args : dict
-        Coregistration arguments.
+    target : numpy.ndarray
+        The target image. For additional information see table 
+        :ref:`variable-types-table`. 
     **kwargs : dict
         Coregistration keyword arguments.
     
@@ -146,13 +153,17 @@ def coreg(source:np.ndarray, *args, **kwargs):
     """
 
     if source.ndim == 2: 
-        return _coreg_2d(source, *args, **kwargs)
+        return _coreg_2d(source, target, **kwargs)
     
     if source.ndim == 3:
-        return _coreg_3d(source, *args, **kwargs)
+        return _coreg_3d(source, target, **kwargs)
 
-    
-def _coreg_2d(source_large, target_large, params=None, params_obj=None, spacing=1.0, log=False, mask=None, downsample=1):
+
+
+
+  
+def _coreg_2d(source_large, target_large, params=None, params_obj=None, 
+              spacing=1.0, log=False, mask=None, downsample=1):
 
     if np.isscalar(spacing):
         spacing = [spacing, spacing]
@@ -178,8 +189,10 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None, spacing=
     origin_small = [(spacing_small_y - spacing_large_y)/2, (spacing_small_x - spacing_large_x) / 2]
 
     # Coregister downsampled source to target
-    source_small = itk.GetImageFromArray(np.array(source_small, np.float32)) 
-    target_small = itk.GetImageFromArray(np.array(target_small, np.float32))
+    source_small = np.ascontiguousarray(source_small.astype(np.float32))
+    target_small = np.ascontiguousarray(target_small.astype(np.float32))
+    source_small = itk.GetImageFromArray(source_small) 
+    target_small = itk.GetImageFromArray(target_small)
     source_small.SetSpacing(spacing_small)
     target_small.SetSpacing(spacing_small)
     source_small.SetOrigin(origin_small)
@@ -193,7 +206,8 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None, spacing=
     large_shape_x, large_shape_y = source_large.shape
     result_transform_parameters.SetParameter(0, "Size", [str(large_shape_y), str(large_shape_x)])
     result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large_y), str(spacing_large_x)])
-    source_large = itk.GetImageFromArray(np.array(source_large, np.float32))
+    source_large = np.ascontiguousarray(source_large.astype(np.float32))
+    source_large = itk.GetImageFromArray(source_large)
     source_large.SetSpacing(spacing_large)
     source_large.SetOrigin(origin_large)
     coreg_large = itk.transformix_filter(
@@ -203,7 +217,8 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None, spacing=
     coreg_large = itk.GetArrayFromImage(coreg_large)
     
     # Get deformation field at original size
-    target_large = itk.GetImageFromArray(np.array(target_large, np.float32))
+    target_large = np.ascontiguousarray(target_large.astype(np.float32))
+    target_large = itk.GetImageFromArray(target_large)
     target_large.SetSpacing(spacing_large)
     target_large.SetOrigin(origin_large)
     deformation_field = itk.transformix_deformation_field(
@@ -245,8 +260,10 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
     origin_small = [(spacing_small_z - spacing_large_z)/2, (spacing_small_y - spacing_large_y) / 2, (spacing_small_x - spacing_large_x) / 2]
 
     # Coregister downsampled source to target
-    source_small = itk.GetImageFromArray(np.array(source_small, np.float32)) # convert to itk compatiable format
-    target_small = itk.GetImageFromArray(np.array(target_small, np.float32)) # convert to itk compatiable format
+    source_small = np.ascontiguousarray(source_small.astype(np.float32))
+    target_small = np.ascontiguousarray(target_small.astype(np.float32))
+    source_small = itk.GetImageFromArray(source_small) 
+    target_small = itk.GetImageFromArray(target_small) 
     source_small.SetSpacing(spacing_small)
     target_small.SetSpacing(spacing_small)
     source_small.SetOrigin(origin_small)
@@ -259,7 +276,8 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
     # Get coregistered image at original size
     result_transform_parameters.SetParameter(0, "Size", [str(large_shape_z), str(large_shape_y), str(large_shape_x)])
     result_transform_parameters.SetParameter(0, "Spacing", [str(spacing_large_z), str(spacing_large_y), str(spacing_large_x)])
-    source_large = itk.GetImageFromArray(np.array(source_large, np.float32))
+    source_large = np.ascontiguousarray(source_large.astype(np.float32))
+    source_large = itk.GetImageFromArray(source_large)
     source_large.SetSpacing(spacing_large)
     source_large.SetOrigin(origin_large)
     coreg_large = itk.transformix_filter(
@@ -268,7 +286,8 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         log_to_console=log)
     
     # Get deformation field at original size
-    target_large = itk.GetImageFromArray(np.array(target_large, np.float32))
+    target_large = np.ascontiguousarray(target_large.astype(np.float32))
+    target_large = itk.GetImageFromArray(target_large)
     target_large.SetSpacing(spacing_large)
     target_large.SetOrigin(origin_large)
     deformation_field = itk.transformix_deformation_field(
@@ -277,6 +296,7 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         log_to_console=log)
     
     deformation_field = itk.GetArrayFromImage(deformation_field)
+    # Does this need reshaping?
 
     return coreg_large, deformation_field
 

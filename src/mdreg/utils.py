@@ -180,7 +180,8 @@ def fit_pixels(ydata,
   
     return fit.reshape(shape), par.reshape(shape[:-1]+(n,))
 
-def calc_jacobian(defo):
+
+def defo_jacobian_2d(defo):
     """
     Calculate the Jacobian matrix and determinant from a 2D deformation field.
     Can process multi-slice images, but the actual deformation 
@@ -190,23 +191,28 @@ def calc_jacobian(defo):
     ----------
     defo : np.ndarray
         The deformation field to calculate the Jacobian from.
-        Dimensions are expected in the order [x, y, z, t, d], where x, y, z are 
+        Dimensions are expected in the order [x, y, z, d, t], where x, y, z are 
         the spatial dimensions, d is the dimension of the deformation field 
         (two for 2D registration), and t is the time/dynamic.
 
     Returns
     -------
     jac_mat : np.ndarray
-        The Jacobian matrix of the deformation field. 
+        The Jacobian matrix of the deformation field with dimensions [x, y, z, t]
     jac_det : np.ndarray
         The determinant of the Jacobian matrix.
     """
     if defo.ndim != 5:
         raise ValueError('Deformation field must have dimensions '
-                         '[x, y, z, t, d].')
-    if defo.shape[-1] != 2:
+                         '[x, y, z, d, t].')
+    if defo.shape[-2] != 2:
         raise ValueError('Deformation field must be 2D.')
     
+    # the function assumes dims (x,y,z,t,d)
+    # swapping here until the defo dims are redefined
+    defo = np.swapaxes(defo, -2, -1) 
+
+
     jac_mat = np.zeros((defo.shape[0], defo.shape[1], defo.shape[2], 
                         defo.shape[3], 2, 2))
     jac_det = np.zeros((defo.shape[:4]))
@@ -227,7 +233,8 @@ def calc_jacobian(defo):
 
     return jac_mat, jac_det
 
-def calc_norm(defo):
+
+def defo_norm(defo):
     """
     Calculate the norm of a deformation field.
     
@@ -235,7 +242,7 @@ def calc_norm(defo):
     ----------
     defo : np.ndarray
         The deformation field to calculate the norm from. 
-        Dimensions are expected in the order [x, y, z, t, d], where x, y, z are 
+        Dimensions are expected in the order [x, y, z, d, t], where x, y, z are 
         the spatial dimensions, d is the dimension of the deformation field 
         (two for 2D registration, 3 for 3D registration), and t is the 
         time/dynamic.
@@ -247,10 +254,9 @@ def calc_norm(defo):
     """
     if defo.ndim != 5:
         raise ValueError('Deformation field must have dimensions '
-                         '[x, y, z, t, d].')
-    if defo.shape[-1] != 2 and defo.shape[-1] != 3:
+                         '[x, y, z, d, t].')
+    if defo.shape[-1] not in [2,3]:
         raise ValueError('Deformation field must have 2 or 3 dimensions in the '
                          'last axis.')
     
-    norm = np.linalg.norm(defo, axis=-1)
-    return norm
+    return np.linalg.norm(defo, axis=-2)

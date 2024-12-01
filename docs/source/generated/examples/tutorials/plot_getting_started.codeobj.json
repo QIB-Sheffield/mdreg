@@ -1,34 +1,4 @@
 {
- "T1": [
-  {
-   "is_class": true,
-   "is_explicit": false,
-   "module": "ukat.mapping.t1",
-   "module_short": "ukat.mapping",
-   "name": "T1"
-  },
-  {
-   "is_class": true,
-   "is_explicit": false,
-   "module": "ukat.mapping",
-   "module_short": "ukat.mapping",
-   "name": "T1"
-  },
-  {
-   "is_class": true,
-   "is_explicit": false,
-   "module": "ukat",
-   "module_short": "ukat",
-   "name": "T1"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "ukat.mapping.t1",
-   "module_short": "ukat.mapping",
-   "name": "T1"
-  }
- ],
  "abs_exp_recovery_2p": [
   {
    "is_class": false,
@@ -45,15 +15,6 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
-  }
- ],
- "attach30": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
   }
  ],
  "coreg": [
@@ -81,15 +42,6 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
-  }
- ],
- "deform5mm": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
   }
  ],
  "fit": [
@@ -131,22 +83,6 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "animation"
-  }
- ],
- "mdreg.elastix.params": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg.elastix",
-   "module_short": "mdreg.elastix",
-   "name": "params"
   }
  ],
  "mdreg.fetch": [
@@ -197,22 +133,6 @@
    "name": "plot_series"
   }
  ],
- "mdreg.skimage.params": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg.skimage",
-   "module_short": "mdreg.skimage",
-   "name": "params"
-  }
- ],
  "molli": [
   {
    "is_class": false,
@@ -220,65 +140,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "dict"
-  }
- ],
- "my_pixel_fit": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
-  }
- ],
- "my_pixel_model": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  }
- ],
- "my_pixel_model_init": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  }
- ],
- "np.abs": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ufunc"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "abs"
-  }
- ],
- "np.amax": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "_ArrayFunctionDispatcher"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "amax"
   }
  ],
  "np.array": [
@@ -297,54 +158,6 @@
    "name": "array"
   }
  ],
- "np.exp": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "ufunc"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "exp"
-  }
- ],
- "np.eye": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "eye"
-  }
- ],
- "np.inf": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "float"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "inf"
-  }
- ],
  "pars": [
   {
    "is_class": false,
@@ -352,31 +165,6 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
-  }
- ],
- "ukat_model": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
-  }
- ],
- "ukat_t1_model": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "ukat_t1_model"
   }
  ]
 }
