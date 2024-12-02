@@ -36,6 +36,14 @@ def coreg_series(source, target, parallel=False, **kwargs):
     For more information on the main variables in terms of shape
     and description, see the :ref:`variable-types-table`.
     """
+    
+    if np.sum(np.isnan(source)) > 0:
+        raise ValueError('Source image contains NaN values - cannot '
+                         'perform coregistration')
+    if np.sum(np.isnan(target)) > 0:
+        raise ValueError('Target image contains NaN values - cannot '
+                         'perform coregistration')
+    
     if parallel:
         return _coreg_series_parallel(source, target, **kwargs)
     else:
@@ -228,6 +236,11 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None,
     deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
     deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
 
+    try:
+        os.remove('deformationField.nii')
+    except OSError:
+        pass
+
     return coreg_large, deformation_field
 
 
@@ -297,6 +310,11 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
     
     deformation_field = itk.GetArrayFromImage(deformation_field)
     # Does this need reshaping?
+
+    try:
+        os.remove('deformationField.nii')
+    except OSError:
+        pass
 
     return coreg_large, deformation_field
 
@@ -487,7 +505,8 @@ def _freeform():
     # You can save some time by setting this to false, if you are
     # not interested in the final deformed moving image, but only
     # want to analyze the deformation field for example.
-    settings["WriteResultImage"]="true"
+    settings["WriteResultImage"]="false"
+    settings["WriteDeformationField"]="false"
     # The pixel type and format of the resulting deformed moving image
     settings["ResultImagePixelType"]="float"
     settings["ResultImageFormat"]="mhd"
