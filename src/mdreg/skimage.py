@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 from skimage.registration import optical_flow_tvl1
 from skimage.transform import warp
+from skimage.util import img_as_int
 
 from mdreg import utils
 
@@ -136,11 +137,12 @@ def coreg(source:np.ndarray, *args, **kwargs):
         return _coreg_3d(source, *args, **kwargs)
 
 
+
+
 def _coreg_2d(moving, fixed, params=None, coords=None):
 
     # Does not work with float or mixed type for some reason
-    moving = moving.astype(np.int16)
-    fixed = fixed.astype(np.int16)
+    moving, fixed, a, b, dtype = _torange(moving, fixed)
     
     if params is None:
         params = {'method': 'optical flow'}
@@ -168,13 +170,18 @@ def _coreg_2d(moving, fixed, params=None, coords=None):
     deformation_field = np.stack([v, u], axis=-1)
 
     warped_moving = warp(moving, new_coords, mode='edge', preserve_range=True)
+
+    if a is not None:
+        # Scale back to original range and type
+        warped_moving = warped_moving.astype(dtype)
+        warped_moving = (warped_moving-b)/a
+        
     return warped_moving, deformation_field
+
 
 def _coreg_3d(moving, fixed, params=None, coords=None):
 
-    # Does not work with float or mixed type for some reason
-    moving = moving.astype(np.int16)
-    fixed = fixed.astype(np.int16)
+    moving, fixed, a, b, dtype = _torange(moving, fixed)
     
     if params is None:
         params = {'method': 'optical flow'}
@@ -205,6 +212,12 @@ def _coreg_3d(moving, fixed, params=None, coords=None):
     deformation_field = np.stack([v, u, w], axis=-1)
 
     warped_moving = warp(moving, new_coords, mode='edge', preserve_range=True)
+
+    if a is not None:
+        # Scale back to original range and type
+        warped_moving = warped_moving.astype(dtype)
+        warped_moving = (warped_moving-b)/a
+
     return warped_moving, deformation_field
 
 
@@ -234,3 +247,41 @@ def params(**override):
         params[key]=val
     return params
 
+
+def _torange(moving, fixed):
+
+    if moving.dtype in [np.half, np.single, np.double, np.longdouble]:
+
+        i16 = np.iinfo(np.int16)
+
+        # Stay away from the boundaries
+        imin = float(i16.min) + 16
+        imax = float(i16.max) - 16
+
+        # Scale to integer range
+        amin = np.amin([np.amin(moving), np.amin(fixed)])
+        amax = np.amax([np.amax(moving), np.amax(fixed)])
+        if amax == amin:
+            a = 1
+            b = - amin
+        else:
+            a = (imax-imin)/(amax-amin)
+            b = - a * amin + imin
+        # arr 
+        # = (imax-imin)*(arr-amin)/(amax-amin) + imin
+        # = (imax-imin)*arr/(amax-amin)
+        # - (imax-imin)*amin/(amax-amin) + imin
+        # = (imax-imin)/(amax-amin) * arr 
+        # - (imax-imin)/(amax-amin) * amin + imin
+        moving = np.around(a*moving + b).astype(np.int16)
+        fixed = np.around(a*fixed + b).astype(np.int16)
+
+        return moving, fixed, a, b, moving.dtype
+    
+    else:
+    
+        # Not clear why this is necessary but does not work otherwise
+        moving = moving.astype(np.int16)
+        fixed = fixed.astype(np.int16)
+
+        return moving, fixed, None, None, None

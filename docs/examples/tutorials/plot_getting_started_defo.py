@@ -16,7 +16,6 @@ can be done by another package, `skimage`.
 # ----------------------------
 # Import packages 
 import numpy as np
-from scipy.optimize import curve_fit
 import mdreg
 
 #%%
@@ -65,6 +64,7 @@ deform5mm = {
 molli = {
     'func': mdreg.abs_exp_recovery_2p,
     'TI': np.array(data['TI'])/1000,
+    'progress_bar': True,
 }
 
 # Perform model-driven coregistration
@@ -116,12 +116,12 @@ attach30 = {
 # Run ``mdreg`` again with the correct signal model, but now using the 
 # customized ``skimage`` coregistration:
 
+
 # Perform model-driven coregistration
 coreg, defo, fit, pars = mdreg.fit(
     array, 
     fit_image = molli, 
     fit_coreg = attach30, 
-    verbose = 0,
 )
 
 # Visualise the results
