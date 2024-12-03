@@ -133,10 +133,10 @@ Use cases
 
 .. only:: html
 
-  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_poor_model_fitting_thumb.png
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr__plot_poor_model_fitting_thumb.png
     :alt:
 
-  :ref:`sphx_glr_generated_examples_use_cases_plot_poor_model_fitting.py`
+  :ref:`sphx_glr_generated_examples_use_cases__plot_poor_model_fitting.py`
 
 .. raw:: html
 

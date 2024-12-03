@@ -13,7 +13,7 @@ performed, and the results are visualized.
 
 #%% 
 # Import packages and data
-# ----------------------------
+# ------------------------
 # Example data can be easily loaded in using the `fetch` function.
 
 import numpy as np
@@ -24,7 +24,7 @@ data = mdreg.fetch('VFA')
 
 #%% 
 # Extract the desired slice from the data array
-# ----------------------------
+# ---------------------------------------------
 # As an intial step, we will extract the 4D data (x,y,z,t) from the fetched 
 # data dictionary.
 
@@ -32,7 +32,7 @@ array = data['array']
 
 #%%
 # Signal model theory
-# ----------------------------
+# -------------------
 # The signal model used in this example is the variable flip angle 
 # SPGR model. The signal model is defined by the following equation:
 #
@@ -64,7 +64,7 @@ array = data['array']
 
 #%%
 # Define model fit parameters
-# ----------------------------
+# ---------------------------
 # The image fitting settings dictionary (`vfa_fit` in this case) is 
 # required by `mdreg.fit` to fit a specific signal model to the data. Leaving 
 # this as None will fit a constant model to the data as a default.
@@ -80,7 +80,7 @@ vfa_fit = {
     }
 #%%
 # Define the coregistration parameters
-# ----------------------------
+# ------------------------------------
 # The coregistration parameters are set in the `coreg_params` dictionary.
 # The `package` key specifies the coregistration package to be used, with a 
 # choice of elastix, skimage, or dipy.
@@ -99,7 +99,7 @@ coreg_params = {
 
 #%%
 # Define the plotting parameters
-# ----------------------------
+# ------------------------------
 # The plotting parameters are set in the `plot_settings` dictionary.
 #
 # The `interval` key specifies the time interval between frames in 
@@ -136,7 +136,7 @@ plot_settings = {
 
 #%% 
 # Perform model-driven coregistration
-# ----------------------------
+# -----------------------------------
 # The `mdreg.fit` function is used to perform the model-driven coregistration.
 # The function requires the 4D data array, the fit_image dictionary, and the 
 # coregistration parameters we have already defined.
@@ -158,7 +158,7 @@ print(f"Linear fitting time elapsed: {(int(tot_time/60))} mins, {np.round(tot_ti
 
 #%% 
 # Visualize the results
-# ----------------------------
+# ---------------------
 # To easily visualise the output of the employ the `mdreg.plot` module to 
 # easily produce animations that render on screen or save as a gif.
 # Here we utilise `mdreg.plot_series` which accepts both 2D and 3D spatial data 
@@ -179,7 +179,7 @@ anim = mdreg.animation(fit, title='Model Fit', **plot_settings)
 
 #%% 
 # Export all series at once
-# ----------------------------
+# -------------------------
 # The `mdreg.plot_series` function can be used to plot the original, fitted and
 # coregistered data for all slices in the data array. This function can also
 # be used to save the animations to a file. 
