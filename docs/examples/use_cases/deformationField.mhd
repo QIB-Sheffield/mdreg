@@ -1,0 +1,14 @@
+ObjectType = Image
+NDims = 3
+BinaryData = True
+BinaryDataByteOrderMSB = False
+CompressedData = False
+TransformMatrix = 1 0 0 0 1 0 0 0 1
+Offset = 0 0 0
+CenterOfRotation = 0 0 0
+AnatomicalOrientation = RAI
+ElementSpacing = 5 4.6875 4.6875
+DimSize = 36 96 78
+ElementNumberOfChannels = 3
+ElementType = MET_FLOAT
+ElementDataFile = deformationField.raw
