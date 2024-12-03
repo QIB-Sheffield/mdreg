@@ -351,14 +351,14 @@ def params(default='freeform', **override):
         Adjust the default parameters associated with grid spacing for elastix 
         registration.
 
-        >>> params = mdreg.params()
+        >>> params = mdreg.elastix.params()
         >>> print(params['FinalGridSpacingInPhysicalUnits'])
         50.0
 
         Override the default parameters associated with grid spacing for 
         elastix registration.
 
-        >>> params = mdreg.params(FinalGridSpacingInPhysicalUnits='5.0')
+        >>> params = mdreg.elastix.params(FinalGridSpacingInPhysicalUnits='5.0')
         >>> print(params['FinalGridSpacingInPhysicalUnits'])
         5.0
     """

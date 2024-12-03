@@ -56,7 +56,6 @@ deform5mm = {
 }
 
 
-
 #%%
 # We run ``mdreg`` again with the correct signal model, but now using the 5mm 
 # coregistration:
@@ -77,6 +76,7 @@ coreg, defo, fit, pars = mdreg.fit(
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
+
 
 #%%
 # The effect of the finer deformations is apparent, but it has not 
