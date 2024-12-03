@@ -1,5 +1,7 @@
 :orphan:
 
+.. _examples:
+
 ########
 Examples
 ########
@@ -22,6 +24,7 @@ Examples
 
     </div>
 
+
 *********
 Tutorials
 *********
@@ -35,6 +38,57 @@ Tutorials
     <div class="sphx-glr-thumbnails">
 
 .. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="We illustrate the basic use of mdreg for the use case of fitting the  longitudinal MRI relaxation time T1 from a Look-Locker MRI  sequence. ">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using built-in models</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, dcmri uses free-form deformation implemented in the package  itk.elastix, which default settings for all configuration parameters. ">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_defo_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Customizing the coregistration</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In case an appropriate signal model is not available in mdreg&#x27;s model  library, the model must be custom writtem. This tutorial will illustrate this  for the case of T1-mapping with a MOLLI sequence.">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_custom_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using custom-build models</div>
+    </div>
+
 
 .. thumbnail-parent-div-close
 
@@ -55,6 +109,40 @@ Use cases
     <div class="sphx-glr-thumbnails">
 
 .. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA)  dataset. The data is fetched using the fetch function, and the desired slice  is extracted from the data array. The VFA parameters are defined, and the  coregistration parameters are set. The model-driven coregistration is  performed, and the results are visualized.">
+
+.. only:: html
+
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_3Dexample_vfa_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Example 3D data: Variable Flip Angle</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates the effect of poor model fitting on coregistration for the 3D Variable Flip Angle (VFA) dataset used in the 3D data example.">
+
+.. only:: html
+
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr__plot_poor_model_fitting_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_use_cases__plot_poor_model_fitting.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Example: Poor Model Fitting</div>
+    </div>
+
 
 .. thumbnail-parent-div-close
 

@@ -52,6 +52,11 @@ Build release notes
 Creating a PyPi release
 -----------------------
 
+If needed:
+
+>>> pip install build
+>>> pip install twine
+
 In the terminal, cd to the /dcmri directory, and:
 
 >>> python -m build

@@ -2,6 +2,8 @@
 
 .. _sphx_glr_generated_examples_tutorials:
 
+.. _tutorials:
+
 *********
 Tutorials
 *********
@@ -16,9 +18,68 @@ Tutorials
 
 .. thumbnail-parent-div-open
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="We illustrate the basic use of mdreg for the use case of fitting the  longitudinal MRI relaxation time T1 from a Look-Locker MRI  sequence. ">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using built-in models</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, dcmri uses free-form deformation implemented in the package  itk.elastix, which default settings for all configuration parameters. ">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_defo_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Customizing the coregistration</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In case an appropriate signal model is not available in mdreg&#x27;s model  library, the model must be custom writtem. This tutorial will illustrate this  for the case of T1-mapping with a MOLLI sequence.">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_custom_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using custom-build models</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /generated/examples/tutorials/plot_getting_started
+   /generated/examples/tutorials/plot_getting_started_defo
+   /generated/examples/tutorials/plot_getting_started_custom
 
