@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = 'mdreg'
-copyright = '2024, dcmri maintainers'
-author = 'dcmri maintainers'
-release = '0.4.0'
+copyright = '2024, mdreg maintainers'
+author = 'mdreg maintainers'
+release = '0.4.1'
 
 # -- Path setup --------------------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,
