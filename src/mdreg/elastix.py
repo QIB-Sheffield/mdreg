@@ -1,3 +1,4 @@
+import __main__
 import os
 import multiprocessing
 import numpy as np
@@ -233,13 +234,10 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None,
         target_large, 
         result_transform_parameters, 
         log_to_console=log)
-    deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
+    deformation_field = itk.GetArrayFromImage(deformation_field)
     deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
 
-    try:
-        os.remove('deformationField.nii')
-    except OSError:
-        pass
+    _cleanup()
 
     return coreg_large, deformation_field
 
@@ -309,15 +307,43 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         log_to_console=log)
     
     deformation_field = itk.GetArrayFromImage(deformation_field)
-    # Does this need reshaping?
+    deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
+
+    _cleanup()
+
+    return coreg_large, deformation_field
+
+
+def _cleanup():
 
     try:
         os.remove('deformationField.nii')
     except OSError:
         pass
+    try:
+        os.remove('deformationField.mhd')
+    except OSError:
+        pass
+    try:
+        os.remove('deformationField.raw')
+    except OSError:
+        pass
 
-    return coreg_large, deformation_field
+    path = os.path.dirname(__main__.__file__)
 
+    try:
+        os.remove(os.path.join(path, 'deformationField.nii'))
+    except OSError:
+        pass
+    try:
+        os.remove(os.path.join(path, 'deformationField.mhd'))
+    except OSError:
+        pass
+    try:
+        os.remove(os.path.join(path, 'deformationField.raw'))
+    except OSError:
+        pass
+    
 
 def params(default='freeform', **override):
 
