@@ -1,194 +1,136 @@
 """
 ===============================================
-Example 3D data: Variable Flip Angle
+3D Variable Flip Angle (Linear)
 ===============================================
 
-This example illustrates coregistration of a 3D Variable Flip Angle (VFA) 
-dataset. The data is fetched using the `fetch` function, and the desired slice 
-is extracted from the data array. The VFA parameters are defined, and the 
-coregistration parameters are set. The model-driven coregistration is 
-performed, and the results are visualized.
+This example illustrates motion correction of a 3D time series with 
+variable flip angles (VFA). The motion correction is performed with 3D 
+coregistration and we are using a linear signal model fit.
 
 """
 
 #%% 
-# Import packages and data
-# ------------------------
-# Example data can be easily loaded in using the `fetch` function.
+# Import packages and load data
+# -----------------------------
 
 import numpy as np
 import mdreg
-import time
+
+# Example data included in mdreg
 
 data = mdreg.fetch('VFA')
 
-#%% 
-# Extract the desired slice from the data array
-# ---------------------------------------------
-# As an intial step, we will extract the 4D data (x,y,z,t) from the fetched 
-# data dictionary.
+# Variables used in this examples
 
-array = data['array']
+array = data['array']       # 4D signal data (x, y, z, FA)
+FA = data['FA']             # The FA values in degrees
+spacing = data['spacing']   # (x,y,z) voxel size in mm.
 
-#%%
-# Signal model theory
-# -------------------
-# The signal model used in this example is the variable flip angle 
-# SPGR model. The signal model is defined by the following equation:
-#
-#
-# :math:`S(\phi)=S_{0} \frac{\sin{\phi}e^{-\frac{T_{R}}{T_{1}}}}{1-\cos{\phi}e^{-\frac{T_{R}}{T_{1}}}}`
-#
-# Where :math:`S` is the signal, :math:`S_{0}` the initial signal, :math:`\phi`
-# the flip angle, :math:`T_{R}` the reptition time and :math:`T_{1}` the 
-# longitudinal relaxtion time.
-# 
-# A linearised fitting approach is chosen for efficiency, where the above 
-# relationship can be rearranged to give:
-#
-# :math:`S\frac{\cos{\phi}}{\sin{\phi}}=M S\sin{\phi}+C`
-#
-# This takes the form: :math:`Y=MX+C`. Which can be easily solved for using 
-# linear methods.
-# 
-# In this case the slope and intercept terms are defined as:
-#
-# :math:`M=(\frac{1}{E});~~~~C=\frac{(1-E)}{E}~`. :math:`~~~~` Where 
-# :math:`E=e^{\frac{-T_{R}}{T_{1}}}~`.
-#
-# The fitted intercept and slope terms are then used to calculate the fitted 
-# signal :math:`S`.
-#
-# :math:`S(\phi)=\frac{C\sin{\phi}}{\cos{\phi}-M}`
-#
 
 #%%
-# Define model fit parameters
-# ---------------------------
-# The image fitting settings dictionary (`vfa_fit` in this case) is 
-# required by `mdreg.fit` to fit a specific signal model to the data. Leaving 
-# this as None will fit a constant model to the data as a default.
+# Signal model
+# ------------
+# The signal data are acquired using a spoiled gradient-echo 
+# sequence in the steady-state, with different flip angles:
 #
-# Here, we select the model function `func` to be the linear varaible flip 
-# angle SPGR model from the model library (`mdreg.spgr_vfa_lin`). This model 
-# fit requires the flip angle values in radians (`FA`). This information is 
-# provided in the `data` dictionary for this example.
+# :math:`S(\phi)=S_0\sin{\phi} \frac{1-e^{-T_R/T_1}}{1-\cos{\phi}\,e^{-T_R/T_1}}`
+#
+# Here :math:`S(\phi)` is the signal at flip angle :math:`\phi`, 
+# :math:`S_0` a scaling factor, :math:`T_R` the repetition time and 
+# :math:`T_1` the longitudinal relaxation time. The equation can be rewritten 
+# in a linear form: 
+# 
+# :math:`Y(\phi) = AX(\phi)+B` 
+# 
+# with the variables defined as:
+#
+# :math:`X=S(\phi)/\sin{\phi};~~~~Y=S(\phi)\cos{\phi} / \sin{\phi}`
+#
+# and the constants:
+#
+# :math:`E=e^{-T_R/T_1};~~~~A=\frac{1}{E};~~~~B=-S_0\frac{1-E}{E}~`
+#
+# Plotting :math:`Y(\phi)` against :math:`X(\phi)` produces a straight line 
+# with slope :math:`A` and intercept :math:`B`. After solving for :math:`A, B` 
+# these constants can then be used reconstruct the signal:
+#
+# :math:`S(\phi)=\frac{B\sin{\phi}}{\cos{\phi}-A}`
+
+#%%
+# Perform motion correction
+# -------------------------
+# The signal model above is included in `mdreg` as the function 
+# `mdreg.spgr_vfa_lin`, which require the flip angle values in degrees as 
+# input (`FA`). The signal model is therefore defined by:
 
 vfa_fit = {
-    'func': mdreg.spgr_vfa_lin,  # The function to fit the data
-    'FA': data['FA']  # The FA values in degrees
-    }
-#%%
-# Define the coregistration parameters
-# ------------------------------------
-# The coregistration parameters are set in the `coreg_params` dictionary.
-# The `package` key specifies the coregistration package to be used, with a 
-# choice of elastix, skimage, or dipy.
-#
-# The `params` key specifies the parameters required by the chosen 
-# coregistration package. Here None is used to specify default parameters for 
-# freeform registration included by `mdreg`. Here, we use the elastix package 
-# with the following parameters:
+    'func': mdreg.spgr_vfa_lin,     # VFA signal model
+    'FA': FA,                       # Flip agle in degress    
+    'progress_bar': False,          # Do not show a progress bar
+}
 
+#%%
+# For this example we will perform the coregistration with elastix and 
+# use a deformation field with grid spacing 50mm:
 
 coreg_params = {
     'package': 'elastix',
-    'params': mdreg.elastix.params(FinalGridSpacingInPhysicalUnits='150.0'),
-    'spacing': data['spacing']
-}
-
-#%%
-# Define the plotting parameters
-# ------------------------------
-# The plotting parameters are set in the `plot_settings` dictionary.
-#
-# The `interval` key specifies the time interval between frames in 
-# milliseconds, and the `vmin`/`vmax` keys specify the minimum/maximum value of 
-# the colorbar. 
-# 
-# For the case of 3D data, by default the function renders animations for all 
-# slices for the original, fitted and coregistered data in seperate figures. If
-# the `slice` parameter is specified in the plotting parameters, the function
-# will produce a single figure for the specified slice showing the original,
-# fitted and coregistered data animations side-by-side.
-# 
-# If you are interested to save the resulting animation, you can use 
-# the `path` key to the desired file path and the `filename` key to the desired 
-# filename. As a default these are set to None resulting in the animation being 
-# displayed on screen only. For more plotting keyword arguements, see the 
-# `mdreg.plot` module.
-# 
-# The plotting parameters can be provide to the `mdreg.fit` function to provide
-# settings for animations produce if verbose is set to 3. This produces
-# animations after each coregistation iteration. Additionally, the plotting
-# parameters can be provided to the `mdreg.plot` module to produce animations
-# of the final outputs.
-
-plot_settings = {
-    'interval' : 500, # Time interval between animation frames in ms
-    'vmin' : 0, # Minimum value of the colorbar
-    'vmax' : np.percentile(array,99), # Maximum value of the colorbar
-    'path' : None, # Path to save the animation
-    'show' : True, # Display the animation on screen
-    'filename' : None, # Filename to save the animation
-    'slice' : None # No slice specified, show all slices for 3D data
+    'params': mdreg.elastix.params(
+        FinalGridSpacingInPhysicalUnits='50.0',
+    ),
+    'spacing': spacing,
 }
 
 #%% 
-# Perform model-driven coregistration
-# -----------------------------------
-# The `mdreg.fit` function is used to perform the model-driven coregistration.
-# The function requires the 4D data array, the fit_image dictionary, and the 
-# coregistration parameters we have already defined.
-# The `verbose` parameter can be set to 0, 1, 2, or 3 to control the level of 
-# output.
+# We can now perform the motion correction:
 
-stime = time.time()
-
-coreg, defo, fit, pars = mdreg.fit(array, 
-                                   fit_image = vfa_fit, 
-                                   fit_coreg = coreg_params,
-                                   maxit = 3, 
-                                   verbose = 0,
-                                   plot_params = None)
-
-tot_time = time.time() - stime
-
-print(f"Linear fitting time elapsed: {(int(tot_time/60))} mins, {np.round(tot_time-(int(tot_time/60)*60),1)} s")
+coreg, defo, fit, pars = mdreg.fit(
+    array,                          # Signal data to correct
+    fit_image = vfa_fit,            # Signal model
+    fit_coreg = coreg_params,       # Coregistration model
+    maxit = 5,                      # Maximum number of iterations
+    verbose = 0,                    # Do not show progress update
+)
 
 #%% 
 # Visualize the results
 # ---------------------
-# To easily visualise the output of the employ the `mdreg.plot` module to 
-# easily produce animations that render on screen or save as a gif.
-# Here we utilise `mdreg.plot_series` which accepts both 2D and 3D spatial data 
-# arrays which change over an additional dimension (e.g. time or FA in this 
-# case). This displays the orginal data, the fitted data and the coregistered 
-# data. 
-# 
-# Here we apply the plotting parameters defined above to visualise the final
-# results.
+# We visualise the original data and results of the computation using the 
+# builtin `mdreg.animation` function. Since we want to call this 3 times, 
+# we define the settings up front:
 
-anim = mdreg.animation(array, title='Original Data', **plot_settings)
-
-#%%
-anim = mdreg.animation(coreg, title='Coregistered', **plot_settings)
-
-#%%
-anim = mdreg.animation(fit, title='Model Fit', **plot_settings)
+plot_settings = {
+    'interval' : 500,                   # Time between animation frames in ms
+    'vmin' : 0,                         # Minimum value of the colorbar
+    'vmax' : np.percentile(array,99),   # Maximum value of the colorbar
+    'show' : True,                      # Display the animation on screen
+}
 
 #%% 
-# Export all series at once
-# -------------------------
-# The `mdreg.plot_series` function can be used to plot the original, fitted and
-# coregistered data for all slices in the data array. This function can also
-# be used to save the animations to a file. 
-#
-# We include the `mdreg.animation` function to display the animations on screen
-# within the documentation, but recommend using the `mdreg.plot_series` 
-# function to easily process and save the animations to a file when running 
-# locally.
-#  >>> anims = mdreg.plot_series(array, fit_nonlin, coreg_nonlin, **plot_settings)
+# Now we can plot the data, coregistered images and model fits separately:
+
+#%%
+anim = mdreg.animation(array, title='Original data', **plot_settings)
+
+#%%
+anim = mdreg.animation(coreg, title='Motion corrected', **plot_settings)
+
+#%%
+anim = mdreg.animation(fit, title='Model fit', **plot_settings)
+
+#%% 
+# It's also instructive to show the deformation field and check whether 
+# deformations are consistent with the effect of breathing motion. Since the 
+# deformation field is a vector we show here its norm:
+
+#%%
+
+# Get the norm of the deformation field and adjust the plot settings
+defo = mdreg.defo_norm(defo)
+plot_settings['vmax'] = np.percentile(defo, 99)
+
+# Display the norm of the deformation field
+anim = mdreg.animation(defo, title='Deformation field', **plot_settings)
 
 # sphinx_gallery_start_ignore
 

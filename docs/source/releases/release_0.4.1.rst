@@ -2,7 +2,7 @@ mdreg 0.4.1
 ===========
 
 Summary
---------
+-------
 
 - Extended documentation including function-level docstrings
 - New examples 
@@ -16,7 +16,7 @@ Summary
 Contributors
 ------------
 
-3 authora added to this release:
+3 authors added to this release:
 
 - Alex Daniel (`@alexdaniel654 <https://github.com/alexdaniel654>`_)
 - Eve Shalom (`@EShalom <https://github.com/EShalom>`_)

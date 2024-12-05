@@ -8,8 +8,8 @@ Examples
 
 .. note::
 
-   `mdreg` is developed in public but is work in progress. As long as this notice is visible, backwards compatibility is not guaranteed and features may be deprecated without warning.
-
+   ``mdreg`` is under construction. At this stage, the API may still change and 
+   features may be deprecated without warning.
 
 
 .. raw:: html
@@ -112,35 +112,35 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates coregistration of a 3D Variable Flip Angle (VFA)  dataset. The data is fetched using the fetch function, and the desired slice  is extracted from the data array. The VFA parameters are defined, and the  coregistration parameters are set. The model-driven coregistration is  performed, and the results are visualized.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and we are using a linear signal model fit.">
 
 .. only:: html
 
-  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_3Dexample_vfa_thumb.png
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_3Dexample_vfa_thumb.gif
     :alt:
 
   :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Example 3D data: Variable Flip Angle</div>
+      <div class="sphx-glr-thumbnail-title">3D Variable Flip Angle (Linear)</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates the effect of poor model fitting on coregistration for the 3D Variable Flip Angle (VFA) dataset used in the 3D data example.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and in this example we are using a nin-linear signal model.">
 
 .. only:: html
 
-  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr__plot_poor_model_fitting_thumb.png
+  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_3Dexample_vfa_nonlin_thumb.gif
     :alt:
 
-  :ref:`sphx_glr_generated_examples_use_cases__plot_poor_model_fitting.py`
+  :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa_nonlin.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Example: Poor Model Fitting</div>
+      <div class="sphx-glr-thumbnail-title">3D Variable Flip Angle (non-linear)</div>
     </div>
 
 

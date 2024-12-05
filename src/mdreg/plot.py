@@ -33,11 +33,6 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None,
         The interval between frames. The default is 250ms.
     show : bool, optional
         Whether to display the animation. The default is False.
-    
-    Returns
-    -------
-    anim : matplotlib.animation.ArtistAnimation
-        The animation object
 
     """
 
@@ -85,9 +80,10 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None,
             anim.save(file_3D_save + "_"  + ".gif")
         if show:
             plt.show()
+            return anim
         else:
             plt.close()
-        return anim
+            return
     
     elif array.ndim-1 == 3 and slice is not None: # save 3D data
         array = array[:,:,slice,:]
@@ -105,8 +101,10 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None,
             anim.save(file_3D_save + ".gif")
         if show:
             plt.show()
-
-        return anim
+            return anim
+        else:
+            plt.close()
+            return
 
 
 def plot_series(moving, fixed, coreg, path=None, filename='animation', 
@@ -137,11 +135,6 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation',
         The interval between frames. The default is 250ms.
     show : bool, optional
         Whether to display the animation. The default is False.
-
-    Returns
-    -------
-    anim : matplotlib.animation.ArtistAnimation
-        The animation object
 
     """
 
@@ -195,7 +188,10 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation',
                 anims.append(anim)
             else:
                 plt.close()
-        return anims
+        if show:
+            return anims
+        else:
+            return
 
     elif (moving.ndim == fixed.ndim == coreg.ndim == 4) and (slice is not None):
             fixed = fixed[:,:,slice,:]
@@ -229,11 +225,12 @@ def plot_series(moving, fixed, coreg, path=None, filename='animation',
         file_3D_save = os.path.join(path, filename)
         anim.save(file_3D_save + ".gif")
     if show:
-        plt.show()   
+        plt.show()  
+        return anim 
     else:
         plt.close()
-    
-    return anim
+        return
+
 
 
 def _plot_coreg(moving, fixed, coreg, defo, dmax=2.0, vmax=10000):
