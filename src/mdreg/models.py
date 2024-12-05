@@ -1,5 +1,6 @@
 
 import numpy as np
+from tqdm import tqdm
 from mdreg import utils
 
     
@@ -372,12 +373,11 @@ def exp_recovery_3p(signal,
 
 def spgr_vfa_nonlin(signal, 
         FA = None,
-        TR = None,
         bounds = (
-            [0,0],
-            [+np.inf, +np.inf], 
+            [0, 0],
+            [np.inf, 1], 
         ),
-        p0 = [1,1], 
+        p0 = [1, 0.5], 
         parallel = False,
         **kwargs):
     
@@ -392,8 +392,6 @@ def spgr_vfa_nonlin(signal,
             flip angles.
         FA : numpy.array
             Flip Angles
-        TR : float
-            Repetition time
         bounds : tuple
             Bounds for the fit
         p0 : list
@@ -421,14 +419,13 @@ def spgr_vfa_nonlin(signal,
     if FA is None:
         raise ValueError('Flip Angles (FA) are a required parameter.')
     
+    # Precompute sin and cos
     FA = np.deg2rad(FA)
-    
-    def myfunction(FA, S0, T1):
-        return _spgr_vfa_nonlin_func(FA, S0, T1, TR)
+    trigFA = np.stack((np.sin(FA), np.cos(FA)), axis=0)
 
     fit, par = utils.fit_pixels(signal, 
-        model = myfunction, 
-        xdata = FA,
+        model = _spgr_vfa_nonlin_func, 
+        xdata = trigFA,
         func_init = _spgr_vfa_nonlin_func_init,
         bounds = bounds,
         p0 = p0, 
@@ -437,19 +434,19 @@ def spgr_vfa_nonlin(signal,
 
     return fit, par
 
-def _spgr_vfa_nonlin_func(FA, S0, T1, TR):
-    return (S0 * ( (np.sin(FA)*np.exp(-TR/T1)) / (1-np.cos(FA)*np.exp(-TR/T1)) ))
+def _spgr_vfa_nonlin_func(trigFA, S0, E):
+    if 0 in (1 - trigFA[1,:] * E):
+        return S0 * trigFA[0,:] 
+    else:
+        return S0 * trigFA[0,:] * (1-E) / (1 - trigFA[1,:] * E) 
 
-def _spgr_vfa_nonlin_func_init(FA, signal, init):
-    S0 = np.amax(np.abs(signal))
+def _spgr_vfa_nonlin_func_init(trigFA, signal, init):
+    S0 = np.amax(np.abs(signal))/np.amax(trigFA[0,:])
     return [S0*init[0], init[1]]
 
-def spgr_vfa_lin(signal, 
-        FA = None,
-        bounds = (
-            [0,0],
-            [+np.inf, +np.inf]),
-        **kwargs):
+
+
+def spgr_vfa_lin(signal, FA = None, progress_bar=False):
     
     """
     Linearised SPGR model fit
@@ -461,9 +458,9 @@ def spgr_vfa_lin(signal,
             Spatial array with signal intensities over different 
             flip angles.
         FA : numpy.array
-            Flip Angles
-        bounds : tuple
-            Bounds for the fit
+            Flip Angles in degrees
+        progress_bar: bool
+            Display a progress bar (default = False)
     
     Returns
     -------
@@ -471,14 +468,12 @@ def spgr_vfa_lin(signal,
             Fitted data
         pars : numpy.ndarray
             Parameters
-            The parameters are: m,c, giving N=2.
+            The parameters are: A (slope) and B (intercept).
     
-
     For more information on the input and returned variables in terms of shape
     and description, see the :ref:`variable-types-table`.
     
     """
-    
     if FA is None:
         raise ValueError('FLip Angles (FA) are a required parameter.')
     
@@ -486,37 +481,36 @@ def spgr_vfa_lin(signal,
 
     # Construct FA array in matching shape to signal data
     FA_array = np.ones_like(signal)*FA
+    sFA_array = np.sin(FA_array)
 
-    X = signal/np.sin(FA_array)
-    Y = (signal * np.cos(FA_array)) / np.sin(FA_array)
+    X = signal / sFA_array
+    Y = signal * np.cos(FA_array) / sFA_array
 
-    X_flat = X.reshape(-1,signal.shape[-1])
-    Y_flat = Y.reshape(-1,signal.shape[-1])
+    shape = signal.shape
+    X = X.reshape(-1, shape[-1])
+    Y = Y.reshape(-1, shape[-1])
+    signal = signal.reshape(-1, shape[-1])
 
-    return _spgr_vfa_lin_fit(X_flat, Y_flat, FA, signal, signal.shape)
+    pars = np.empty((X.shape[0], 2))
+    fit = np.empty(X.shape)
 
-def _spgr_vfa_lin_func(A, Y):
-    return (np.linalg.lstsq(A, Y, rcond=None)[0])
+    sFA, cFA = np.sin(FA), np.cos(FA)
+    ones = np.ones(shape[-1])
 
-def _spgr_vfa_lin_fit(X, Y, FA, signal, signal_shape):
-    
-    pars = np.empty(X.shape[:-1]+(2,))
-    
-    for i in range(X.shape[0]):
-        A = np.vstack([X[i,:], np.ones(len(X[i,:]))]).T
-        m, c = _spgr_vfa_lin_func(A, Y[i,:])
-        pars[i,0] = m
-        pars[i,1] = c
-    
-    
-    pars = pars.reshape(signal_shape[:-1] + (2,))
-    fit = (pars[...,1][..., np.newaxis]*np.sin(FA))/(np.cos(FA)-pars[...,0][..., np.newaxis])
-    smax = np.amax(signal)
-    fit[fit<0]=0
+    for i in tqdm(range(X.shape[0]), desc='Fitting VFA model', disable=not progress_bar):
+        A = np.vstack([X[i,:], ones])
+        pars[i,:] = np.linalg.lstsq(A.T, Y[i,:], rcond=None)[0]
+        if 0 in (cFA - pars[i,0]):
+            fit[i,:] = signal[i,:]
+        else:
+            fit[i,:] = pars[i,1] * sFA / (cFA - pars[i,0])
+        smax = np.amax(signal[i,:])
+        fit[i,:][fit[i,:] > smax] = smax
+
+    fit[fit<0] = 0
     fit[np.isnan(fit)] = 0
-    fit[fit>2*smax]=2*smax
-
-    return fit, pars
+    
+    return fit.reshape(shape), pars.reshape(shape[:-1] + (2,))
 
 
 

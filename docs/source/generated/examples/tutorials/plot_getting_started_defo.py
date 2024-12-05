@@ -63,7 +63,6 @@ deform5mm = {
 molli = {
     'func': mdreg.abs_exp_recovery_2p,
     'TI': np.array(data['TI'])/1000,
-    'progress_bar': True,
 }
 
 # Perform model-driven coregistration

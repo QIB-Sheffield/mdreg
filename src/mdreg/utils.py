@@ -252,11 +252,4 @@ def defo_norm(defo):
     norm : np.ndarray
         The norm of the deformation field with dimensions [x, y, z, t].
     """
-    if defo.ndim != 5:
-        raise ValueError('Deformation field must have dimensions '
-                         '[x, y, z, d, t].')
-    if defo.shape[-1] not in [2,3]:
-        raise ValueError('Deformation field must have 2 or 3 dimensions in the '
-                         'last axis.')
-    
     return np.linalg.norm(defo, axis=-2)

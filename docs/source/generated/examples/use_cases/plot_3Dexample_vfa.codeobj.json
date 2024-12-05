@@ -1,13 +1,4 @@
 {
- "(": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "("
-  }
- ],
  ":math:": [
   {
    "is_class": false,
@@ -36,9 +27,39 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": ":math:"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": ":math:"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": ":math:"
+  }
+ ],
+ "AX(\\phi)+B": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "AX(\\phi)+B"
   }
  ],
  "FA": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  },
   {
    "is_class": false,
    "is_explicit": true,
@@ -47,67 +68,49 @@
    "name": "FA"
   }
  ],
- "S": [
+ "S(\\phi)": [
   {
    "is_class": false,
    "is_explicit": true,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "S"
+   "name": "S(\\phi)"
   }
  ],
- "S\\sin{\\phi}+C": [
+ "S_0": [
   {
    "is_class": false,
    "is_explicit": true,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "S\\sin{\\phi}+C"
+   "name": "S_0"
   }
  ],
- "S_{0}": [
+ "T_1": [
   {
    "is_class": false,
    "is_explicit": true,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "S_{0}"
+   "name": "T_1"
   }
  ],
- "T_{1}": [
+ "T_R": [
   {
    "is_class": false,
    "is_explicit": true,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "T_{1}"
+   "name": "T_R"
   }
  ],
- "T_{R}": [
+ "\\frac{1-e^{-T_R/T_1}}{1-\\cos{\\phi}\\,e^{-T_R/T_1}}": [
   {
    "is_class": false,
    "is_explicit": true,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "T_{R}"
-  }
- ],
- "Y=MX+C": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "Y=MX+C"
-  }
- ],
- "\\frac{\\sin{\\phi}e^{-\\frac{T_{R}}{T_{1}}}}{1-\\cos{\\phi}e^{-\\frac{T_{R}}{T_{1}}}}": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "\\frac{\\sin{\\phi}e^{-\\frac{T_{R}}{T_{1}}}}{1-\\cos{\\phi}e^{-\\frac{T_{R}}{T_{1}}}}"
+   "name": "\\frac{1-e^{-T_R/T_1}}{1-\\cos{\\phi}\\,e^{-T_R/T_1}}"
   }
  ],
  "\\phi": [
@@ -117,6 +120,15 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "\\phi"
+  }
+ ],
+ "\\sin{\\phi}": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "\\sin{\\phi}"
   }
  ],
  "anim": [
@@ -160,13 +172,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "dict"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "coreg_params"
   }
  ],
  "data": [
@@ -176,13 +181,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "dict"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "data"
   }
  ],
  "defo": [
@@ -194,31 +192,6 @@
    "name": "ndarray"
   }
  ],
- "fetch": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "fetch"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "fetch"
-  }
- ],
- "filename": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "filename"
-  }
- ],
  "fit": [
   {
    "is_class": false,
@@ -226,24 +199,6 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
-  }
- ],
- "func": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "func"
-  }
- ],
- "interval": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "interval"
   }
  ],
  "mdreg": [
@@ -276,6 +231,22 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "animation"
+  }
+ ],
+ "mdreg.defo_norm": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "defo_norm"
   }
  ],
  "mdreg.elastix.params": [
@@ -324,73 +295,6 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "fit"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "fit"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "fit"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "fit"
-  }
- ],
- "mdreg.plot": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot"
-  }
- ],
- "mdreg.plot_series": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot_series"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot_series"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "mdreg",
-   "module_short": "mdreg",
-   "name": "plot_series"
   }
  ],
  "mdreg.spgr_vfa_lin": [
@@ -432,40 +336,6 @@
    "name": "percentile"
   }
  ],
- "np.round": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "_ArrayFunctionDispatcher"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "numpy",
-   "module_short": "numpy",
-   "name": "round"
-  }
- ],
- "package": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "package"
-  }
- ],
- "params": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "params"
-  }
- ],
  "pars": [
   {
    "is_class": false,
@@ -475,15 +345,6 @@
    "name": "ndarray"
   }
  ],
- "path": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "path"
-  }
- ],
  "plot_settings": [
   {
    "is_class": false,
@@ -491,65 +352,15 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "dict"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "plot_settings"
   }
  ],
- "slice": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "slice"
-  }
- ],
- "stime": [
+ "spacing": [
   {
    "is_class": false,
    "is_explicit": false,
    "module": "builtins",
    "module_short": "builtins",
-   "name": "float"
-  }
- ],
- "time.time": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "builtin_function_or_method"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "time",
-   "module_short": "time",
-   "name": "time"
-  }
- ],
- "tot_time": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "float"
-  }
- ],
- "verbose": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "verbose"
+   "name": "list"
   }
  ],
  "vfa_fit": [
@@ -559,24 +370,6 @@
    "module": "builtins",
    "module_short": "builtins",
    "name": "dict"
-  }
- ],
- "vmax": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "vmax"
-  }
- ],
- "vmin": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "vmin"
   }
  ]
 }

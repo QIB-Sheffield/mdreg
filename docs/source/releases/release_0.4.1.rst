@@ -2,7 +2,7 @@ mdreg 0.4.1
 ===========
 
 Summary
---------
+-------
 
 - Extended documentation including function-level docstrings
 - New examples 
