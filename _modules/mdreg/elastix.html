@@ -1,0 +1,1088 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdreg.elastix &#8212; mdreg 0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=cd8af66b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../_static/documentation_options.js?v=ff822928"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdreg/elastix';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/tristan-logo.jpg" class="logo__image only-light" alt="mdreg 0.4.2 documentation - Home"/>
+    <img src="../../_static/tristan-logo.jpg" class="logo__image only-dark pst-js-only" alt="mdreg 0.4.2 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guide/index.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../generated/examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contribute/index.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../releases/index.html">
+    Releases
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../about/index.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/QIB-Sheffield/mdreg" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guide/index.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../generated/examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contribute/index.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../releases/index.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/QIB-Sheffield/mdreg" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdreg.elastix</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdreg.elastix</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">__main__</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">itk</span>
+<span class="kn">from</span> <span class="nn">skimage.measure</span> <span class="kn">import</span> <span class="n">block_reduce</span>
+<span class="kn">from</span> <span class="nn">mdreg</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+
+<div class="viewcode-block" id="coreg_series">
+<a class="viewcode-back" href="../../generated/api/mdreg.elastix.coreg_series.html#mdreg.elastix.coreg_series">[docs]</a>
+<span class="k">def</span> <span class="nf">coreg_series</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coregister two series of images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source : numpy.ndarray</span>
+<span class="sd">        The source image. For additional information see table </span>
+<span class="sd">        :ref:`variable-types-table`. </span>
+<span class="sd">    target : numpy.ndarray</span>
+<span class="sd">        The target image. For additional information see table </span>
+<span class="sd">        :ref:`variable-types-table`. </span>
+<span class="sd">    parallel : bool</span>
+<span class="sd">        Whether to perform coregistration in parallel.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Coregistration keyword arguments.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    coreg : numpy.ndarray</span>
+<span class="sd">            Coregistered series. </span>
+<span class="sd">    deformation : numpy.ndarray</span>
+<span class="sd">            Deformation field.</span>
+<span class="sd">    </span>
+<span class="sd">            </span>
+<span class="sd">    For more information on the main variables in terms of shape</span>
+<span class="sd">    and description, see the :ref:`variable-types-table`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">source</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Source image contains NaN values - cannot &#39;</span>
+                         <span class="s1">&#39;perform coregistration&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">target</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Target image contains NaN values - cannot &#39;</span>
+                         <span class="s1">&#39;perform coregistration&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_coreg_series_parallel</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_coreg_series_sequential</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    
+
+<span class="k">def</span> <span class="nf">_coreg_series_sequential</span><span class="p">(</span>
+        <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> 
+        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spacing</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> 
+        <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+        <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+        <span class="n">downsample</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+
+    <span class="c1"># This is a very slow step so needs to be done outside the loop</span>
+    <span class="n">p_obj</span> <span class="o">=</span> <span class="n">_make_params_obj</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">params</span><span class="p">)</span> 
+
+    <span class="n">deformed</span><span class="p">,</span> <span class="n">deformation</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_init_output</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Coregistering series&#39;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress_bar</span><span class="p">):</span> 
+
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask_t</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">mask_t</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">deformed</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">],</span> <span class="n">deformation</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">coreg</span><span class="p">(</span>
+                <span class="n">source</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">],</span> 
+                <span class="n">params_obj</span><span class="o">=</span><span class="n">p_obj</span><span class="p">,</span> 
+                <span class="n">spacing</span><span class="o">=</span><span class="n">spacing</span><span class="p">,</span> 
+                <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> 
+                <span class="n">mask</span><span class="o">=</span><span class="n">mask_t</span><span class="p">,</span>
+                <span class="n">downsample</span><span class="o">=</span><span class="n">downsample</span><span class="p">,</span>
+            <span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">deformed</span><span class="p">,</span> <span class="n">deformation</span>
+
+
+<span class="k">def</span> <span class="nf">_coreg_series_parallel</span><span class="p">(</span>
+        <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> 
+        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spacing</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> 
+        <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+        <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+        <span class="n">downsample</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+
+    <span class="c1"># itk.force_load() # should speed up (but doesn&#39;t)</span>
+    <span class="c1"># https://github.com/InsightSoftwareConsortium/ITKElastix/issues/204</span>
+
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="n">num_workers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sched_getaffinity</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="n">num_workers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">())</span>
+
+    <span class="c1"># Build list of arguments</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask_t</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">mask_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">args_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">],</span> <span class="n">params</span><span class="p">,</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">mask_t</span><span class="p">,</span> <span class="n">downsample</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args_t</span><span class="p">)</span>
+
+    <span class="c1"># Process list of arguments in parallel</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">_coreg_parallel</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="c1"># Good practice to close and join when the pool is no longer needed</span>
+    <span class="c1"># https://stackoverflow.com/questions/38271547/when-should-we-call-multiprocessing-pool-join</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="c1"># Reformat list of results into arrays</span>
+    <span class="n">coreg</span><span class="p">,</span> <span class="n">deformation</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_init_output</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">coreg</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">deformation</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">coreg</span><span class="p">,</span> <span class="n">deformation</span>
+
+
+<span class="k">def</span> <span class="nf">_coreg_parallel</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">downsample</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">return</span> <span class="n">coreg</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">spacing</span><span class="o">=</span><span class="n">spacing</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="n">downsample</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="coreg">
+<a class="viewcode-back" href="../../generated/api/mdreg.elastix.coreg.html#mdreg.elastix.coreg">[docs]</a>
+<span class="k">def</span> <span class="nf">coreg</span><span class="p">(</span><span class="n">source</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coregister two arrays</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source : numpy.ndarray</span>
+<span class="sd">        The source image. For additional information see table </span>
+<span class="sd">        :ref:`variable-types-table`. </span>
+<span class="sd">    target : numpy.ndarray</span>
+<span class="sd">        The target image. For additional information see table </span>
+<span class="sd">        :ref:`variable-types-table`. </span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Coregistration keyword arguments.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    coreg : numpy.ndarray</span>
+<span class="sd">        Coregistered image.</span>
+<span class="sd">        The array is the same shape as the source image.</span>
+<span class="sd">    deformation : numpy.ndarray</span>
+<span class="sd">        Deformation field.</span>
+<span class="sd">        The array is the same shape as the source image with an additional </span>
+<span class="sd">        dimension for each spatial dimension.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="n">_coreg_2d</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_coreg_3d</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+
+
+  
+<span class="k">def</span> <span class="nf">_coreg_2d</span><span class="p">(</span><span class="n">source_large</span><span class="p">,</span> <span class="n">target_large</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">params_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+              <span class="n">spacing</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">spacing</span><span class="p">):</span>
+        <span class="n">spacing</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing</span><span class="p">,</span> <span class="n">spacing</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">params_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_obj</span> <span class="o">=</span> <span class="n">_make_params_obj</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="c1"># Downsample source and target</span>
+    <span class="c1"># The origin of an image is the center of the voxel in the lower left corner</span>
+    <span class="c1"># The origin of the large image is (0,0).</span>
+    <span class="c1"># The original of the small image is therefore: </span>
+    <span class="c1">#   spacing_large/2 + (spacing_small/2 - spacing_large)</span>
+    <span class="c1">#   = (spacing_small - spacing_large)/2</span>
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">target_large</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">downsample</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">source_large</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">downsample</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+    <span class="n">spacing_large</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">spacing</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="c1"># correct numpy(x,y) ordering for itk(y,x)</span>
+    <span class="n">spacing_small</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing_large</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">downsample</span><span class="p">,</span> <span class="n">spacing_large</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">downsample</span><span class="p">]</span> <span class="c1"># downsample large spacing</span>
+
+    <span class="n">spacing_large_y</span><span class="p">,</span> <span class="n">spacing_large_x</span> <span class="o">=</span> <span class="n">spacing_large</span> <span class="c1"># seperate for straightforward readable implementation with ITK ordering</span>
+    <span class="n">spacing_small_y</span><span class="p">,</span> <span class="n">spacing_small_x</span> <span class="o">=</span> <span class="n">spacing_small</span>
+
+    <span class="n">origin_large</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">origin_small</span> <span class="o">=</span> <span class="p">[(</span><span class="n">spacing_small_y</span> <span class="o">-</span> <span class="n">spacing_large_y</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">spacing_small_x</span> <span class="o">-</span> <span class="n">spacing_large_x</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Coregister downsampled source to target</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">source_small</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">target_small</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">source_small</span><span class="p">)</span> 
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">target_small</span><span class="p">)</span>
+    <span class="n">source_small</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_small</span><span class="p">)</span>
+    <span class="n">target_small</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_small</span><span class="p">)</span>
+    <span class="n">source_small</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_small</span><span class="p">)</span>
+    <span class="n">target_small</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_small</span><span class="p">)</span>
+    <span class="n">coreg_small</span><span class="p">,</span> <span class="n">result_transform_parameters</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">elastix_registration_method</span><span class="p">(</span>
+        <span class="n">target_small</span><span class="p">,</span> <span class="n">source_small</span><span class="p">,</span>
+        <span class="n">parameter_object</span><span class="o">=</span><span class="n">params_obj</span><span class="p">,</span> 
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    
+    <span class="c1"># Get coregistered image at original size</span>
+    <span class="n">large_shape_x</span><span class="p">,</span> <span class="n">large_shape_y</span> <span class="o">=</span> <span class="n">source_large</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">result_transform_parameters</span><span class="o">.</span><span class="n">SetParameter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Size&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">large_shape_y</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">large_shape_x</span><span class="p">)])</span>
+    <span class="n">result_transform_parameters</span><span class="o">.</span><span class="n">SetParameter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Spacing&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">spacing_large_y</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">spacing_large_x</span><span class="p">)])</span>
+    <span class="n">source_large</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">source_large</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">source_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">source_large</span><span class="p">)</span>
+    <span class="n">source_large</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_large</span><span class="p">)</span>
+    <span class="n">source_large</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_large</span><span class="p">)</span>
+    <span class="n">coreg_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">transformix_filter</span><span class="p">(</span>
+        <span class="n">source_large</span><span class="p">,</span>
+        <span class="n">result_transform_parameters</span><span class="p">,</span>
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    <span class="n">coreg_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">coreg_large</span><span class="p">)</span>
+    
+    <span class="c1"># Get deformation field at original size</span>
+    <span class="n">target_large</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">target_large</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">target_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">target_large</span><span class="p">)</span>
+    <span class="n">target_large</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_large</span><span class="p">)</span>
+    <span class="n">target_large</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_large</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">transformix_deformation_field</span><span class="p">(</span>
+        <span class="n">target_large</span><span class="p">,</span> 
+        <span class="n">result_transform_parameters</span><span class="p">,</span> 
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">,</span> <span class="n">target_large</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_large</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="p">))</span>
+
+    <span class="n">_cleanup</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">coreg_large</span><span class="p">,</span> <span class="n">deformation_field</span>
+
+
+<span class="k">def</span> <span class="nf">_coreg_3d</span><span class="p">(</span><span class="n">source_large</span><span class="p">,</span> <span class="n">target_large</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">params_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spacing</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">spacing</span><span class="p">):</span>
+        <span class="n">spacing</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing</span><span class="p">,</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">spacing</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">params_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_obj</span> <span class="o">=</span> <span class="n">_make_params_obj</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># Downsample source and target</span>
+    <span class="c1"># The origin of an image is the center of the voxel in the lower left corner</span>
+    <span class="c1"># The origin of the large image is (0,0,0).</span>
+    <span class="c1"># The original of the small image is therefore: </span>
+    <span class="c1">#   spacing_large/2 + (spacing_small/2 - spacing_large)</span>
+    <span class="c1">#   = (spacing_small - spacing_large)/2</span>
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">target_large</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">downsample</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">source_large</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">downsample</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+    <span class="n">spacing_large</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">spacing</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">spacing</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="c1"># correct numpy(x,y,z) ordering for itk(z,y,x)</span>
+    <span class="n">spacing_small</span> <span class="o">=</span> <span class="p">[</span><span class="n">spacing_large</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">downsample</span><span class="p">,</span> <span class="n">spacing_large</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">downsample</span><span class="p">,</span> <span class="n">spacing_large</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">downsample</span><span class="p">]</span> <span class="c1"># downsample large spacing</span>
+
+    <span class="n">spacing_large_z</span><span class="p">,</span> <span class="n">spacing_large_y</span><span class="p">,</span> <span class="n">spacing_large_x</span> <span class="o">=</span> <span class="n">spacing_large</span> <span class="c1"># seperate for straightforward readable implementation with ITK ordering</span>
+    <span class="n">spacing_small_z</span><span class="p">,</span> <span class="n">spacing_small_y</span><span class="p">,</span> <span class="n">spacing_small_x</span> <span class="o">=</span> <span class="n">spacing_small</span>
+
+    <span class="n">large_shape_x</span><span class="p">,</span> <span class="n">large_shape_y</span><span class="p">,</span> <span class="n">large_shape_z</span> <span class="o">=</span> <span class="n">source_large</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">origin_large</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">origin_small</span> <span class="o">=</span> <span class="p">[(</span><span class="n">spacing_small_z</span> <span class="o">-</span> <span class="n">spacing_large_z</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">spacing_small_y</span> <span class="o">-</span> <span class="n">spacing_large_y</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">spacing_small_x</span> <span class="o">-</span> <span class="n">spacing_large_x</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Coregister downsampled source to target</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">source_small</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">target_small</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">source_small</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">source_small</span><span class="p">)</span> 
+    <span class="n">target_small</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">target_small</span><span class="p">)</span> 
+    <span class="n">source_small</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_small</span><span class="p">)</span>
+    <span class="n">target_small</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_small</span><span class="p">)</span>
+    <span class="n">source_small</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_small</span><span class="p">)</span>
+    <span class="n">target_small</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_small</span><span class="p">)</span>
+    <span class="n">coreg_small</span><span class="p">,</span> <span class="n">result_transform_parameters</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">elastix_registration_method</span><span class="p">(</span>
+        <span class="n">target_small</span><span class="p">,</span> <span class="n">source_small</span><span class="p">,</span>
+        <span class="n">parameter_object</span><span class="o">=</span><span class="n">params_obj</span><span class="p">,</span> 
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span> <span class="c1"># perform registration of downsampled image</span>
+    
+    <span class="c1"># Get coregistered image at original size</span>
+    <span class="n">result_transform_parameters</span><span class="o">.</span><span class="n">SetParameter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Size&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">large_shape_z</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">large_shape_y</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">large_shape_x</span><span class="p">)])</span>
+    <span class="n">result_transform_parameters</span><span class="o">.</span><span class="n">SetParameter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Spacing&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">spacing_large_z</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">spacing_large_y</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">spacing_large_x</span><span class="p">)])</span>
+    <span class="n">source_large</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">source_large</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">source_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">source_large</span><span class="p">)</span>
+    <span class="n">source_large</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_large</span><span class="p">)</span>
+    <span class="n">source_large</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_large</span><span class="p">)</span>
+    <span class="n">coreg_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">transformix_filter</span><span class="p">(</span>
+        <span class="n">source_large</span><span class="p">,</span>
+        <span class="n">result_transform_parameters</span><span class="p">,</span>
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    
+    <span class="c1"># Get deformation field at original size</span>
+    <span class="n">target_large</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">target_large</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">target_large</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">target_large</span><span class="p">)</span>
+    <span class="n">target_large</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing_large</span><span class="p">)</span>
+    <span class="n">target_large</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="n">origin_large</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">transformix_deformation_field</span><span class="p">(</span>
+        <span class="n">target_large</span><span class="p">,</span> 
+        <span class="n">result_transform_parameters</span><span class="p">,</span> 
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">,</span> <span class="n">target_large</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_large</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="p">))</span>
+
+    <span class="n">_cleanup</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">coreg_large</span><span class="p">,</span> <span class="n">deformation_field</span>
+
+
+<span class="k">def</span> <span class="nf">_cleanup</span><span class="p">():</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;deformationField.nii&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;deformationField.mhd&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;deformationField.raw&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__main__</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;deformationField.nii&#39;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;deformationField.mhd&#39;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;deformationField.raw&#39;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+
+<div class="viewcode-block" id="params">
+<a class="viewcode-back" href="../../generated/api/mdreg.elastix.params.html#mdreg.elastix.params">[docs]</a>
+<span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;freeform&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">override</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate parameters for elastix registration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    default : str</span>
+<span class="sd">        The default parameter set to use.</span>
+<span class="sd">    **override : dict</span>
+<span class="sd">        Parameters to override.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        The parameter set.</span>
+
+<span class="sd">        </span>
+<span class="sd">    Example:</span>
+
+<span class="sd">        Adjust the default parameters associated with grid spacing for elastix </span>
+<span class="sd">        registration.</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :include-source:</span>
+<span class="sd">        :context: close-figs</span>
+<span class="sd">    </span>
+<span class="sd">        &gt;&gt;&gt; import mdreg</span>
+
+<span class="sd">        Adjust the default parameters associated with grid spacing for elastix </span>
+<span class="sd">        registration.</span>
+
+<span class="sd">        &gt;&gt;&gt; params = mdreg.elastix.params()</span>
+<span class="sd">        &gt;&gt;&gt; print(params[&#39;FinalGridSpacingInPhysicalUnits&#39;])</span>
+<span class="sd">        50.0</span>
+
+<span class="sd">        Override the default parameters associated with grid spacing for </span>
+<span class="sd">        elastix registration.</span>
+
+<span class="sd">        &gt;&gt;&gt; params = mdreg.elastix.params(FinalGridSpacingInPhysicalUnits=&#39;5.0&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(params[&#39;FinalGridSpacingInPhysicalUnits&#39;])</span>
+<span class="sd">        5.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">default</span><span class="o">==</span><span class="s1">&#39;freeform&#39;</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">_freeform</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This default is not available&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">override</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">val</span>
+    <span class="k">return</span> <span class="n">params</span></div>
+
+
+    
+<span class="k">def</span> <span class="nf">_freeform</span><span class="p">():</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># See here for default bspline settings and explanation of parameters</span>
+    <span class="c1"># https://github.com/SuperElastix/ElastixModelZoo/tree/master/models%2Fdefault</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * ImageTypes</span>
+    <span class="c1"># *********************</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;FixedInternalImagePixelType&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;float&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;MovingInternalImagePixelType&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;float&quot;</span>
+    <span class="c1">## selection based on 3D or 2D image data: newest elastix version does not require input image dimension</span>
+    <span class="c1"># settings[&quot;FixedImageDimension&quot;, d) </span>
+    <span class="c1"># settings[&quot;MovingImageDimension&quot;, d) </span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;UseDirectionCosines&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Components</span>
+    <span class="c1"># *********************</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Registration&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;MultiResolutionRegistration&quot;</span>
+    <span class="c1"># Image intensities are sampled using an ImageSampler, Interpolator and ResampleInterpolator.</span>
+    <span class="c1"># Image sampler is responsible for selecting points in the image to sample. </span>
+    <span class="c1"># The RandomCoordinate simply selects random positions.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ImageSampler&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;RandomCoordinate&quot;</span>
+    <span class="c1"># Interpolator is responsible for interpolating off-grid positions during optimization. </span>
+    <span class="c1"># The BSplineInterpolator with BSplineInterpolationOrder = 1 used here is very fast and uses very little memory</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Interpolator&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;BSplineInterpolator&quot;</span>
+    <span class="c1"># ResampleInterpolator here chosen to be FinalBSplineInterpolator with FinalBSplineInterpolationOrder = 1</span>
+    <span class="c1"># is used to resample the result image from the moving image once the final transformation has been found.</span>
+    <span class="c1"># This is a one-time step so the additional computational complexity is worth the trade-off for higher image quality.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ResampleInterpolator&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;FinalBSplineInterpolator&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Resampler&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;DefaultResampler&quot;</span>
+    <span class="c1"># Order of B-Spline interpolation used during registration/optimisation.</span>
+    <span class="c1"># It may improve accuracy if you set this to 3. Never use 0.</span>
+    <span class="c1"># An order of 1 gives linear interpolation. This is in most </span>
+    <span class="c1"># applications a good choice.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;BSplineInterpolationOrder&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;1&quot;</span>
+    <span class="c1"># Order of B-Spline interpolation used for applying the final</span>
+    <span class="c1"># deformation.</span>
+    <span class="c1"># 3 gives good accuracy; recommended in most cases.</span>
+    <span class="c1"># 1 gives worse accuracy (linear interpolation)</span>
+    <span class="c1"># 0 gives worst accuracy, but is appropriate for binary images</span>
+    <span class="c1"># (masks, segmentations); equivalent to nearest neighbor interpolation.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;FinalBSplineInterpolationOrder&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;3&quot;</span>
+    <span class="c1"># Pyramids found in Elastix:</span>
+    <span class="c1"># 1)	Smoothing -&gt; Smoothing: YES, Downsampling: NO</span>
+    <span class="c1"># 2)	Recursive -&gt; Smoothing: YES, Downsampling: YES</span>
+    <span class="c1">#      If Recursive is chosen and only # of resolutions is given </span>
+    <span class="c1">#      then downsamlping by a factor of 2 (default)</span>
+    <span class="c1"># 3)	Shrinking -&gt; Smoothing: NO, Downsampling: YES</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;FixedImagePyramid&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;FixedRecursiveImagePyramid&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;MovingImagePyramid&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;MovingRecursiveImagePyramid&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Optimizer&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;AdaptiveStochasticGradientDescent&quot;</span>
+    <span class="c1"># Whether transforms are combined by composition or by addition.</span>
+    <span class="c1"># In generally, Compose is the best option in most cases.</span>
+    <span class="c1"># It does not influence the results very much.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;HowToCombineTransforms&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;Compose&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Transform&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;BSplineTransform&quot;</span>
+    <span class="c1"># Metric</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;Metric&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;AdvancedMeanSquares&quot;</span>
+    <span class="c1"># Number of grey level bins in each resolution level,</span>
+    <span class="c1"># for the mutual information. 16 or 32 usually works fine.</span>
+    <span class="c1"># You could also employ a hierarchical strategy:</span>
+    <span class="c1">#(NumberOfHistogramBins 16 32 64)</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;NumberOfHistogramBins&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;32&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Transformation</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># The control point spacing of the bspline transformation in </span>
+    <span class="c1"># the finest resolution level. Can be specified for each </span>
+    <span class="c1"># dimension differently. Unit: mm.</span>
+    <span class="c1"># The lower this value, the more flexible the deformation.</span>
+    <span class="c1"># Low values may improve the accuracy, but may also cause</span>
+    <span class="c1"># unrealistic deformations.</span>
+    <span class="c1"># By default the grid spacing is halved after every resolution,</span>
+    <span class="c1"># such that the final grid spacing is obtained in the last </span>
+    <span class="c1"># resolution level.</span>
+    <span class="c1"># The grid spacing here is specified in voxel units.</span>
+    <span class="c1">#(FinalGridSpacingInPhysicalUnits 10.0 10.0)</span>
+    <span class="c1">#(FinalGridSpacingInVoxels 8)</span>
+    <span class="c1">#settings[&quot;FinalGridSpacingInPhysicalUnits&quot;, [&quot;50.0&quot;, &quot;50.0&quot;])</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;FinalGridSpacingInPhysicalUnits&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;50.0&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Optimizer settings</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># The number of resolutions. 1 Is only enough if the expected</span>
+    <span class="c1"># deformations are small. 3 or 4 mostly works fine. For large</span>
+    <span class="c1"># images and large deformations, 5 or 6 may even be useful.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;NumberOfResolutions&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;4&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;AutomaticParameterEstimation&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ASGDParameterEstimationMethod&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;MaximumNumberOfIterations&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;500&quot;</span>
+    <span class="c1"># The step size of the optimizer, in mm. By default the voxel size is used.</span>
+    <span class="c1"># which usually works well. In case of unusual high-resolution images</span>
+    <span class="c1"># (eg histology) it is necessary to increase this value a bit, to the size</span>
+    <span class="c1"># of the &quot;smallest visible structure&quot; in the image:</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;MaximumStepLength&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span> 
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Pyramid settings</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># The downsampling/blurring factors for the image pyramids.</span>
+    <span class="c1"># By default, the images are downsampled by a factor of 2</span>
+    <span class="c1"># compared to the next resolution.</span>
+    <span class="c1">#settings[&quot;ImagePyramidSchedule&quot;]=&quot;8 8  4 4  2 2  1 1&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Sampler parameters</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># Number of spatial samples used to compute the mutual</span>
+    <span class="c1"># information (and its derivative) in each iteration.</span>
+    <span class="c1"># With an AdaptiveStochasticGradientDescent optimizer,</span>
+    <span class="c1"># in combination with the two options below, around 2000</span>
+    <span class="c1"># samples may already suffice.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;NumberOfSpatialSamples&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;2048&quot;</span>
+    <span class="c1"># Refresh these spatial samples in every iteration, and select</span>
+    <span class="c1"># them randomly. See the manual for information on other sampling</span>
+    <span class="c1"># strategies.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;NewSamplesEveryIteration&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;CheckNumberOfSamples&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Mask settings</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># If you use a mask, this option is important. </span>
+    <span class="c1"># If the mask serves as region of interest, set it to false.</span>
+    <span class="c1"># If the mask indicates which pixels are valid, then set it to true.</span>
+    <span class="c1"># If you do not use a mask, the option doesn&#39;t matter.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ErodeMask&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ErodeFixedMask&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+    <span class="c1"># *********************</span>
+    <span class="c1"># * Output settings</span>
+    <span class="c1"># *********************</span>
+    <span class="c1">#Default pixel value for pixels that come from outside the picture:</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;DefaultPixelValue&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;0&quot;</span>
+    <span class="c1"># Choose whether to generate the deformed moving image.</span>
+    <span class="c1"># You can save some time by setting this to false, if you are</span>
+    <span class="c1"># not interested in the final deformed moving image, but only</span>
+    <span class="c1"># want to analyze the deformation field for example.</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;WriteResultImage&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;WriteDeformationField&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+    <span class="c1"># The pixel type and format of the resulting deformed moving image</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ResultImagePixelType&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;float&quot;</span>
+    <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ResultImageFormat&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;mhd&quot;</span>
+    
+    <span class="k">return</span> <span class="n">settings</span>
+
+
+<span class="k">def</span> <span class="nf">_make_params_obj</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;bspline&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make an elastix parameter object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    default : str</span>
+<span class="sd">        The default parameter set to use.</span>
+<span class="sd">    settings : dict</span>
+<span class="sd">        Parameters to override.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param_obj</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">ParameterObject</span><span class="o">.</span><span class="n">New</span><span class="p">()</span> <span class="c1"># long runtime ~20s</span>
+    <span class="n">parameter_map_bspline</span> <span class="o">=</span> <span class="n">param_obj</span><span class="o">.</span><span class="n">GetDefaultParameterMap</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> 
+    <span class="n">param_obj</span><span class="o">.</span><span class="n">AddParameterMap</span><span class="p">(</span><span class="n">parameter_map_bspline</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">param_obj</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+        <span class="n">param_obj</span><span class="o">.</span><span class="n">SetParameter</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">settings</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">param_obj</span>
+
+
+
+
+
+
+
+
+
+
+<span class="c1"># Retired</span>
+
+<span class="k">def</span> <span class="nf">_OLD_coreg_2d</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">params_obj</span><span class="p">,</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coregister two arrays and return coregistered + deformation field </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shape_source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+    <span class="c1"># Coregister source to target</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+    <span class="n">source</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing</span><span class="p">)</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">spacing</span><span class="p">)</span>
+    <span class="n">coregistered</span><span class="p">,</span> <span class="n">result_transform_parameters</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">elastix_registration_method</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">parameter_object</span><span class="o">=</span><span class="n">params_obj</span><span class="p">,</span> <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    <span class="n">coregistered</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">coregistered</span><span class="p">)</span>
+
+    <span class="c1"># Get deformation field</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">transformix_deformation_field</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">,</span> 
+        <span class="n">result_transform_parameters</span><span class="p">,</span> 
+        <span class="n">log_to_console</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">itk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">deformation_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">deformation_field</span><span class="p">,</span> <span class="n">shape_source</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape_source</span><span class="p">),</span> <span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">coregistered</span><span class="p">,</span> <span class="n">deformation_field</span>
+
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, mdreg maintainers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
