@@ -5,24 +5,30 @@ from tqdm import tqdm
 
 from skimage.registration import optical_flow_tvl1
 from skimage.transform import warp
-from skimage.util import img_as_int
 
 from mdreg import utils
 
 
-def coreg_series(*args, parallel=False, **kwargs):
+def coreg_series(moving, fixed, params=None, parallel=False, progress_bar=False):
     
     """
-    Coregister a series of images.
+    Coregister two series of images.
 
     Parameters
     ----------
-    *args : dict
-            Coregistration arguments.
+    moving : numpy.ndarray
+        The moving images in dimensions (x,y,t) or (x,y,z,t). For additional 
+        information see table :ref:`variable-types-table`. 
+    fixed : numpy.ndarray
+        The fixed images in the same dimensions as the moving images. For 
+        additional information see table :ref:`variable-types-table`. 
+    params : dict
+        Coregistration options.
     parallel : bool
-            Whether to perform coregistration in parallel.
-    **kwargs : dict
-            Coregistration keyword arguments.
+        Set to True to parallelize the computations (default = False)
+    progress_bar : bool
+        Show a progress bar during the computation. This keyword is ignored 
+        if parallel = True. Defaults to False.
 
     Returns
     -------
@@ -31,24 +37,21 @@ def coreg_series(*args, parallel=False, **kwargs):
     deformation : numpy.ndarray
             Deformation field.
     
-            
     For more information on the main variables in terms of shape
     and description, see the :ref:`variable-types-table`.
 
     """
-    
 
     if parallel:
-        return _coreg_series_parallel(*args, **kwargs)
+        return _coreg_series_parallel(moving, fixed, params=params)
     else:
-        return _coreg_series_sequential(*args, **kwargs)
+        return _coreg_series_sequential(moving, fixed, params=params, progress_bar=progress_bar)
 
 
 def _coreg_series_sequential(
-        moving:np.ndarray, 
-        fixed:np.ndarray, 
+        moving, 
+        fixed, 
         params=None,
-        coords=None,
         progress_bar=False):
 
     nt = moving.shape[-1]
@@ -58,22 +61,13 @@ def _coreg_series_sequential(
 
         deformed[...,t], deformation[...,t] = coreg(
             moving[...,t], fixed[...,t], 
-            params=params, coords=coords,
+            params=params,
         )
 
     return deformed, deformation
 
 
-def _coreg_series_parallel(moving:np.ndarray, fixed:np.ndarray, params=None):
-
-    rc, cc = np.meshgrid( 
-        np.arange(moving.shape[0]), 
-        np.arange(moving.shape[1]),
-        indexing='ij')
-    coords = {
-        'row_coords': rc,
-        'col_coords': cc,
-    }
+def _coreg_series_parallel(moving, fixed, params=None):
 
     nt = moving.shape[-1]
     deformed, deformation = utils._init_output(moving)
@@ -84,7 +78,7 @@ def _coreg_series_parallel(moving:np.ndarray, fixed:np.ndarray, params=None):
         num_workers = int(os.cpu_count())
         
     pool = multiprocessing.Pool(processes=num_workers)
-    args = [(moving[...,t], fixed[...,t], params, coords) for t in range(nt)]
+    args = [(moving[...,t], fixed[...,t], params) for t in range(nt)]
     results = list(tqdm(pool.imap(_coregister_parallel, args), total=nt, desc='Coregistering series'))
 
     # Good practice to close and join when the pool is no longer needed
@@ -100,23 +94,24 @@ def _coreg_series_parallel(moving:np.ndarray, fixed:np.ndarray, params=None):
     
 
 def _coregister_parallel(args):
-    moving, fixed, params, coords = args
-    return coreg(moving, fixed, params=params, coords=coords)
+    moving, fixed, params = args
+    return coreg(moving, fixed, params=params)
 
-def coreg(source:np.ndarray, *args, **kwargs):
+def coreg(moving, fixed, params=None):
 
     """
     Coregister two arrays
     
     Parameters
     ----------
-    source : numpy.ndarray
-        The source image. For additional information see table 
+    moving : numpy.ndarray
+        The moving image. For additional information see table 
         :ref:`variable-types-table`. 
-    *args : dict
-        Coregistration arguments.
-    **kwargs : dict
-        Coregistration keyword arguments.
+    fixed : numpy.ndarray
+        The fixed image. For additional information see table 
+        :ref:`variable-types-table`. 
+    params : dict
+        Coregistration parameters.
     
     Returns
     -------
@@ -130,16 +125,16 @@ def coreg(source:np.ndarray, *args, **kwargs):
     
     """
 
-    if source.ndim == 2: 
-        return _coreg_2d(source, *args, **kwargs)
+    if moving.ndim == 2: 
+        return _coreg_2d(moving, fixed, params=params)
     
-    if source.ndim == 3:
-        return _coreg_3d(source, *args, **kwargs)
+    if moving.ndim == 3:
+        return _coreg_3d(moving, fixed, params=params)
 
 
 
 
-def _coreg_2d(moving, fixed, params=None, coords=None):
+def _coreg_2d(moving, fixed, params=None):
 
     # Does not work with float or mixed type for some reason
     moving, fixed, a, b, dtype = _torange(moving, fixed)
@@ -149,16 +144,12 @@ def _coreg_2d(moving, fixed, params=None, coords=None):
     if 'method' not in params:
         params['method'] = 'optical flow'
     
-    if coords is None:
-        rc, cc = np.meshgrid( 
-            np.arange(moving.shape[0]), 
-            np.arange(moving.shape[1]),
-            indexing='ij')
-        row_coords = rc
-        col_coords = cc
-    else:
-        row_coords = coords['row_coords']
-        col_coords = coords['col_coords']
+    rc, cc = np.meshgrid( 
+        np.arange(moving.shape[0]), 
+        np.arange(moving.shape[1]),
+        indexing='ij')
+    row_coords = rc
+    col_coords = cc
 
     if params['method'] == 'optical flow':
         kwargs = {i:params[i] for i in params if i!='method'}
@@ -179,7 +170,7 @@ def _coreg_2d(moving, fixed, params=None, coords=None):
     return warped_moving, deformation_field
 
 
-def _coreg_3d(moving, fixed, params=None, coords=None):
+def _coreg_3d(moving, fixed, params=None):
 
     moving, fixed, a, b, dtype = _torange(moving, fixed)
     
@@ -188,19 +179,14 @@ def _coreg_3d(moving, fixed, params=None, coords=None):
     if 'method' not in params:
         params['method'] = 'optical flow'
     
-    if coords is None:
-        rc, cc, sc = np.meshgrid( 
-            np.arange(moving.shape[0]), 
-            np.arange(moving.shape[1]),
-            np.arange(moving.shape[2]),
-            indexing='ij')
-        row_coords = rc
-        col_coords = cc
-        slice_coords = sc
-    else:
-        row_coords = coords['row_coords']
-        col_coords = coords['col_coords']
-        slice_coords = coords['slice_coords']
+    rc, cc, sc = np.meshgrid( 
+        np.arange(moving.shape[0]), 
+        np.arange(moving.shape[1]),
+        np.arange(moving.shape[2]),
+        indexing='ij')
+    row_coords = rc
+    col_coords = cc
+    slice_coords = sc
 
     if params['method'] == 'optical flow':
         kwargs = {i:params[i] for i in params if i!='method'}
