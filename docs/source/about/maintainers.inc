@@ -1,5 +1,5 @@
 
-.. _core-developers-team:
+.. _maintainers-team:
 
 These are the current maintainers of `mdreg`:
 
