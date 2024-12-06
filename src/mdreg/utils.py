@@ -234,7 +234,7 @@ def defo_jacobian_2d(defo):
     return jac_mat, jac_det
 
 
-def defo_norm(defo):
+def defo_norm(defo, norm='euclidian'):
     """
     Calculate the norm of a deformation field.
     
@@ -246,10 +246,21 @@ def defo_norm(defo):
         the spatial dimensions, d is the dimension of the deformation field 
         (two for 2D registration, 3 for 3D registration), and t is the 
         time/dynamic.
+    norm : str
+        The type of norm to use. Options are 'euclidian', 'max' or 'eumax'. 
+        The latter is the maximum projection over time of the euclidian norm.
+        Default is 'euclidian'.
 
     Returns
     -------
     norm : np.ndarray
         The norm of the deformation field with dimensions [x, y, z, t].
     """
-    return np.linalg.norm(defo, axis=-2)
+    if norm == 'euclidian':
+        return np.linalg.norm(defo, axis=-2)
+    elif norm == 'max':
+        return np.amax(defo, axis=2)
+    elif norm == 'eumip':
+        return np.amax(np.linalg.norm(defo, axis=-2), axis=-1)
+    else:
+        raise ValueError('Norm ' + str(norm) + ' is not available.')

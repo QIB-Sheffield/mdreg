@@ -1,6 +1,6 @@
 """
 ===============================================
-Using custom-build models
+Using custom-built models
 ===============================================
 
 In case an appropriate signal model is not available in mdreg's model 

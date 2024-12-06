@@ -6,9 +6,9 @@ from mdreg import elastix, skimage, utils, plot, models
 
 
 def fit(moving: np.ndarray,
-        fit_pixel = None,
         fit_image = None,
         fit_coreg = None,
+        fit_pixel = None,
         precision = 1.0,
         maxit = 3,
         verbose = 0,
@@ -25,19 +25,21 @@ def fit(moving: np.ndarray,
     moving : numpy.array
         The series of images to be corrected. For more detail see table 
         :ref:`variable-types-table`.
-    fit_pixel : dict, optional
-        The parameters for fitting the signal model to each pixel, consisiting
-        of, if required, of arguements for inbuilt function :func:`fit_pixels`. 
-        The default 
-        is None.
-    fit_image : dict, optional
-        The parameters for fitting the signal model to the whole image. The 
-        default is None, which will apply the inbuilt :func:`constant` model fit. 
+    fit_image : dict or list, optional
+        A dictionary with the parameters defining the signal model. For a 
+        slice-by-slice computation (4D array with force_2d=True), this can be 
+        a list of dictionaries, one for each slice. If fit_image is not 
+        provided, a constant model is used.  
         For more detail see table :ref:`fit-image-table`.
     fit_coreg : dict, optional
         The parameters for coregistering the images. The default is None, which 
         uses the default elastix package setting. For more detail see table 
         :ref:`fit-coreg-table`.
+    fit_pixel : dict, optional
+        A dictionary with the parameters defining a single-pixel signal model.
+        For a slice-by-slice computation (4D array with force_2d=True), this 
+        can be a list of dictionaries, one for each slice. 
+        The default is None.
     precision : float, optional
         The precision of the coregistration. The default is 1.0.
     maxit : int, optional
@@ -73,7 +75,11 @@ def fit(moving: np.ndarray,
     variables.
         
     """
+    if fit_image is None:
+        fit_image = {'func': models.constant}
 
+    # 2D slice-by-slice coregistration
+    
     if moving.ndim==4:
         if force_2d:
             coreg = np.zeros(moving.shape)
@@ -83,10 +89,22 @@ def fit(moving: np.ndarray,
                 print('-----------------')
                 print('Fitting slice ' + str(k).zfill(3) )
                 print('-----------------')
+
+                if isinstance(fit_image, dict):
+                    fit_image_k = fit_image
+                else:
+                    fit_image_k = fit_image[k]
+                if fit_pixel is None:
+                    fit_pixel_k = None
+                elif isinstance(fit_pixel, dict):
+                    fit_pixel_k = fit_pixel
+                else:
+                    fit_pixel_k = fit_pixel[k]
+
                 coreg[:,:,k,:], defo[:,:,k,:,:], fit_array[:,:,k,:], pars_k = fit(
                     moving[:,:,k,:],
-                    fit_pixel = fit_pixel,
-                    fit_image = fit_image,
+                    fit_pixel = fit_pixel_k,
+                    fit_image = fit_image_k,
                     fit_coreg = fit_coreg,
                     precision = precision,
                     maxit = maxit,
@@ -98,12 +116,14 @@ def fit(moving: np.ndarray,
                 pars[:,:,k,:] = pars_k
             return coreg, defo, fit_array, pars
 
+    # 2D or 3D coregistration   
+    if not isinstance(fit_image, dict):
+        raise ValueError(
+            'For 3D coregistration, the fit_image argument must be a '
+            'dictionary. ')
 
-    if fit_image is None:
-        fit_image = {'func': models.constant,}
-    
     if fit_coreg is None:
-        fit_coreg = {'package': 'elastix',}
+        fit_coreg = {'package': 'elastix'}
     
     if 'package' not in fit_coreg:
             fit_coreg['package'] = 'elastix'
@@ -124,12 +144,10 @@ def fit(moving: np.ndarray,
         if verbose > 0:
             print('Fitting signal model (iteration ' + str(it) + ')')
         if fit_pixel is not None:
-            #fit_pixel['progress_bar'] = verbose>1
             fit_array, pars = utils.fit_pixels(coreg, **fit_pixel)
         else:
             fit_func = fit_image['func']
             kwargs = {i:fit_image[i] for i in fit_image if i!='func'}
-            #kwargs['progress_bar'] = verbose>1
             fit_array, pars = fit_func(coreg, **kwargs)
 
         # Fit deformation
