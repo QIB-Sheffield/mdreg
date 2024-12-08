@@ -1,0 +1,42 @@
+
+
+Examples using ``mdreg.mdreg.fit``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In case an appropriate signal model is not available in mdreg&#x27;s model  library, the model must be custom writtem. This tutorial will illustrate this  for the case of T1-mapping with a MOLLI sequence.">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_custom_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using custom-built models</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+

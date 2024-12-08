@@ -34,7 +34,7 @@ def test_elastix_series():
     moving = data['array'][:,:,z,:]
     fixed = mdreg.fetch('MOLLIfit')['array'][:,:,z,:]
 
-    params = elastix.params('freeform')
+    params = elastix.params('bspline')
     params["FinalGridSpacingInPhysicalUnits"] = "5.0"
 
     coreg, defo = elastix.coreg_series(

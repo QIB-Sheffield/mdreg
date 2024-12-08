@@ -11,4 +11,3 @@ Elastix wrappers
 
     coreg_series
     coreg
-    params

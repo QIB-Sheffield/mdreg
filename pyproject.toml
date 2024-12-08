@@ -22,7 +22,7 @@ dependencies = [
 
 # optional information
 description = "Model-driven image registration"
-readme = "README.md"
+readme = "README.rst"
 authors = [
   { name = "Steven Sourbron", email = "s.sourbron@sheffield.ac.uk" }
   ]
@@ -51,6 +51,12 @@ requires-python = ">=3.6"
 
 [project.urls]
 "Homepage" = "https://github.com/QIB-Sheffield/mdreg"
+
+[tool.setuptools]
+# ...
+# By default, include-package-data is true in pyproject.toml, so you do
+# NOT have to specify this line.
+include-package-data = true
 
 #[tool.setuptools]
 #packages = ["mdreg"]

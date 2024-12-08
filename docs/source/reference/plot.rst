@@ -1,10 +1,10 @@
 .. _plot:
 
-*************
+********
 Plotting
-*************
+********
 
-.. currentmodule:: mdreg.plot
+.. currentmodule:: mdreg
 
 .. autosummary::
    :toctree: ../generated/api/

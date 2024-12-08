@@ -41,11 +41,28 @@ Tutorials
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples shows how mdreg can be used to perform 2D motion correction  slice-by-slice on a 4D array. Typical application examples are motion  correction of multi-slice MRI series such as Look-Locker T1 mapping as in  this example.">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_multislice_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_multislice.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multi-slice 2D registration</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="We illustrate the basic use of mdreg for the use case of fitting the  longitudinal MRI relaxation time T1 from a Look-Locker MRI  sequence. ">
 
 .. only:: html
 
-  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.png
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_thumb.gif
     :alt:
 
   :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py`
@@ -86,7 +103,7 @@ Tutorials
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Using custom-build models</div>
+      <div class="sphx-glr-thumbnail-title">Using custom-built models</div>
     </div>
 
 
@@ -112,7 +129,7 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and we are using a linear signal model fit.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and using a linear signal model fit.">
 
 .. only:: html
 
@@ -129,7 +146,7 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and in this example we are using a nin-linear signal model.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and a non-linear signal model fit.">
 
 .. only:: html
 

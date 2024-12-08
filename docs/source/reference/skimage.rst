@@ -11,4 +11,3 @@ Skimage wrappers
 
     coreg_series
     coreg
-    params
