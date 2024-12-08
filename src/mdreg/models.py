@@ -31,10 +31,6 @@ def constant(signal, **kwargs):
     par : numpy.ndarray
         The parameters of the fitted signal model.
         The parameters are: S0, giving N=1.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
 
     """
 
@@ -90,11 +86,7 @@ def exp_decay(signal,
     par : numpy.ndarray
         The parameters of the fitted signal model.
         The parameters are: S0, T, giving N=2.
-    
 
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
-        
     """
     
     if time is None:
@@ -155,10 +147,6 @@ def abs_exp_recovery_2p(signal,
     par : numpy.ndarray
         Parameters. 
         The parameters are: S0, T1, giving N=2.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -221,10 +209,6 @@ def exp_recovery_2p(signal,
         par : numpy.ndarray
             Parameters
             The parameters are: S0, T1, giving N=2.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -287,10 +271,6 @@ def abs_exp_recovery_3p(signal,
         par : numpy.ndarray
             Parameters
             The parameters are: S0, T1, eff, giving N=3.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
         
     """
     
@@ -352,10 +332,6 @@ def exp_recovery_3p(signal,
         par : numpy.ndarray
             Parameters
             The parameters are: S0, T1, eff, giving N=3.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
         
         """
     
@@ -408,10 +384,6 @@ def spgr_vfa_nonlin(signal,
         pars : numpy.ndarray
             Fitted model parameters
             The parameters are: S0, T1, giving N=2.
-    
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
             
     
     """
@@ -469,9 +441,6 @@ def spgr_vfa_lin(signal, FA = None, progress_bar=False):
         pars : numpy.ndarray
             Parameters
             The parameters are: A (slope) and B (intercept).
-    
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
     
     """
     if FA is None:
@@ -548,9 +517,6 @@ def array_2cfm_lin(signal,
             Fitted model parameters
             The parameters are: Fp, Tp, PS, Te, giving N=4.
 
-
-    For more information on the input and returned variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
     """
 
     if aif is None:

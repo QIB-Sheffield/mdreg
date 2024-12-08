@@ -5,7 +5,7 @@
 
 This example illustrates motion correction of a 3D time series with 
 variable flip angles (VFA). The motion correction is performed with 3D 
-coregistration and we are using a linear signal model fit.
+coregistration and using a linear signal model fit.
 
 """
 
@@ -17,15 +17,12 @@ import numpy as np
 import mdreg
 
 # Example data included in mdreg
-
 data = mdreg.fetch('VFA')
 
 # Variables used in this examples
-
 array = data['array']       # 4D signal data (x, y, z, FA)
 FA = data['FA']             # The FA values in degrees
 spacing = data['spacing']   # (x,y,z) voxel size in mm.
-
 
 #%%
 # Signal model
@@ -60,25 +57,21 @@ spacing = data['spacing']   # (x,y,z) voxel size in mm.
 # Perform motion correction
 # -------------------------
 # The signal model above is included in `mdreg` as the function 
-# `mdreg.spgr_vfa_lin`, which require the flip angle values in degrees as 
-# input (`FA`). The signal model is therefore defined by:
+# `mdreg.spgr_vfa_lin`, which require the flip angle (FA) values in degrees as 
+# input:
 
 vfa_fit = {
     'func': mdreg.spgr_vfa_lin,     # VFA signal model
-    'FA': FA,                       # Flip agle in degress    
-    'progress_bar': False,          # Do not show a progress bar
+    'FA': FA,                       # Flip angle in degress  
 }
 
 #%%
-# For this example we will perform the coregistration with elastix and 
-# use a deformation field with grid spacing 50mm:
+# For this example we will use a relatively coarse deformation field with 
+# grid spacing 50mm:
 
 coreg_params = {
-    'package': 'elastix',
-    'params': mdreg.elastix.params(
-        FinalGridSpacingInPhysicalUnits='50.0',
-    ),
     'spacing': spacing,
+    'FinalGridSpacingInPhysicalUnits': 50.0,
 }
 
 #%% 
@@ -88,8 +81,7 @@ coreg, defo, fit, pars = mdreg.fit(
     array,                          # Signal data to correct
     fit_image = vfa_fit,            # Signal model
     fit_coreg = coreg_params,       # Coregistration model
-    maxit = 5,                      # Maximum number of iterations
-    verbose = 0,                    # Do not show progress update
+    maxit = 5,                      # Maximum number of iteration
 )
 
 #%% 

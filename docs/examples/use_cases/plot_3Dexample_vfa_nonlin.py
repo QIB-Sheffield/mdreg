@@ -5,7 +5,7 @@
 
 This example illustrates motion correction of a 3D time series with 
 variable flip angles (VFA). The motion correction is performed with 3D 
-coregistration and in this example we are using a nin-linear signal model.
+coregistration and a non-linear signal model fit.
 
 """
 
@@ -17,15 +17,12 @@ import numpy as np
 import mdreg
 
 # Example data included in mdreg
-
 data = mdreg.fetch('VFA')
 
 # Variables used in this examples
-
 array = data['array']       # 4D signal data (x, y, z, FA)
 FA = data['FA']             # The FA values in degrees
 spacing = data['spacing']   # (x,y,z) voxel size in mm.
-
 
 #%%
 # Signal model
@@ -51,25 +48,21 @@ spacing = data['spacing']   # (x,y,z) voxel size in mm.
 # Perform motion correction
 # -------------------------
 # The signal model above is included in `mdreg` as the function 
-# `mdreg.spgr_vfa_nonlin`, which require the flip angle values in degrees as 
-# input (`FA`). The signal model is therefore defined by:
+# `mdreg.spgr_vfa_nonlin`, which requires the flip angle (FA) in degrees as 
+# input:
 
 vfa_fit = {
     'func': mdreg.spgr_vfa_nonlin,      # VFA signal model
-    'FA': FA,                           # Flip agle in degress    
-    'progress_bar': False,              # Do not show a progress bar
+    'FA': FA,                           # Flip angle in degress    
 }
 
 #%%
-# For this example we will perform the coregistration with elastix and 
-# use a deformation field with grid spacing 50mm:
+# For this example we will use a coarse deformation field with grid spacing 
+# 50mm:
 
 coreg_params = {
-    'package': 'elastix',
-    'params': mdreg.elastix.params(
-        FinalGridSpacingInPhysicalUnits='50.0',
-    ),
     'spacing': spacing,
+    'FinalGridSpacingInPhysicalUnits': 50.0,
 }
 
 #%% 
@@ -80,7 +73,6 @@ coreg, defo, fit, pars = mdreg.fit(
     fit_image = vfa_fit,            # Signal model
     fit_coreg = coreg_params,       # Coregistration model
     maxit = 2,                      # Maximum number of iterations
-    verbose = 0,                    # Do not show progress update
 )
 
 #%% 
@@ -110,6 +102,7 @@ anim = mdreg.animation(coreg, title='Motion corrected', **plot_settings)
 anim = mdreg.animation(fit, title='Model fit', **plot_settings)
 
 #%% 
+#
 # It's also instructive to show the deformation field and check whether 
 # deformations are consistent with the effect of breathing motion. Since the 
 # deformation field is a vector we show here its norm:
@@ -122,6 +115,8 @@ plot_settings['vmax'] = np.percentile(defo, 99)
 
 # Display the norm of the deformation field
 anim = mdreg.animation(defo, title='Deformation field', **plot_settings)
+#
+#
 
 # sphinx_gallery_start_ignore
 

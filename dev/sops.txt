@@ -117,8 +117,8 @@ Creating a new release (from a fork)
 - Run the test suite in a clean environment (see above) and check test 
   coverage (see above)
 - Add any new contributors to the teams.inc file (About)
-- Update the version number in the below locations, push to dev and check that 
-  all tests pass. Fix issues if not.
+- Build docs and check
+- Update the version number in the below locations:
     - pyproject.toml
     - docs/source/conf.py
 - Build release notes (see above), build and check the documentation, and push 

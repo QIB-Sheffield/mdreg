@@ -15,7 +15,28 @@ Examples using ``mdreg.fetch``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and we are using a linear signal model fit.">
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, dcmri uses free-form deformation implemented in the package  itk.elastix, which default settings for all configuration parameters. ">
+
+.. only:: html
+
+  .. image:: /generated/examples/tutorials/images/thumb/sphx_glr_plot_getting_started_defo_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Customizing the coregistration</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and using a linear signal model fit.">
 
 .. only:: html
 
@@ -33,27 +54,6 @@ Examples using ``mdreg.fetch``
 .. only:: not html
 
  * :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py`
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and in this example we are using a nin-linear signal model.">
-
-.. only:: html
-
-  .. image:: /generated/examples/use_cases/images/thumb/sphx_glr_plot_3Dexample_vfa_nonlin_thumb.gif
-    :alt:
-
-  :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa_nonlin.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">3D Variable Flip Angle (non-linear)</div>
-    </div>
-
-
-.. only:: not html
-
- * :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa_nonlin.py`
 
 .. thumbnail-parent-div-close
 

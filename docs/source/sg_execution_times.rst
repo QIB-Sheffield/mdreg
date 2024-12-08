@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**110:34.114** total execution time for 5 files **from all galleries**:
+**54:17.028** total execution time for 6 files **from all galleries**:
 
 .. container::
 
@@ -32,11 +32,11 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa_nonlin.py` (``..\examples\use_cases\plot_3Dexample_vfa_nonlin.py``)
-     - 99:34.245
+   * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py` (``..\examples\tutorials\plot_getting_started_defo.py``)
+     - 40:53.742
      - 0.0
    * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa.py` (``..\examples\use_cases\plot_3Dexample_vfa.py``)
-     - 10:59.869
+     - 13:23.286
      - 0.0
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py` (``..\examples\tutorials\plot_getting_started.py``)
      - 00:00.000
@@ -44,6 +44,9 @@ Computation times
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py` (``..\examples\tutorials\plot_getting_started_custom.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py` (``..\examples\tutorials\plot_getting_started_defo.py``)
+   * - :ref:`sphx_glr_generated_examples_tutorials_plot_multislice.py` (``..\examples\tutorials\plot_multislice.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_generated_examples_use_cases_plot_3Dexample_vfa_nonlin.py` (``..\examples\use_cases\plot_3Dexample_vfa_nonlin.py``)
      - 00:00.000
      - 0.0

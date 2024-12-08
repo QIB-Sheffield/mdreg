@@ -1,13 +1,4 @@
 {
- "abs_exp_recovery_2p": [
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "abs_exp_recovery_2p"
-  }
- ],
  "array": [
   {
    "is_class": false,
@@ -64,6 +55,13 @@
   {
    "is_class": false,
    "is_explicit": false,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "abs_exp_recovery_2p"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "abs_exp_recovery_2p"
