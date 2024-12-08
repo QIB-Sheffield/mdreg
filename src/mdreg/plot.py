@@ -49,7 +49,7 @@ def animation(array, path=None, filename='animation', vmin=None, vmax=None,
         fig_3d, axes1 = plt.subplots(grid_size, grid_size, figsize=(grid_size*2, grid_size*2))
         fig_3d.subplots_adjust(wspace=0.5, hspace=0.01)
 
-        fig_3d.suptitle('Series Type: {} \n \n'.format(title), fontsize=titlesize+2)
+        fig_3d.suptitle('{} \n \n'.format(title), fontsize=titlesize+2)
         plt.tight_layout()
 
         for i in range(grid_size * grid_size):

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**24:44.585** total execution time for 3 files **from generated\examples\tutorials**:
+**40:53.742** total execution time for 4 files **from generated\examples\tutorials**:
 
 .. container::
 
@@ -33,11 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_defo.py` (``plot_getting_started_defo.py``)
-     - 24:44.585
+     - 40:53.742
      - 0.0
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started.py` (``plot_getting_started.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_generated_examples_tutorials_plot_getting_started_custom.py` (``plot_getting_started_custom.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_generated_examples_tutorials_plot_multislice.py` (``plot_multislice.py``)
      - 00:00.000
      - 0.0

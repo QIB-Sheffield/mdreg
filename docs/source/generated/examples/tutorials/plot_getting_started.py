@@ -3,14 +3,14 @@
 Using built-in models
 ===============================================
 
-We illustrate the basic use of mdreg for the use case of fitting the 
+We illustrate the basic use of ``mdreg`` for the use case of fitting the 
 longitudinal MRI relaxation time T1 from a Look-Locker MRI 
 sequence. 
 """
 
 #%%
 # Import packages and data
-# ----------------------------
+# ------------------------
 # Let's start by importing the packages needed in this tutorial. 
 
 import numpy as np
@@ -55,10 +55,11 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 #%%
 # Changing the signal model
 # -------------------------
-# In this case we are lucky -- the appropriate model for a MOLLI sequence is 
-# `abs_exp_recovery_2p` and is included in ``mdreg``'s model library. We just 
-# need to tell ``mdreg`` which fitting function to use (``'func'``), and 
-# provide the keyword arguments required by the model. For this model these are 
+# he appropriate model for a MOLLI sequence is 
+# `~mdreg.abs_exp_recovery_2p` and is included in ``mdreg``'s model library. 
+# We just 
+# need to tell ``mdreg`` which fitting function to use (*func*), and 
+# provide the keyword arguments required by the model - in this example 
 # the inversion times TI in units of sec. We define the signal model up front 
 # so it can be used again later in this script:
 
@@ -71,11 +72,12 @@ molli = {
     'TI': np.array(data['TI'])/1000,
 }
 
+
 #%%
 #Now we can run ``mdreg`` with this model and check the result again:
 
 # Perform model-driven coregistration
-coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli, verbose=0)
+coreg, defo, fit, pars = mdreg.fit(array, fit_image=molli)
 
 # # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)

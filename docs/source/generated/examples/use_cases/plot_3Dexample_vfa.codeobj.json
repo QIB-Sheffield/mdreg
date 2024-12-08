@@ -59,13 +59,6 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
-  },
-  {
-   "is_class": false,
-   "is_explicit": true,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "FA"
   }
  ],
  "S(\\phi)": [
@@ -247,22 +240,6 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "defo_norm"
-  }
- ],
- "mdreg.elastix.params": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg.elastix",
-   "module_short": "mdreg.elastix",
-   "name": "params"
   }
  ],
  "mdreg.fetch": [

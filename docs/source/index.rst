@@ -10,17 +10,67 @@ Model-driven image registration for medical imaging
    features may be deprecated without warning.
 
 
+***
+Aim
+***
+
+TO offer a user-friendly approach to remove subject motion 
+from a time series of medical images with changing intrinsic contrast. 
+
+
+************
+Installation
+************
+
+.. code-block:: console
+
+    pip install mdreg
+
+
+*************
+Typical usage
+*************
+
+Consider a dataset consisting of:
+
+- a 4D array *signal* with a series of free-breathing 3D MRI images of 
+  the abdomen with variable flip angles (VFA).
+- a 1D array *FA* with the respective flip angles.
+
+The following script removes the motion from the array and shows an animation 
+with the results:
+
+.. code-block:: python
+
+    import mdreg
+
+    # Identify a suitable signal model from the library
+    vfa = {
+        'func': mdreg.spgr_vfa_lin,  
+        'FA': FA,
+    }
+  
+    # Remove the motion from the signal data
+    coreg, defo, fit, pars = mdreg.fit(signal, vfa) 
+    
+    # Inspect the result visually
+    mdreg.animation(coreg, show=True)
+
+
+The function :func:`mdreg.fit` returns 4 arrays:
+
+- *coreg* is the signal array with motion removed;
+- *defo* is the deformation field;
+- *fit* is the array with model fits;
+- *pars* is an array with fitted parameters.
+
+
 ********
 Features
 ********
 
-`mdreg` aims to offer a user-friendly approach to remove subject motion 
-from time series of medical images with changing intrinsic contrast. 
-
-It includes:
-
-- A simple customizable high-level interface `~mdreg.fit` for 2D or 3D motion 
-  correction of time series.
+- A simple customizable high-level interface :func:`mdreg.fit` for 2D or 3D 
+  motion correction of time series.
 
 - A growing library of :ref:`signal models <models>` for different 
   applications, including T1- or T2 mapping, dynamic contrast-enhanced 
@@ -33,35 +83,11 @@ It includes:
   deformable, optical flow) available in different packages (`elastix`, 
   `skimage`, `dipy`).
 
-
-*********
-Rationale
-*********
-
-Many applications in medical imaging involve time series of 2D images or 
-3D volumes that are corrupted by subject motion. Examples are T1- or T2- 
-mapping in MRI, diffusion-weighted MRI, or dynamic contrast-enhanced imaging 
-in MRI or CT.
-
-Motion correction of such data is challenging because the signal changes 
-caused by the motion are superposed on the often drastic changes in intrinsic 
-image contrast. 
-
-In most cases though, these intrinsic changes in image 
-contrast can be described analytically. Indeed many of these applications 
-critically depend on the availability of a model to derive parametric maps 
-from the signal data.
-
-Model-driven image registration leverages the existence of a signal model to 
-remove the confounding effects of changes in image contrast on the results 
-of the motion correction. 
-
-
 ***************
 Getting started
 ***************
 
-To get started, have look at the :ref:`user guide <user-guide>` or the list 
+Have look at the :ref:`user guide <user-guide>` or the list 
 of :ref:`examples <examples>`.
 
 

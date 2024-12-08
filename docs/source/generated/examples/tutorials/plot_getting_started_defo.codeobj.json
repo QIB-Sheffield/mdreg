@@ -1,4 +1,13 @@
 {
+ ":func:": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": ":func:"
+  }
+ ],
  "array": [
   {
    "is_class": false,
@@ -8,15 +17,6 @@
    "name": "ndarray"
   }
  ],
- "attach30": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "dict"
-  }
- ],
  "coreg": [
   {
    "is_class": false,
@@ -24,6 +24,15 @@
    "module": "numpy",
    "module_short": "numpy",
    "name": "ndarray"
+  }
+ ],
+ "coreg_skimg": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
   }
  ],
  "data": [
@@ -103,22 +112,6 @@
    "name": "animation"
   }
  ],
- "mdreg.elastix.params": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg.elastix",
-   "module_short": "mdreg.elastix",
-   "name": "params"
-  }
- ],
  "mdreg.fetch": [
   {
    "is_class": false,
@@ -149,6 +142,13 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "fit"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "fit"
   }
  ],
  "mdreg.plot_series": [
@@ -165,22 +165,6 @@
    "module": "mdreg",
    "module_short": "mdreg",
    "name": "plot_series"
-  }
- ],
- "mdreg.skimage.params": [
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "builtins",
-   "module_short": "builtins",
-   "name": "function"
-  },
-  {
-   "is_class": false,
-   "is_explicit": false,
-   "module": "mdreg.skimage",
-   "module_short": "mdreg.skimage",
-   "name": "params"
   }
  ],
  "molli": [

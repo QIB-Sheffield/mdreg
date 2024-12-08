@@ -9,89 +9,166 @@ from mdreg import utils
 
 
 
-def coreg_series(source, target, parallel=False, **kwargs):
-    """
-    Coregister two series of images.
+def coreg(moving:np.ndarray, fixed:np.ndarray, spacing=1.0, downsample=1, 
+          log=False, method='bspline', **params):
 
+    """
+    Coregister two arrays
+    
     Parameters
     ----------
-    source : numpy.ndarray
-        The source image. For additional information see table 
-        :ref:`variable-types-table`. 
-    target : numpy.ndarray
-        The target image. For additional information see table 
-        :ref:`variable-types-table`. 
-    parallel : bool
-        Whether to perform coregistration in parallel.
-    **kwargs : dict
-        Coregistration keyword arguments.
-
+    moving : numpy.ndarray
+        The moving image with dimensions (x,y) or (x,y,z). 
+    fixed : numpy.ndarray
+        The fixed target image with the same shape as the moving image. 
+    spacing: array-like
+        Pixel spacing in mm. This can be a single scalar if all dimensions 
+        are equal, or an array of 2 elements (for 2D data) or 3 elements (
+        for 3D data). Defaults to 1. 
+    downsample: float
+        Speed up the registration by downsampling the images with this factor. 
+        downsample=1 means no downsampling. This is the default.
+    log: bool
+        Print a log during computations. Defaults to False.
+    method : str
+        Deformation method to use. Options are 'bspline', 'affine', 'rigid' 
+        or 'translation'. Default is 'bspline'.
+    params : dict
+        Use keyword arguments to overrule any of the default parameters in 
+        the elastix template for the chosen method.  
+    
     Returns
     -------
     coreg : numpy.ndarray
-            Coregistered series. 
+        Coregistered image in the same shape as the moving image.
     deformation : numpy.ndarray
-            Deformation field.
+        Deformation field in the same shape as the moving image - but with an 
+        additional dimension at the end for the components of the deformation 
+        vector. 
     
-            
-    For more information on the main variables in terms of shape
-    and description, see the :ref:`variable-types-table`.
     """
+
+    # Masking is not yet implemented
+    mask = None
+
+    params_obj = _params_obj(method, **params) 
+
+    if moving.ndim == 2: 
+        coreg, defo = _coreg_2d(moving, fixed, spacing, downsample, 
+                         log, mask, params_obj)
     
-    if np.sum(np.isnan(source)) > 0:
+    if moving.ndim == 3:
+        coreg, defo = _coreg_3d(moving, fixed, spacing, downsample, 
+                         log, mask, params_obj)
+        
+    _cleanup(**params)
+        
+    return coreg, defo
+
+
+def coreg_series(
+        moving:np.ndarray, fixed:np.ndarray, spacing=1.0, downsample=1, 
+        log=False, progress_bar=False, method='bspline', **params):
+    
+    """
+    Coregister two series of 2D images or 3D volumes.
+
+    Parameters
+    ----------
+    moving : numpy.ndarray
+        The moving image or volume, with dimensions (x,y,t) or (x,y,z,t). 
+    fixed : numpy.ndarray
+        The fixed target image or volume, in the same dimensions as the 
+        moving image. 
+    spacing: array-like
+        Pixel spacing in mm. This can be a single scalar if all dimensions 
+        are equal, or an array of 2 elements (for 2D data) or 3 elements (
+        for 3D data). Defaults to 1. 
+    downsample: float
+        Speed up the registration by downsampling the images with this factor. 
+        downsample=1 means no downsampling. This is the default.
+    log: bool
+        Print a log during computations. Defaults to False.
+    progress_bar: bool
+        Display a progress bar during coregistration. Defaults to False.
+    method : str
+        Deformation method to use. Options are 'bspline', 'affine', 'rigid' 
+        or 'translation'. Default is 'bspline'.
+    params : dict
+        Use keyword arguments to overrule any of the default parameters in 
+        the elastix template for the chosen method.  
+
+    Returns
+    -------
+    coregistered : numpy.ndarray
+        Coregistered series with the same dimensions as the moving image. 
+    deformation : numpy.ndarray
+        The deformation field with the same dimensions as *moving*, and one 
+        additional dimension for the components of the vector field. If 
+        *moving* 
+        has dimensions (x,y,t) and (x,y,z,t), then the deformation field will 
+        have dimensions (x,y,2,t) and (x,y,z,3,t), respectively.
+    """
+
+    if np.shape(moving) != np.shape(fixed):
+        raise ValueError('Moving and fixed arrays must have the '
+                         'same dimensions.')
+    if np.sum(np.isnan(moving)) > 0:
         raise ValueError('Source image contains NaN values - cannot '
                          'perform coregistration')
-    if np.sum(np.isnan(target)) > 0:
+    if np.sum(np.isnan(fixed)) > 0:
         raise ValueError('Target image contains NaN values - cannot '
                          'perform coregistration')
     
+    # There is currently no benefit in parallellization with elastix 
+    # because creating of the parameter object takes a long time and 
+    # must be done for each pairwise coregistration - removing all 
+    # potential benefit of the parallellization. Once the issues
+    # has been resolved, this option can be offered as a keyword argument. 
+    parallel = False
+
+    # Masking is not yet implemented
+    mask = None
+
     if parallel:
-        return _coreg_series_parallel(source, target, **kwargs)
+        coreg, defo = _coreg_series_parallel(
+            moving, fixed, spacing, downsample, log, mask, 
+            method, **params)
     else:
-        return _coreg_series_sequential(source, target, **kwargs)
+        coreg, defo = _coreg_series_sequential(
+            moving, fixed, spacing, downsample, log, mask, 
+            progress_bar, method, **params)
+
+    _cleanup(**params)
+
+    return coreg, defo
     
 
-def _coreg_series_sequential(
-        source, target, 
-        params = None,
-        spacing = 1.0, 
-        log = False, 
-        mask = None, 
-        downsample = 1,
-        progress_bar = False,
-    ):
+def _coreg_series_sequential(moving, fixed, spacing, downsample, log, mask, 
+                             progress_bar, method, **params):
 
     # This is a very slow step so needs to be done outside the loop
-    p_obj = _make_params_obj(settings=params) 
+    p_obj = _params_obj(method, **params) 
 
-    deformed, deformation = utils._init_output(source)
-    for t in tqdm(range(source.shape[-1]), desc='Coregistering series', disable=not progress_bar): 
+    deformed, deformation = utils._init_output(moving)
+    for t in tqdm(range(moving.shape[-1]), 
+                  desc='Coregistering series', 
+                  disable=not progress_bar): 
 
         if mask is not None:
             mask_t = mask[...,t]
         else: 
             mask_t = None
 
-        deformed[...,t], deformation[...,t] = coreg(
-                source[...,t], target[...,t], 
-                params_obj=p_obj, 
-                spacing=spacing, 
-                log=log, 
-                mask=mask_t,
-                downsample=downsample,
-            )
+        deformed[...,t], deformation[...,t] = _coreg(
+            moving[...,t], fixed[...,t],
+            spacing, downsample, log, mask_t, p_obj)
         
     return deformed, deformation
 
 
-def _coreg_series_parallel(
-        source, target, 
-        params = None,
-        spacing = 1.0, 
-        log = False, 
-        mask = None, 
-        downsample = 1,
-    ):
+def _coreg_series_parallel(moving, fixed, spacing, downsample, log, mask, 
+                           method, **params):
 
     # itk.force_load() # should speed up (but doesn't)
     # https://github.com/InsightSoftwareConsortium/ITKElastix/issues/204
@@ -103,12 +180,13 @@ def _coreg_series_parallel(
 
     # Build list of arguments
     args = []
-    for t in range(source.shape[-1]):
+    for t in range(moving.shape[-1]):
         if mask is not None:
             mask_t = mask[...,t]
         else: 
             mask_t = None
-        args_t = (source[...,t], target[...,t], params, spacing, log, mask_t, downsample)
+        args_t = (moving[...,t], fixed[...,t], spacing, 
+                  downsample, log, mask_t, method, params)
         args.append(args_t)
 
     # Process list of arguments in parallel
@@ -120,8 +198,8 @@ def _coreg_series_parallel(
     pool.join()
 
     # Reformat list of results into arrays
-    coreg, deformation = utils._init_output(source)
-    for t in range(source.shape[-1]):
+    coreg, deformation = utils._init_output(moving)
+    for t in range(moving.shape[-1]):
         coreg[...,t] = results[t][0]
         deformation[...,t] = results[t][1]
 
@@ -129,56 +207,34 @@ def _coreg_series_parallel(
 
 
 def _coreg_parallel(args):
-    source, target, params, spacing, log, mask, downsample = args
-    return coreg(source, target, params=params, spacing=spacing, log=log, mask=mask, downsample=downsample)
+    moving, fixed, spacing, downsample, log, mask, method, params = args
+    p_obj = _params_obj(method, **params) 
+    return _coreg(moving, fixed, spacing, downsample, log, mask, p_obj)
 
 
-def coreg(source:np.ndarray, target:np.ndarray, **kwargs):
+def _params_obj(method, **params):
+    param_obj = itk.ParameterObject.New() # long runtime ~20s
+    parameter_map_bspline = param_obj.GetDefaultParameterMap(method) 
+    param_obj.AddParameterMap(parameter_map_bspline)
+    for key, val in params.items():
+        param_obj.SetParameter(key, str(val))
+    return param_obj
 
-    """
-    Coregister two arrays
-    
-    Parameters
-    ----------
-    source : numpy.ndarray
-        The source image. For additional information see table 
-        :ref:`variable-types-table`. 
-    target : numpy.ndarray
-        The target image. For additional information see table 
-        :ref:`variable-types-table`. 
-    **kwargs : dict
-        Coregistration keyword arguments.
-    
-    Returns
-    -------
-    coreg : numpy.ndarray
-        Coregistered image.
-        The array is the same shape as the source image.
-    deformation : numpy.ndarray
-        Deformation field.
-        The array is the same shape as the source image with an additional 
-        dimension for each spatial dimension.
-    
-    """
 
-    if source.ndim == 2: 
-        return _coreg_2d(source, target, **kwargs)
-    
-    if source.ndim == 3:
-        return _coreg_3d(source, target, **kwargs)
+def _coreg(moving, *args):
+    if moving.ndim == 2: 
+        return _coreg_2d(moving, *args)
+    if moving.ndim == 3:
+        return _coreg_3d(moving, *args)
 
 
 
-
-  
-def _coreg_2d(source_large, target_large, params=None, params_obj=None, 
-              spacing=1.0, log=False, mask=None, downsample=1):
+def _coreg_2d(source_large, target_large, spacing, downsample, log, mask, 
+              params_obj):
 
     if np.isscalar(spacing):
         spacing = [spacing, spacing]
 
-    if params_obj is None:
-        params_obj = _make_params_obj(settings=params)
     # Downsample source and target
     # The origin of an image is the center of the voxel in the lower left corner
     # The origin of the large image is (0,0).
@@ -237,18 +293,14 @@ def _coreg_2d(source_large, target_large, params=None, params_obj=None,
     deformation_field = itk.GetArrayFromImage(deformation_field)
     deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
 
-    _cleanup()
-
     return coreg_large, deformation_field
 
 
-def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=1.0, log=False, mask=None, downsample=1):
+def _coreg_3d(source_large, target_large, spacing, downsample, log, mask, 
+              params_obj):
 
     if np.isscalar(spacing):
         spacing = [spacing, spacing, spacing]
-
-    if params_obj is None:
-        params_obj = _make_params_obj(settings=params)
 
     # Downsample source and target
     # The origin of an image is the center of the voxel in the lower left corner
@@ -296,7 +348,7 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         result_transform_parameters,
         log_to_console=log)
     
-    # Get deformation field at original size
+    # Get deformation field
     target_large = np.ascontiguousarray(target_large.astype(np.float32))
     target_large = itk.GetImageFromArray(target_large)
     target_large.SetSpacing(spacing_large)
@@ -305,296 +357,43 @@ def _coreg_3d(source_large, target_large, params=None, params_obj=None, spacing=
         target_large, 
         result_transform_parameters, 
         log_to_console=log)
-    
     deformation_field = itk.GetArrayFromImage(deformation_field)
     deformation_field = np.reshape(deformation_field, target_large.shape + (len(target_large.shape), ))
-
-    _cleanup()
 
     return coreg_large, deformation_field
 
 
-def _cleanup():
-
-    try:
-        os.remove('deformationField.nii')
-    except OSError:
-        pass
-    try:
-        os.remove('deformationField.mhd')
-    except OSError:
-        pass
-    try:
-        os.remove('deformationField.raw')
-    except OSError:
-        pass
-
-    path = os.path.dirname(__main__.__file__)
-
-    try:
-        os.remove(os.path.join(path, 'deformationField.nii'))
-    except OSError:
-        pass
-    try:
-        os.remove(os.path.join(path, 'deformationField.mhd'))
-    except OSError:
-        pass
-    try:
-        os.remove(os.path.join(path, 'deformationField.raw'))
-    except OSError:
-        pass
+def _cleanup(
+        WriteResultImage = 'true',
+        WriteDeformationField = "true", 
+        **params):
     
+    if WriteDeformationField == 'false':
 
-def params(default='freeform', **override):
+        try:
+            os.remove('deformationField.nii')
+        except OSError:
+            pass
+        try:
+            os.remove('deformationField.mhd')
+        except OSError:
+            pass
+        try:
+            os.remove('deformationField.raw')
+        except OSError:
+            pass
 
-    """
-    Generate parameters for elastix registration.
+        path = os.path.dirname(__main__.__file__)
 
-    Parameters
-    ----------
-    default : str
-        The default parameter set to use.
-    **override : dict
-        Parameters to override.
-    
-    Returns
-    -------
-    params : dict
-        The parameter set.
-
-        
-    Example:
-
-        Adjust the default parameters associated with grid spacing for elastix 
-        registration.
-
-    .. plot::
-        :include-source:
-        :context: close-figs
-    
-        >>> import mdreg
-
-        Adjust the default parameters associated with grid spacing for elastix 
-        registration.
-
-        >>> params = mdreg.elastix.params()
-        >>> print(params['FinalGridSpacingInPhysicalUnits'])
-        50.0
-
-        Override the default parameters associated with grid spacing for 
-        elastix registration.
-
-        >>> params = mdreg.elastix.params(FinalGridSpacingInPhysicalUnits='5.0')
-        >>> print(params['FinalGridSpacingInPhysicalUnits'])
-        5.0
-    """
-
-    if default=='freeform':
-        params = _freeform()
-    else:
-        raise ValueError('This default is not available')
-    for key, val in override.items():
-        params[key]=val
-    return params
-
-    
-def _freeform():
-    settings = {}
-    # See here for default bspline settings and explanation of parameters
-    # https://github.com/SuperElastix/ElastixModelZoo/tree/master/models%2Fdefault
-    # *********************
-    # * ImageTypes
-    # *********************
-    settings["FixedInternalImagePixelType"]="float"
-    settings["MovingInternalImagePixelType"]="float"
-    ## selection based on 3D or 2D image data: newest elastix version does not require input image dimension
-    # settings["FixedImageDimension", d) 
-    # settings["MovingImageDimension", d) 
-    settings["UseDirectionCosines"]="true"
-    # *********************
-    # * Components
-    # *********************
-    settings["Registration"]="MultiResolutionRegistration"
-    # Image intensities are sampled using an ImageSampler, Interpolator and ResampleInterpolator.
-    # Image sampler is responsible for selecting points in the image to sample. 
-    # The RandomCoordinate simply selects random positions.
-    settings["ImageSampler"]="RandomCoordinate"
-    # Interpolator is responsible for interpolating off-grid positions during optimization. 
-    # The BSplineInterpolator with BSplineInterpolationOrder = 1 used here is very fast and uses very little memory
-    settings["Interpolator"]="BSplineInterpolator"
-    # ResampleInterpolator here chosen to be FinalBSplineInterpolator with FinalBSplineInterpolationOrder = 1
-    # is used to resample the result image from the moving image once the final transformation has been found.
-    # This is a one-time step so the additional computational complexity is worth the trade-off for higher image quality.
-    settings["ResampleInterpolator"]="FinalBSplineInterpolator"
-    settings["Resampler"]="DefaultResampler"
-    # Order of B-Spline interpolation used during registration/optimisation.
-    # It may improve accuracy if you set this to 3. Never use 0.
-    # An order of 1 gives linear interpolation. This is in most 
-    # applications a good choice.
-    settings["BSplineInterpolationOrder"]="1"
-    # Order of B-Spline interpolation used for applying the final
-    # deformation.
-    # 3 gives good accuracy; recommended in most cases.
-    # 1 gives worse accuracy (linear interpolation)
-    # 0 gives worst accuracy, but is appropriate for binary images
-    # (masks, segmentations); equivalent to nearest neighbor interpolation.
-    settings["FinalBSplineInterpolationOrder"]="3"
-    # Pyramids found in Elastix:
-    # 1)	Smoothing -> Smoothing: YES, Downsampling: NO
-    # 2)	Recursive -> Smoothing: YES, Downsampling: YES
-    #      If Recursive is chosen and only # of resolutions is given 
-    #      then downsamlping by a factor of 2 (default)
-    # 3)	Shrinking -> Smoothing: NO, Downsampling: YES
-    settings["FixedImagePyramid"]="FixedRecursiveImagePyramid"
-    settings["MovingImagePyramid"]="MovingRecursiveImagePyramid"
-    settings["Optimizer"]="AdaptiveStochasticGradientDescent"
-    # Whether transforms are combined by composition or by addition.
-    # In generally, Compose is the best option in most cases.
-    # It does not influence the results very much.
-    settings["HowToCombineTransforms"]="Compose"
-    settings["Transform"]="BSplineTransform"
-    # Metric
-    settings["Metric"]="AdvancedMeanSquares"
-    # Number of grey level bins in each resolution level,
-    # for the mutual information. 16 or 32 usually works fine.
-    # You could also employ a hierarchical strategy:
-    #(NumberOfHistogramBins 16 32 64)
-    settings["NumberOfHistogramBins"]="32"
-    # *********************
-    # * Transformation
-    # *********************
-    # The control point spacing of the bspline transformation in 
-    # the finest resolution level. Can be specified for each 
-    # dimension differently. Unit: mm.
-    # The lower this value, the more flexible the deformation.
-    # Low values may improve the accuracy, but may also cause
-    # unrealistic deformations.
-    # By default the grid spacing is halved after every resolution,
-    # such that the final grid spacing is obtained in the last 
-    # resolution level.
-    # The grid spacing here is specified in voxel units.
-    #(FinalGridSpacingInPhysicalUnits 10.0 10.0)
-    #(FinalGridSpacingInVoxels 8)
-    #settings["FinalGridSpacingInPhysicalUnits", ["50.0", "50.0"])
-    settings["FinalGridSpacingInPhysicalUnits"]="50.0"
-    # *********************
-    # * Optimizer settings
-    # *********************
-    # The number of resolutions. 1 Is only enough if the expected
-    # deformations are small. 3 or 4 mostly works fine. For large
-    # images and large deformations, 5 or 6 may even be useful.
-    settings["NumberOfResolutions"]="4"
-    settings["AutomaticParameterEstimation"]="true"
-    settings["ASGDParameterEstimationMethod"]="Original"
-    settings["MaximumNumberOfIterations"]="500"
-    # The step size of the optimizer, in mm. By default the voxel size is used.
-    # which usually works well. In case of unusual high-resolution images
-    # (eg histology) it is necessary to increase this value a bit, to the size
-    # of the "smallest visible structure" in the image:
-    settings["MaximumStepLength"]="1.0" 
-    # *********************
-    # * Pyramid settings
-    # *********************
-    # The downsampling/blurring factors for the image pyramids.
-    # By default, the images are downsampled by a factor of 2
-    # compared to the next resolution.
-    #settings["ImagePyramidSchedule"]="8 8  4 4  2 2  1 1"
-    # *********************
-    # * Sampler parameters
-    # *********************
-    # Number of spatial samples used to compute the mutual
-    # information (and its derivative) in each iteration.
-    # With an AdaptiveStochasticGradientDescent optimizer,
-    # in combination with the two options below, around 2000
-    # samples may already suffice.
-    settings["NumberOfSpatialSamples"]="2048"
-    # Refresh these spatial samples in every iteration, and select
-    # them randomly. See the manual for information on other sampling
-    # strategies.
-    settings["NewSamplesEveryIteration"]="true"
-    settings["CheckNumberOfSamples"]="true"
-    # *********************
-    # * Mask settings
-    # *********************
-    # If you use a mask, this option is important. 
-    # If the mask serves as region of interest, set it to false.
-    # If the mask indicates which pixels are valid, then set it to true.
-    # If you do not use a mask, the option doesn't matter.
-    settings["ErodeMask"]="false"
-    settings["ErodeFixedMask"]="false"
-    # *********************
-    # * Output settings
-    # *********************
-    #Default pixel value for pixels that come from outside the picture:
-    settings["DefaultPixelValue"]="0"
-    # Choose whether to generate the deformed moving image.
-    # You can save some time by setting this to false, if you are
-    # not interested in the final deformed moving image, but only
-    # want to analyze the deformation field for example.
-    settings["WriteResultImage"]="false"
-    settings["WriteDeformationField"]="false"
-    # The pixel type and format of the resulting deformed moving image
-    settings["ResultImagePixelType"]="float"
-    settings["ResultImageFormat"]="mhd"
-    
-    return settings
-
-
-def _make_params_obj(default='bspline', settings=None):
-
-    """
-    Make an elastix parameter object.
-
-    Parameters
-    ----------
-    default : str
-        The default parameter set to use.
-    settings : dict
-        Parameters to override.
-    """
-    param_obj = itk.ParameterObject.New() # long runtime ~20s
-    parameter_map_bspline = param_obj.GetDefaultParameterMap(default) 
-    param_obj.AddParameterMap(parameter_map_bspline) 
-    if settings is None:
-        return param_obj
-    for p in settings:
-        param_obj.SetParameter(p, settings[p])
-    return param_obj
-
-
-
-
-
-
-
-
-
-
-# Retired
-
-def _OLD_coreg_2d(source, target, params_obj, spacing, log, mask):
-    """
-    Coregister two arrays and return coregistered + deformation field 
-    """
-    shape_source = np.shape(source)
-
-    # Coregister source to target
-    source = itk.GetImageFromArray(np.array(source, np.float32))
-    target = itk.GetImageFromArray(np.array(target, np.float32))
-    source.SetSpacing(spacing)
-    target.SetSpacing(spacing)
-    coregistered, result_transform_parameters = itk.elastix_registration_method(
-        target, source, parameter_object=params_obj, log_to_console=log)
-    coregistered = itk.GetArrayFromImage(coregistered)
-
-    # Get deformation field
-    deformation_field = itk.transformix_deformation_field(
-        target, 
-        result_transform_parameters, 
-        log_to_console=log)
-    deformation_field = itk.GetArrayFromImage(deformation_field).flatten()
-    deformation_field = np.reshape(deformation_field, shape_source + (len(shape_source), ))
-
-    return coregistered, deformation_field
-
-
+        try:
+            os.remove(os.path.join(path, 'deformationField.nii'))
+        except OSError:
+            pass
+        try:
+            os.remove(os.path.join(path, 'deformationField.mhd'))
+        except OSError:
+            pass
+        try:
+            os.remove(os.path.join(path, 'deformationField.raw'))
+        except OSError:
+            pass

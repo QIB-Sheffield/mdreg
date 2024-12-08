@@ -96,6 +96,22 @@
    "name": "function"
   }
  ],
+ "mdreg.abs_exp_recovery_2p": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "abs_exp_recovery_2p"
+  },
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg",
+   "module_short": "mdreg",
+   "name": "abs_exp_recovery_2p"
+  }
+ ],
  "mdreg.animation": [
   {
    "is_class": false,
@@ -144,6 +160,15 @@
    "name": "fit"
   }
  ],
+ "mdreg.mdreg.fit": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "mdreg.mdreg",
+   "module_short": "mdreg.mdreg",
+   "name": "fit"
+  }
+ ],
  "mdreg.plot_series": [
   {
    "is_class": false,
@@ -160,7 +185,7 @@
    "name": "plot_series"
   }
  ],
- "my_fit_image": [
+ "my_fit": [
   {
    "is_class": false,
    "is_explicit": false,

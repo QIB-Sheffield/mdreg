@@ -1,6 +1,6 @@
 """
 ===============================================
-Using custom-build models
+Using custom-built models
 ===============================================
 
 In case an appropriate signal model is not available in mdreg's model 
@@ -35,6 +35,7 @@ mdreg.animation(array, vmin=0, vmax=1e4, show=True)
 def my_molli(TI, S0, T1):
     return np.abs(S0 * (1 - 2 * np.exp(-TI/T1)))
 
+#%%
 # In order to use this as a model fit in mdreg, we need a function that 
 # takes the image array as argument, and returns the fit to the model and the 
 # fitted model parameters:
@@ -52,12 +53,15 @@ def fit_my_molli(array, TI=None):
 
     # Fit the model for each pixel
     for x in range(nx):
-        par[x,:], _ = curve_fit(
-            my_molli, TI, array[x,:], 
-            p0 = [np.amax(np.abs(array[x,:])), 1.3], 
-            bounds = (0, np.inf),
-        )
-        fit[x,:] = my_molli(TI, par[x,0], par[x,1])
+        try:
+            par[x,:], _ = curve_fit(
+                my_molli, TI, array[x,:], 
+                p0 = [np.amax(np.abs(array[x,:])), 1.3], 
+                bounds = (0, np.inf),
+            )
+            fit[x,:] = my_molli(TI, par[x,0], par[x,1])
+        except:
+            fit[x,:] = array[x,:]
 
     # Return results in the original shape
     return fit.reshape(shape), par.reshape(shape[:-1]+(2,))
@@ -67,20 +71,20 @@ def fit_my_molli(array, TI=None):
 # run ``mdreg``:
 
 # Define the fit function and its arguments
-my_fit_image = {
+my_fit = {
     'func': fit_my_molli,
-    'TI': np.array(data['TI']),
+    'TI': np.array(data['TI'])/1000,
 }
 
 # Perform model-driven coregistration
-coreg, defo, fit, pars = mdreg.fit(array, fit_image=my_fit_image, verbose=0)
+coreg, defo, fit, pars = mdreg.fit(array, fit_image=my_fit)
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 
 #%%
-# As expected, the result is the same as before using the built-in model 
-# ``abs_exp_recovery_2p``.
+# In this case, the same result can be obtained using the built-in function  
+# `~mdreg.abs_exp_recovery_2p`.
 
 
 #%%
@@ -88,10 +92,10 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 # ----------------------
 # The example above represents a common scenario where a 1D 
 # signal model is applied for each pixel independently (*pixel-by-pixel 
-# fitting*). For such models, `mdreg`` offers a convenient shortcut which 
+# fitting*). For such models, ``mdreg`` offers a convenient shortcut which 
 # removes the need to define a fit function explicitly. 
 # 
-# We illustrate this idea by fitting the my_molli() function 
+# We illustrate this idea by fitting the *my_molli()* function 
 # defined above. In this case we also need a function that derives initial 
 # values from the data and any constant initial values p0 provided by the user:
 
@@ -126,12 +130,12 @@ my_pixel_fit = {
 }   
 
 #%%
-# And this can be provided directly to ``mdreg.fit`` via the keyword argument 
-# ``fit_pixel`` - instructing ``mdreg`` to perform pixel-based fitting using 
-# the parameters defined in ``my_pixel_fit``:
+# And this can be provided directly to `~mdreg.mdreg.fit` via the keyword argument 
+# *fit_pixel** - instructing ``mdreg`` to perform pixel-based fitting using 
+# the parameters defined in *my_pixel_fit*:
 
 # Perform model-driven coregistration with a custom pixel model
-coreg, defo, fit, pars = mdreg.fit(array, fit_pixel=my_pixel_fit, verbose=0)
+coreg, defo, fit, pars = mdreg.fit(array, fit_pixel=my_pixel_fit)
 
 # Visualise the results
 mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
@@ -139,7 +143,7 @@ mdreg.plot_series(array, fit, coreg, vmin=0, vmax=1e4, show=True)
 #%%
 #
 # As expected, the result is the same as before using the built-in model 
-# ``abs_exp_recovery_2p`` and the dedicated function ``fit_my_molli``.
+# `~mdreg.abs_exp_recovery_2p` and the custom-built function *fit_my_molli*.
 
 # sphinx_gallery_start_ignore
 

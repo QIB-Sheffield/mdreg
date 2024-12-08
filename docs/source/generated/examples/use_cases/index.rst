@@ -18,7 +18,7 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and we are using a linear signal model fit.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and using a linear signal model fit.">
 
 .. only:: html
 
@@ -35,7 +35,7 @@ Use cases
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and in this example we are using a nin-linear signal model.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates motion correction of a 3D time series with  variable flip angles (VFA). The motion correction is performed with 3D  coregistration and a non-linear signal model fit.">
 
 .. only:: html
 

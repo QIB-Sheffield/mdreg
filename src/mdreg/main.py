@@ -17,26 +17,23 @@ def fit(moving: np.ndarray,
     ):
 
     """
-    Fit a signal model to a series of images and perform coregistration to 
-    correct for motion artefacts.
+    Remove motion from a series of images or volumes.
 
     Parameters
     ----------
-    moving : numpy.array
-        The series of images to be corrected. For more detail see table 
-        :ref:`variable-types-table`.
+    moving : numpy.ndarray
+        The series of images to be corrected, with dimensions (x,y,t) or 
+        (x,y,z,t). 
     fit_image : dict or list, optional
-        A dictionary with the parameters defining the signal model. For a 
+        A dictionary defining the signal model. For a 
         slice-by-slice computation (4D array with force_2d=True), this can be 
         a list of dictionaries, one for each slice. If fit_image is not 
         provided, a constant model is used.  
-        For more detail see table :ref:`fit-image-table`.
     fit_coreg : dict, optional
         The parameters for coregistering the images. The default is None, which 
-        uses the default elastix package setting. For more detail see table 
-        :ref:`fit-coreg-table`.
+        uses bspline coregistration in elastix with default parameters. 
     fit_pixel : dict, optional
-        A dictionary with the parameters defining a single-pixel signal model.
+        A dictionary defining a single-pixel signal model.
         For a slice-by-slice computation (4D array with force_2d=True), this 
         can be a list of dictionaries, one for each slice. 
         The default is None.
@@ -49,31 +46,33 @@ def fit(moving: np.ndarray,
         output only; 2: text output and progress bars; 3: text output, progress 
         bars and image exports. The default is 0.
     plot_params : dict, optional
-        The parameters for plotting the images. The default is None, which 
-        creates an empty dictionary. For more detail see table 
-        :ref:`plot-param-table`.
+        The parameters for plotting the images when verbose = 3. Any keyword 
+        arguments accepted by `mdreg.plot_series` can be included. 
+        This keyword is ignored when verbose < 3. 
     force_2d : bool, optional
         By default, a 3-dimensional moving array will be coregistered with a 
         3-dimensional deformation field. To perform slice-by-slice 
-        2-dimensional registration instead, set force_2d = True. This 
-        keyword is ignored when moving arrays are 2-dimensional. The 
+        2-dimensional registration instead, set *force_2d* to True. This 
+        keyword is ignored when the arrays are 2-dimensional. The 
         default is False.
     
     Returns
     -------
-    coreg : numpy.array
-        The coregistered images.
-    defo : numpy.array
-        The deformation field.
-    fit : numpy.array
-        The fitted signal model.
+    coreg : numpy.ndarray
+        The coregistered images with the same dimensions as *moving*.
+    defo : numpy.ndarray
+        The deformation field with the same dimensions as *moving*, and one 
+        additional dimension for the components of the vector field. If 
+        *moving* 
+        has dimensions (x,y,t) and (x,y,z,t), then the deformation field will 
+        have dimensions (x,y,2,t) and (x,y,z,3,t), respectively.
+    fit : numpy.ndarray
+        The fitted signal model with the same dimensions as *moving*.
     pars : dict
-        The parameters of the fitted signal model.
-
-    
-    Please see :ref:`variable-types-table` for more detail on the returned 
-    variables.
-        
+        The parameters of the fitted signal model with dimensions (x,y,n) or 
+        (x,y,z,n), where n is the number of free parameters of the signal 
+        model.
+ 
     """
     if fit_image is None:
         fit_image = {'func': models.constant}
@@ -86,10 +85,10 @@ def fit(moving: np.ndarray,
             defo = np.zeros(moving.shape[:3] + (2, moving.shape[3]))
             fit_array = np.zeros(moving.shape)
             for k in range(moving.shape[2]):
-                print('-----------------')
-                print('Fitting slice ' + str(k).zfill(3) )
-                print('-----------------')
-
+                if verbose > 0:
+                    print('-----------------')
+                    print('Fitting slice ' + str(k).zfill(3) )
+                    print('-----------------')
                 if isinstance(fit_image, dict):
                     fit_image_k = fit_image
                 else:
@@ -126,7 +125,7 @@ def fit(moving: np.ndarray,
         fit_coreg = {'package': 'elastix'}
     
     if 'package' not in fit_coreg:
-            fit_coreg['package'] = 'elastix'
+        fit_coreg['package'] = 'elastix'
 
     if plot_params is None:
         plot_params = {}
@@ -180,11 +179,48 @@ def fit(moving: np.ndarray,
 
 
 
-def _coreg_series(moving, fit, package='elastix', **coreg_params):
+def _coreg_series(moving, fit, package='elastix', **fit_coreg):
 
     if package == 'elastix':
-        return elastix.coreg_series(moving, fit, **coreg_params)
+        fit_coreg = _set_mdreg_elastix_defaults(fit_coreg)
+        return elastix.coreg_series(moving, fit, **fit_coreg)
+    
     elif package == 'skimage':
-        return skimage.coreg_series(moving, fit, **coreg_params)
+        return skimage.coreg_series(moving, fit, **fit_coreg)
+    
     else:
-        raise NotImplementedError('This coregistration package is not implemented')
+        raise NotImplementedError(
+            'This coregistration package is not implemented')
+    
+
+
+def _set_mdreg_elastix_defaults(params):
+
+    if "WriteResultImage" not in params:
+        params["WriteResultImage"] = "false"
+    if "WriteDeformationField" not in params:
+        params["WriteDeformationField"] = "false"
+    if "ResultImagePixelType" not in params:
+        params["ResultImagePixelType"] = "float"
+
+    # # Removing this for v0.4.2 as results appear to be worse
+    # if 'Metric' not in params:
+    #     params["Metric"] = "AdvancedMeanSquares"
+
+    # # Settings pre v0.4.0 - unclear why - removed for now
+    # if "FinalGridSpacingInPhysicalUnits" not in params:
+    #     params["FinalGridSpacingInPhysicalUnits"] = "50.0"
+    # if "AutomaticParameterEstimation" not in params:
+    #     params["AutomaticParameterEstimation"] = "true"
+    # if "ASGDParameterEstimationMethod" not in params:
+    #     params["ASGDParameterEstimationMethod"] = "Original"
+    # if "MaximumStepLength" not in params:
+    #     params["MaximumStepLength"] = "1.0"
+    # if "CheckNumberOfSamples" not in params:
+    #     params["CheckNumberOfSamples"] = "true"
+    # if "RandomCoordinate" not in params:
+    #     params["ImageSampler"] = "RandomCoordinate"
+
+    return params
+    
+

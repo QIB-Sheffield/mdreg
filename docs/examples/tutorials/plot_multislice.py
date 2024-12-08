@@ -10,15 +10,15 @@ this example.
 """
 
 #%%
-# Import packages and data
-# ----------------------------
-# Let's start by importing the packages needed in this tutorial. 
+# Setup
+# -----
+# Import packages 
 
 import numpy as np
 import mdreg
 
 #%%
-# Fetch the multi-slice renal MOLLI dataset:
+# Fetch the multi-slice MOLLI dataset and plot
 
 data = mdreg.fetch('MOLLI')
 
@@ -26,7 +26,7 @@ data = mdreg.fetch('MOLLI')
 array = data['array']  
 TI = np.array(data['TI'])/1000
 
-# Use the built-in animation function of mdreg to visualise the motion:
+# Visualise the motion
 mdreg.animation(array, vmin=0, vmax=1e4, show=True)
 
 
@@ -42,36 +42,32 @@ molli = {
 
 #%%
 # Slice-by-slice analysis works the same way as single-slice analysis. We 
-# just have to remember to set the keyword argument force_2d to True so 
+# just have to remember to set the keyword argument *force_2d* to True so 
 # `~mdreg.fit` knows that we want 2D motion correction. This overrules the 
 # default behaviour of fitting 3D data with 3D motion correction:
 
 coreg, defo, fit, pars = mdreg.fit(
-    array, fit_image=molli, verbose=2, 
-    force_2d=True, xtol=1e-3, maxit=2,
-)
+    array, fit_image=molli, force_2d=True, maxit=2)
 
 #%%
 # Visualise the results
 
 anim = mdreg.animation(
     coreg, title='Motion corrected', 
-    interval=500, vmin=0, vmax=1e4, show=True,
-)
+    interval=500, vmin=0, vmax=1e4, show=True)
 
 #%%
 # Different options per slice
 # ---------------------------
 # It is not uncommon that each slice in a multislice sequence has different 
-# imaging parameters. For instance in a MOLLI sequence such as illustrated 
-# in this example, it may well be that each slice has its own set of TI
+# imaging parameters. For instance in a MOLLI sequence such as used 
+# in this example, it is often the case that each slice has its own set of TI
 # values. 
 # 
 # The situation can be accomodated in `~mdreg.fit` by assigning a 
-# list of dictionaries to the fit_image argument - one for each slice. 
+# list of dictionaries to the *fit_image* argument - one for each slice. 
 # We illustrate that here assuming that the TI's for each slice are offset by 
-# 100 ms relative to the previous slice. So now the signal model is a list of 
-# dictionaries:
+# 100 ms relative to the previous slice:
 
 molli = [
     {
@@ -82,29 +78,28 @@ for z in range(array.shape[2])]
 
 
 #%%
-# Other than that the call to mdreg is the same as before:
+# The call to mdreg is the same as before
 
 coreg, defo, fit, pars = mdreg.fit(
-    array, fit_image=molli, verbose=2, 
-    force_2d=True, xtol=1e-3, maxit=2,
-)
+    array, fit_image=molli, force_2d=True, maxit=2)
 
-# In this case the result is poor because the real TI's are in fact the same 
-# for each slice, so we have provided a biased model:
+#%%
+# Visualise the results
 
 anim = mdreg.animation(
-    coreg, title='Motion corrected with biased model', 
-    interval=500, vmin=0, vmax=1e4, show=True,
-)
+    coreg, title='Motion corrected (variable TI)', 
+    interval=500, vmin=0, vmax=1e4, show=True)
 
 #%%
 # Slice-by-slice with custom models
 # ---------------------------------
 # If the signal model fit is defined with a custom model via the 
 # *fit_pixel* argument, the slice-by-slice operation works the same: 
-# set the force_2d keyword to True, and supply the *fit_pixel* 
-# argument as a list of dictionaries in the event that each slice needs 
-# different parameter settings.
+# set the *force_2d* keyword to True, and - if each slice has 
+# different parameter settings - supply the *fit_pixel* 
+# argument as a list of dictionaries.
+#
+#
 
 # sphinx_gallery_start_ignore
 
