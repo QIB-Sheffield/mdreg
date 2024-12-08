@@ -8,7 +8,7 @@
 project = 'mdreg'
 copyright = '2024, mdreg maintainers'
 author = 'mdreg maintainers'
-release = '0.4.2'
+release = '0.4.3'
 
 # -- Path setup --------------------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,
