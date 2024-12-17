@@ -1,5 +1,6 @@
 import __main__
 import os
+import warnings
 import multiprocessing
 import numpy as np
 from tqdm import tqdm
@@ -262,10 +263,16 @@ def _coreg_2d(source_large, target_large, spacing, downsample, log, mask,
     target_small.SetSpacing(spacing_small)
     source_small.SetOrigin(origin_small)
     target_small.SetOrigin(origin_small)
-    coreg_small, result_transform_parameters = itk.elastix_registration_method(
-        target_small, source_small,
-        parameter_object=params_obj, 
-        log_to_console=log)
+    try:
+        coreg_small, result_transform_parameters = itk.elastix_registration_method(
+            target_small, source_small,
+            parameter_object=params_obj, 
+            log_to_console=log)
+    except:
+        warnings.warn('Elastix coregistration failed. Returning zero '
+                      'deformation field. To find out the error, set log=True.')
+        deformation_field = np.zeros(source_large.shape + (len(source_large.shape), ))
+        return source_large.copy(), deformation_field
     
     # Get coregistered image at original size
     large_shape_x, large_shape_y = source_large.shape
@@ -331,10 +338,16 @@ def _coreg_3d(source_large, target_large, spacing, downsample, log, mask,
     target_small.SetSpacing(spacing_small)
     source_small.SetOrigin(origin_small)
     target_small.SetOrigin(origin_small)
-    coreg_small, result_transform_parameters = itk.elastix_registration_method(
-        target_small, source_small,
-        parameter_object=params_obj, 
-        log_to_console=log) # perform registration of downsampled image
+    try:
+        coreg_small, result_transform_parameters = itk.elastix_registration_method(
+            target_small, source_small,
+            parameter_object=params_obj, 
+            log_to_console=log) # perform registration of downsampled image
+    except:
+        warnings.warn('Elastix coregistration failed. Returning zero '
+                      'deformation field. To find out the error, set log=True.')
+        deformation_field = np.zeros(source_large.shape + (len(source_large.shape), ))
+        return source_large.copy(), deformation_field
     
     # Get coregistered image at original size
     result_transform_parameters.SetParameter(0, "Size", [str(large_shape_z), str(large_shape_y), str(large_shape_x)])
