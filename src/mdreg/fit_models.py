@@ -8,6 +8,7 @@ import dask
 import dask.array as da
 from scipy.integrate import cumulative_trapezoid
 from scipy.optimize import curve_fit
+from sklearn.decomposition import PCA
 
 from mdreg import pixel_models, io
 
@@ -228,6 +229,128 @@ def _fit_pixels_zarr(
 
 
 
+def fit_deconvolution(signals: np.ndarray, aif=None, tol=0.2, n0=1):
+    """Fits DCE signals with a model-free deconvolution
+
+    Args:
+        signals (np.ndarray): Input array
+        aif (np.ndarray, optional): Arterial input signal (1D). Defaults to None.
+        tol (float, optional): Cut-off value for the singular values. Defaults to 0.2.
+        n0 (int, optional): Baseline length. Defaults to 1.
+
+    Returns:
+        tuple: reconstructed signals, None
+    """
+    shape = signals.shape
+    signals = signals.reshape(-1, shape[-1])
+
+    # Build signal change
+    ca = aif - np.mean(aif[:n0])
+    S0 = np.mean(signals[...,:n0], axis=-1)[..., None]
+    conc = signals - S0
+
+    # Build matrix
+    n = len(ca)
+    mat = np.zeros((n,n))
+    for i in range(0,n):
+        for j in range(0,i+1):
+            mat[i,j] = ca[i-j]
+
+    # Invert matrix
+    U, s, Vt = np.linalg.svd(mat, full_matrices=False)
+    svmin = tol*np.amax(s)
+    s_inv = np.array([1/x if x > svmin else 0 for x in s])
+    mat_inv = np.dot(Vt.T * s_inv, U.T)
+
+    # Apply matrices
+    conc_rec = (mat @ mat_inv) @ conc.T
+    signal_rec = conc_rec.T + S0
+
+    return signal_rec.reshape(shape), None
+
+
+
+def fit_pca(data_4d, n_components=None):
+    """
+    Performs Principal Component Analysis (PCA) on a 4D dataset (3D spatial + 1D time).
+
+    The function reshapes the 4D array into a 2D matrix where each row
+    represents the time series of a single voxel. PCA is then applied to
+    this matrix to identify the principal components of the temporal variations.
+
+    Args:
+        data_4d (np.ndarray): The input 4D array with shape (X, Y, Z, T),
+                              where T is the time dimension.
+        n_components (int, optional): The number of principal components to keep.
+                                      If None, all components are kept. Defaults to None.
+
+    Returns:
+        tuple: A tuple containing:
+            - components (np.ndarray): The principal components (eigen-curves) of the
+                                       time series. Shape: (n_components, T).
+            - spatial_maps (np.ndarray): The 3D spatial weights (scores) for each
+                                         component. Shape: (X, Y, Z, n_components).
+            - explained_variance (np.ndarray): The amount of variance explained by
+                                               each component.
+    """
+    # --- 2. Reshape the 4D data to 2D ---
+    # The new shape will be (number_of_voxels, time_points)
+    # This is the format required by scikit-learn's PCA
+    reshaped_data = data_4d.reshape(-1, data_4d.shape[-1])
+
+    # --- 3. Perform PCA ---
+    pca = PCA(n_components=n_components)
+    
+    # fit_transform calculates the principal components and projects the data onto them
+    scores = pca.fit_transform(reshaped_data)
+    
+    # The principal components are the "eigen-curves"
+    components = pca.components_
+    
+    # --- 4. Reshape the scores back to 3D spatial maps ---
+    # This gives us a 3D map for each component, showing its spatial distribution
+    num_actual_components = components.shape[0]
+    spatial_maps = scores.reshape(data_4d.shape[:-1] + (num_actual_components, ))
+
+    pca_fit = _reconstruct_from_pca(spatial_maps, components)
+
+    return pca_fit, spatial_maps
+
+
+def _reconstruct_from_pca(spatial_maps, components):
+    """
+    Reconstructs the 4D signal from its PCA components and spatial maps.
+
+    This is the inverse operation of the PCA decomposition. It performs a
+    matrix multiplication of the scores (spatial maps) and the components
+    to rebuild the time series for each voxel.
+
+    Args:
+        spatial_maps (np.ndarray): The 3D spatial weights (scores) for each
+                                   component. Shape: (X, Y, Z, n_components).
+        components (np.ndarray): The principal components (eigen-curves).
+                                 Shape: (n_components, T).
+
+    Returns:
+        np.ndarray: The reconstructed 4D data array. Shape: (X, Y, Z, T).
+    """
+    # Get original dimensions
+    t_dim = components.shape[1]
+
+    # Reshape spatial maps from (X, Y, Z, n_components) to (X*Y*Z, n_components)
+    scores = spatial_maps.reshape(-1, spatial_maps.shape[-1])
+
+    # Reconstruct the 2D data matrix by matrix multiplication
+    # (N_voxels, n_components) @ (n_components, T) -> (N_voxels, T)
+    reconstructed_2d = scores @ components
+
+    # Reshape the 2D data back to the original 4D shape
+    reconstructed_4d = reconstructed_2d.reshape(spatial_maps.shape[:-1] + (t_dim, ))
+    
+    return reconstructed_4d
+
+
+
 def fit_constant(signal: Union[np.ndarray, zarr.Array]):
     r"""
     Fit to a constant.
@@ -260,6 +383,9 @@ def fit_constant(signal: Union[np.ndarray, zarr.Array]):
     fit = da.repeat(par, repeats=shape[-1], axis=-1)
     fit.compute()
     return fit, par
+
+
+
 
 
 
@@ -797,9 +923,6 @@ def _fit_spgr_vfa_lin_compute(signal, FA, progress_bar):
 
 
 
-
-
-
 def fit_2cm_lin(
         signal: Union[np.ndarray, zarr.Array], 
         aif=None,
@@ -809,6 +932,7 @@ def fit_2cm_lin(
         memdim=2, 
         parallel=False,
         progress_bar=True,
+        input_corr=False,
 
     ) -> Tuple[Union[np.ndarray, zarr.Array], Union[np.ndarray, zarr.Array]]:
     
@@ -869,7 +993,7 @@ def fit_2cm_lin(
     
     if isinstance(signal, np.ndarray):
         fit, par = _fit_2cm_lin_compute(
-            signal, aif, time, baseline, progress_bar,
+            signal, aif, time, baseline, input_corr, progress_bar,
         )
         if path is not None:
             np.save(os.path.join(path, 'fit'), fit)
@@ -886,7 +1010,8 @@ def fit_2cm_lin(
         raise ValueError("memdim cannot be larger than signal.ndim-1.")
 
     # Build stores for outputs
-    fit, par = io._fit_models_init(signal, path, 4)
+    npar = 5 if input_corr else 4
+    fit, par = io._fit_models_init(signal, path, npar)
 
     # Get the shape and number of slice dimensions
     shape = signal.shape[memdim:-1]
@@ -899,7 +1024,7 @@ def fit_2cm_lin(
         pbar = False
         tasks = [
             dask.delayed(_fit_2cm_lin_slice)(
-                k, signal, shape, p, aif, time, baseline, fit, par, pbar,
+                k, signal, shape, p, aif, time, baseline, input_corr, fit, par, pbar,
             )
             for k in range(n)
         ]
@@ -912,13 +1037,13 @@ def fit_2cm_lin(
             ):
             pbar = progress_bar and (n==1)
             _fit_2cm_lin_slice(
-                k, signal, shape, p, aif, time, baseline, fit, par, pbar,
+                k, signal, shape, p, aif, time, baseline, input_corr, fit, par, pbar,
             )
 
     return fit, par
 
 
-def _fit_2cm_lin_slice(k, signal, shape, p, aif, time, baseline, fit, par, 
+def _fit_2cm_lin_slice(k, signal, shape, p, aif, time, baseline, input_corr, fit, par, 
                  progress_bar):
 
     # Convert flat index to multi-index
@@ -930,7 +1055,7 @@ def _fit_2cm_lin_slice(k, signal, shape, p, aif, time, baseline, fit, par,
 
     # Compute
     fit_k, par_k = _fit_2cm_lin_compute(
-        signal_k, aif, time, baseline, progress_bar,
+        signal_k, aif, time, baseline, input_corr, progress_bar,
     )
 
     # Save results for slize z in the zarray
@@ -939,7 +1064,9 @@ def _fit_2cm_lin_slice(k, signal, shape, p, aif, time, baseline, fit, par,
 
 
 
-def _fit_2cm_lin_compute(signal, aif, time, baseline, progress_bar):
+def _fit_2cm_lin_compute(signal, aif, time, baseline, input_corr, progress_bar):
+
+    npar = 5 if input_corr else 4
 
     # Reshape to 2D (x,t)
     shape = signal.shape
@@ -948,11 +1075,13 @@ def _fit_2cm_lin_compute(signal, aif, time, baseline, progress_bar):
     S0 = np.mean(signal[:,:baseline], axis=1)
     ca = aif-np.mean(aif[:baseline])
     
-    A = np.empty((signal.shape[1],4))
+    A = np.empty((signal.shape[1],npar))
     A[:,2], A[:,3] = _ddint(ca, time)
+    if input_corr:
+        A[:,4] = ca
 
     fit = np.empty(signal.shape)
-    par = np.empty((signal.shape[0], 4))
+    par = np.empty((signal.shape[0], npar))
     for x in tqdm(
             range(signal.shape[0]), 
             desc='Fitting 2-comp model', 
@@ -964,7 +1093,12 @@ def _fit_2cm_lin_compute(signal, aif, time, baseline, progress_bar):
         A[:,1] = -cti
         p = np.linalg.lstsq(A, c, rcond=None)[0] 
         fit[x,:] = S0[x] + p[0]*A[:,0] + p[1]*A[:,1] + p[2]*A[:,2] + p[3]*A[:,3]
-        par[x,:] = _2cm_lin_params(p)
+        if input_corr:
+            fit[x,:] += p[4]*A[:,4]
+        if input_corr:
+            par[x,:] = _2cm_lin_params(p[:4]) + [p[4]]
+        else:
+            par[x,:] = _2cm_lin_params(p)
 
     # Apply bounds
     smax = np.amax(signal)
@@ -973,7 +1107,7 @@ def _fit_2cm_lin_compute(signal, aif, time, baseline, progress_bar):
 
     # Return in original shape
     fit = fit.reshape(shape)
-    par = par.reshape(shape[:-1] + (4,))
+    par = par.reshape(shape[:-1] + (npar,))
 
     return fit, par
 
