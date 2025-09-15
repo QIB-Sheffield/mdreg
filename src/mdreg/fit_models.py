@@ -230,6 +230,17 @@ def _fit_pixels_zarr(
 
 
 def fit_deconvolution(signals: np.ndarray, aif=None, tol=0.2, n0=1):
+    """Fits DCE signals with a model-free deconvolution
+
+    Args:
+        signals (np.ndarray): Input array
+        aif (np.ndarray, optional): Arterial input signal (1D). Defaults to None.
+        tol (float, optional): Cut-off value for the singular values. Defaults to 0.2.
+        n0 (int, optional): Baseline length. Defaults to 1.
+
+    Returns:
+        tuple: reconstructed signals, None
+    """
     shape = signals.shape
     signals = signals.reshape(-1, shape[-1])
 

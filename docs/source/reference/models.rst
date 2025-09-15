@@ -68,3 +68,5 @@ Functions to fit signal models directly to signal array data.
    fit_spgr_vfa
    fit_spgr_vfa_lin
    fit_2cm_lin
+   fit_pca
+   fit_deconvolution
