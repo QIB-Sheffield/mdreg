@@ -225,18 +225,19 @@ def coreg(
         )
     
     # Convert NumPy arrays to ANTs images
-    fixed = ants.from_numpy(fixed)
-    moving = ants.from_numpy(moving)
+    fixed_ants = ants.from_numpy(fixed)
+    moving_ants = ants.from_numpy(moving)
     if 'mask' in kwargs:
         kwargs['mask'] = ants.from_numpy(kwargs['mask'])
     if 'moving_mask' in kwargs:
         kwargs['moving_mask'] = ants.from_numpy(kwargs['moving_mask'])
 
     # Perform registration
-    registration = ants.registration(fixed, moving, **kwargs)
+    registration = ants.registration(fixed_ants, moving_ants, **kwargs)
 
     # Get the transformed moving image as an array
-    coreg = registration['warpedmovout'].numpy()
+    coreg_ants = registration['warpedmovout']
+    coreg = coreg_ants.numpy().astype(fixed.dtype)
 
     # Create return values
     transfo = registration['fwdtransforms']
@@ -274,18 +275,18 @@ def transform(moving, transfo, interpolator='linear'):
             "pip install mdreg[ants] if you want to use these features."
         )
     
-    moving = ants.from_numpy(moving)
+    moving_ants = ants.from_numpy(moving)
 
     # Apply transformation
-    warped_image = ants.apply_transforms(
-        fixed=moving, 
-        moving=moving, 
+    warped_image_ants = ants.apply_transforms(
+        fixed=moving_ants, 
+        moving=moving_ants, 
         transformlist=transfo,
         interpolator=interpolator,
     )
 
     # Return as numpy array
-    return warped_image.numpy()
+    return warped_image_ants.numpy().astype(moving.dtype)
 
 
 
