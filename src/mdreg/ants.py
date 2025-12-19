@@ -206,6 +206,8 @@ def coreg(
             to files on disk. If this is set to False, only the coregistered 
             image is returned and the transformations are deleted on disk.
             Defaults to True.
+        return_inverse (bool): If True, the path to the parameter file which
+            encodes the inverse transformation is returned.
         kwargs: Any keyword argument accepted by 
           `ants.registration <https://antspy.readthedocs.io/en/latest/registration.html>`_. 
           Note that array arguments need to be provided as numpy arrays rather 
