@@ -192,6 +192,7 @@ def coreg(
         moving: np.ndarray, 
         fixed: np.ndarray, 
         return_transfo = True,
+        return_inverse = False,
         **kwargs,
     ):
     """
@@ -205,6 +206,8 @@ def coreg(
             to files on disk. If this is set to False, only the coregistered 
             image is returned and the transformations are deleted on disk.
             Defaults to True.
+        return_inverse (bool): If True, the path to the parameter file which
+            encodes the inverse transformation is returned.
         kwargs: Any keyword argument accepted by 
           `ants.registration <https://antspy.readthedocs.io/en/latest/registration.html>`_. 
           Note that array arguments need to be provided as numpy arrays rather 
@@ -214,8 +217,12 @@ def coreg(
         coreg : np.ndarray
             The registered moving image.
         transfo : str | list
-            path or paths of parameter files encoding the transformation from moving 
-            to coregistered image 
+            path or paths of parameter files encoding the transformations.
+            If return_inverse = False, transfo contains the path(s) to the forward
+            transformation parameter file only (from moving to coregistered
+            image). If return_inverse = True, transfo is a list where each element
+            contains the path(s) to the forward and inverse (from coregistered to
+            moving image) transformation parameter files, respectively.
     """
 
     if not_installed:
@@ -240,7 +247,10 @@ def coreg(
     coreg = coreg_ants.numpy().astype(fixed.dtype)
 
     # Create return values
-    transfo = registration['fwdtransforms']
+    if return_inverse == True:
+        transfo = [registration['fwdtransforms'], registration['invtransforms']]
+    else:
+        transfo = registration['fwdtransforms']
     if not return_transfo:
         if isinstance(transfo, list):
             [os.remove(t) for t in transfo]
